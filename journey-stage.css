@@ -1,0 +1,57 @@
+/* A quiet black-box theatre. Original text remains the single accessible reading layer. */
+#section-journey{--paper:#030405;--ink:#ecedf0;--muted:#a4a7b0;--line:#ffffff24;--accent:#e6d4ac;--soft:#101216;--white:#14161b;background:#030405;color:var(--ink);isolation:isolate;overflow:clip;padding-top:clamp(75px,10vh,130px);padding-bottom:110px}
+#section-journey .section-content{position:relative;z-index:2;opacity:1;transform:none;translate:none;transition:none}
+#section-journey .journey-layout{perspective:1400px;gap:clamp(35px,6vw,100px);align-items:center}
+#section-journey .journey-copy{position:relative;transform-style:preserve-3d;transform:rotateX(var(--stage-pitch,0deg)) rotateY(var(--stage-yaw,0deg));transform-origin:50% 45%;transition:transform .65s cubic-bezier(.2,.7,.2,1);backface-visibility:hidden}
+#section-journey .page-heading{text-align:left;margin-bottom:35px}
+#section-journey .page-title-row{justify-content:flex-start}
+#section-journey .page-title-row h1{font-size:clamp(31px,3vw,48px);line-height:1.45;letter-spacing:3px;color:#f2f3f7;font-weight:400}
+#section-journey .page-heading>.eyebrow{color:#828792;letter-spacing:4px;font-size:9px}
+#section-journey .page-heading>p{color:#9095a0;font-size:12px}
+#section-journey .journey-milestone-title{font-size:clamp(18px,1.65vw,23px);color:#dedfe5;line-height:1.8;letter-spacing:1px;margin-bottom:28px}
+#section-journey .journey-story aside h2{font-size:13px;color:#a9afbc;letter-spacing:5px;margin-bottom:16px}
+#section-journey .journey-copy .prose{color:#c0c3cd;font-size:14px;line-height:2.2;letter-spacing:.35px;max-width:45ch}
+.journey-dimensional{position:relative;transform-style:preserve-3d}
+.journey-text-face{position:relative;display:block;transform:translateZ(4px);text-shadow:0 0 20px #dbe4ff0d,0 8px 18px #0008}
+.journey-text-depth{position:absolute;inset:0;display:block;color:#353a46;transform:translate3d(.6px,1px,var(--text-depth));pointer-events:none;user-select:none;text-shadow:.5px .5px #23262d}
+.prose .journey-text-face{transform:translateZ(2px);text-shadow:0 1px 1px #fff1}
+.prose .journey-text-depth{color:#424752;transform:translate3d(.35px,.6px,-1px)}
+.journey-fireflies{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+#section-journey .medal-exhibit{isolation:isolate;color:#e3e5eb}
+#section-journey .medal-stage{background:none;overflow:visible}
+.journey-beam{position:absolute;left:50%;top:-210px;bottom:12px;width:105%;transform:translateX(-50%);pointer-events:none;z-index:-1;overflow:visible}
+.journey-beam svg{width:100%;height:100%;overflow:visible}
+#section-journey .medal-shadow{bottom:30px;width:80%;height:45px;background:radial-gradient(ellipse,#edf3ff25, #dde8ff0b 45%,transparent 72%);filter:blur(13px)}
+#section-journey .medal-controls{position:relative;z-index:3}
+#section-journey .medal-controls p{color:#838997;font-size:10px;letter-spacing:1px}
+#section-journey .medal-controls button{color:#bac0cc;font-size:11px;transition:color .2s;text-shadow:0 0 14px #ffffff12}
+#section-journey .medal-controls button:hover,#section-journey .medal-controls button:focus-visible{color:#fff}
+#section-journey .medal-controls button:disabled{color:#737986}
+#section-journey .medal-controls>div{gap:14px}
+#section-journey [data-medal-asset] .medal-back>svg,#section-journey [data-medal-asset] .medal-edge,#section-journey [data-medal-asset] .medal-glint{display:none}
+.journey-active .topbar{background:#030405df;color:#e3e5eb;border-color:#ffffff14}
+.journey-active #navigation{background:#090b0f;color:#e3e5eb;border-color:#ffffff20}
+.journey-active #navigation .nav-link.active{color:#e6d4ac}
+@media(max-width:850px){#section-journey{padding-top:70px;padding-bottom:80px}#section-journey .journey-layout{gap:75px}#section-journey .journey-copy .prose{max-width:none}.journey-beam{top:-110px;bottom:12px;width:100%}#section-journey .medal-stage{height:500px}#section-journey .medal-controls>div{gap:10px}}
+@media(max-width:600px){#section-journey .journey-copy{transform:none!important}#section-journey .page-title-row h1{font-size:30px;letter-spacing:1px}#section-journey .journey-milestone-title{font-size:18px}#section-journey .medal-stage{height:440px}#section-journey .medal-controls>div{gap:7px}#section-journey .medal-controls button{font-size:10px}}
+@media(prefers-reduced-motion:reduce){#section-journey .journey-copy{transform:none!important;transition:none}.journey-text-face{transform:none}.journey-text-depth{display:none}}
+@media print{#section-journey{background:#fff;color:#111}.journey-fireflies,.journey-beam,.journey-text-depth{display:none}#section-journey .journey-copy,#section-journey .journey-text-face{transform:none!important;color:#111;text-shadow:none}}
+/* Keep the lit object in view beside the original long-form writing. */
+@media(min-width:851px){#section-journey .journey-layout{align-items:start}#section-journey .medal-exhibit{position:sticky;top:90px;margin-top:15px;align-self:start}#section-journey .medal-stage{height:clamp(440px,66svh,660px)}}
+#section-journey .journey-copy .prose{max-width:44em}
+.prose .journey-text-depth{opacity:.3}
+#section-journey{overflow:clip visible;z-index:1}
+/* V15: centred, quieter copy at the left; the object sits lower on stage. */
+#section-journey .section-content{max-width:1460px;width:100%}
+#section-journey .journey-copy{text-align:center}
+#section-journey .page-heading{text-align:center}
+#section-journey .page-title-row{justify-content:center}
+#section-journey .page-title-row h1{font-size:clamp(28px,2.5vw,40px)}
+#section-journey .journey-milestone-title{font-size:clamp(17px,1.4vw,20px)}
+#section-journey .journey-copy .prose{font-size:13px;max-width:42em;margin-inline:auto;line-height:2.15}
+#section-journey>.medal-controls{position:absolute;right:28px;bottom:24px;z-index:4;padding:0;border:0;max-width:calc(100% - 40px)}
+#section-journey>.medal-controls>div{justify-content:flex-end}
+@media(min-width:851px){#section-journey .journey-layout{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(45px,7vw,120px)}#section-journey .medal-exhibit{margin-top:75px;top:135px}}
+@media(max-width:850px){#section-journey{padding-bottom:120px}#section-journey .journey-copy .prose{font-size:14px}#section-journey>.medal-controls{right:20px;bottom:22px}#section-journey .medal-exhibit{margin-top:25px}}
+/* The medal, cone and copy share document movement during section transitions. */
+#section-journey .medal-exhibit{position:relative;top:auto}

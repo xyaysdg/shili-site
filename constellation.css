@@ -1,0 +1,69 @@
+.constellation-wall .flow-viewport,.constellation-wall.diagonal-wall .flow-viewport{height:640px;background:radial-gradient(ellipse at 48% 44%,#182741 0%,#0c162a 48%,#080f20 100%)}
+.constellation-wall .flow-viewport::before,.constellation-wall .flow-viewport::after{display:none}
+.constellation-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.constellation-stars{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.star-node{position:absolute;left:0;top:0;z-index:1;will-change:transform}
+.star-node.is-selected{z-index:6}
+.star-card{position:relative;display:block;width:100%;height:100%;padding:2px;border:1px solid #b4c9ef66;background:#101c33;box-shadow:0 0 14px #99b8ec14,0 3px 12px #0003;cursor:zoom-in;transform:scale(1);transition:transform 620ms cubic-bezier(.45,0,.25,1),box-shadow 620ms ease-in-out,border-color 620ms ease-in-out}
+.star-card::before{content:'';position:absolute;left:-4px;top:-4px;width:5px;height:5px;background:#e0e8ff;border-radius:50%;box-shadow:0 0 10px #b9cfffaa;pointer-events:none}
+.star-card img{width:100%;height:100%;object-fit:cover;pointer-events:none;user-select:none}
+.star-node.is-selected .star-card{transform:scale(var(--star-scale));border-color:#e0e9ffa3;box-shadow:0 12px 35px #0008,0 0 30px #a2bce532}
+.star-caption{position:absolute;top:calc(100% + 7px);left:0;right:0;white-space:nowrap;text-align:left;font-size:7px;line-height:1.5;letter-spacing:.7px;color:#e1e8d8;opacity:0;transition:opacity 350ms ease-in-out;pointer-events:none;overflow:hidden;text-overflow:ellipsis}
+.star-node.is-selected .star-caption{opacity:1}
+.star-card:focus-visible{outline:1px solid #e6edcf;outline-offset:5px}
+@media(max-width:600px){.constellation-wall.diagonal-wall .flow-viewport{height:570px}.star-card{padding:1px}}
+@media(prefers-reduced-motion:reduce){.star-card,.star-caption{transition:none}}
+
+/* A route-local night sky: title, navigation, field and tools share one palette. */
+body.pantheon-page{--paper:#090f21;--side:#0c1428;--ink:#e3e9f7;--muted:#a6b2cd;--line:#33415e;--accent:#d1c3a1;--white:#152039;--soft:#1c2b47;background:var(--paper);color:var(--ink);color-scheme:dark}
+.pantheon-page .site-shell{background-color:#090f21;background-image:radial-gradient(circle at 27px 43px,#cad9fb66 .7px,transparent 1.3px),radial-gradient(circle at 137px 109px,#a9c2f147 .8px,transparent 1.5px),radial-gradient(circle at 71px 179px,#f1e2c66b .65px,transparent 1.3px),radial-gradient(ellipse at 68% 34%,#22335b66,transparent 63%),radial-gradient(ellipse at 18% 74%,#2a204c44,transparent 55%);background-size:213px 257px,337px 311px,401px 379px,100% 100%,100% 100%}
+.pantheon-page .sidebar{background:linear-gradient(160deg,#111c33,#0a1225 80%);border-color:#809bc333}
+.pantheon-page .seal,.pantheon-page .small-seal{background:#adbcda;color:#101a2d;outline-color:#adbcda}
+.pantheon-page .nav-link.active{background:#243551;color:#eef2ff;box-shadow:inset 2px 0 #c6d7f4}
+.pantheon-page .nav-link.active .nav-number{opacity:.8}
+.pantheon-page .topbar{background:#0b1326b3;border-color:#8da4cd26}
+.pantheon-page .main-content>.page-heading{padding-bottom:36px}
+.pantheon-page .page-heading>.eyebrow{color:#a7badb;letter-spacing:3px}
+.pantheon-page .page-title-row h1{color:#e8edfa;text-shadow:0 0 35px #b6ccff19}
+.pantheon-page .main-content .page-heading>p{color:#bdcbe3;opacity:1}
+.pantheon-page .page-count{color:#d4ddf0}
+.pantheon-page .constellation-wall{background:transparent;border:1px solid #8da4cd30;box-shadow:0 16px 70px #00000018}
+.pantheon-page .constellation-wall .flow-top,.pantheon-page .constellation-wall .flow-bottom{background:#101b304d;color:#becce5;border-color:#8da4cd30}
+.pantheon-page .constellation-wall .flow-top{border-bottom:1px solid #8da4cd20}
+.pantheon-page .constellation-wall .flow-top>a{border-color:#adbfdd88;color:#e0e8f8}
+.pantheon-page .constellation-wall .flow-toggle{color:#e0e8f8}
+.pantheon-page .constellation-wall.diagonal-wall .flow-viewport,:root[data-theme=dark] .pantheon-page .constellation-wall.diagonal-wall .flow-viewport{background:radial-gradient(ellipse at 50% 48%,#253b5a45,transparent 75%)}
+.pantheon-page .footer{border-color:#8da4cd30;color:#9caccb}
+.pantheon-page .full-wall .image-wrap{background:#14213a}
+.lightbox[data-lightbox-gallery=pantheon]{background:#080f20f2;color:#e3e9f7}
+@media print{body.pantheon-page{--paper:white;--ink:#111;--muted:#555}.pantheon-page .site-shell{background:white}.pantheon-page .page-title-row h1{color:#111;text-shadow:none}}
+
+/* One uninterrupted sky, with quiet controls in opposite corners. */
+.pantheon-heading{text-align:center;padding:42px 0 12px}
+.pantheon-heading h1{font:400 28px/1.5 var(--serif);letter-spacing:8px;padding-left:8px;color:#e8edfa}
+.pantheon-heading p{font-size:11px;letter-spacing:3px;color:#a6b2cd;margin-top:12px}
+.pantheon-page .constellation-wall{position:relative;border:0;box-shadow:none;overflow:hidden}
+.pantheon-page .constellation-wall .flow-top,.pantheon-page .constellation-wall .flow-bottom{position:absolute;z-index:8;background:none;border:0;padding:0;min-height:0;width:auto}
+.pantheon-page .constellation-wall .flow-top{top:0;right:0}
+.pantheon-page .constellation-wall .flow-bottom{bottom:0;left:0}
+.pantheon-page .constellation-wall .flow-top>a,.pantheon-page .constellation-wall .flow-toggle{border:0;min-height:44px;display:inline-flex;align-items:center;padding:10px 12px;font-size:10px;letter-spacing:1px;opacity:.8;background:transparent;transition:opacity .25s}
+.pantheon-page .constellation-wall .flow-top>a:hover,.pantheon-page .constellation-wall .flow-toggle:hover{opacity:1}
+.pantheon-page .constellation-wall.diagonal-wall .flow-viewport,:root[data-theme=dark] .pantheon-page .constellation-wall.diagonal-wall .flow-viewport{height:clamp(520px,72vh,800px);background:transparent;overflow:hidden}
+@media(max-width:600px){.pantheon-heading{padding-top:30px}.pantheon-heading h1{font-size:24px;letter-spacing:6px;padding-left:6px}.pantheon-heading p{font-size:10px;letter-spacing:2px}.pantheon-page .constellation-wall.diagonal-wall .flow-viewport{height:580px}}
+
+/* The section itself is the canvas: no inner 1320px window or clipped seams. */
+#section-pantheon{padding:0;height:calc(100svh - 62px);min-height:600px;overflow:hidden;background-color:#090f21;background-image:radial-gradient(ellipse at 68% 34%,#22335b66,transparent 63%),radial-gradient(ellipse at 18% 74%,#2a204c33,transparent 55%);background-size:100% 100%}
+#section-pantheon .section-content{position:relative;width:100%;height:100%;max-width:none;opacity:1;transform:none;translate:none}
+#section-pantheon .pantheon-heading{position:absolute;z-index:9;inset:0 0 auto;padding:clamp(30px,4vh,52px) 0 0;pointer-events:none}
+#section-pantheon .constellation-wall{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;box-shadow:none;background:transparent}
+#section-pantheon .constellation-wall .flow-viewport{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:0}
+#section-pantheon .constellation-wall .flow-top{top:20px;right:clamp(14px,2.5vw,56px)}
+#section-pantheon .constellation-wall .flow-bottom{bottom:18px;left:clamp(14px,2.5vw,56px)}
+@media(max-width:700px){#section-pantheon{min-height:560px}#section-pantheon .constellation-wall .flow-top{top:100px;right:12px}}
+
+/* V40: opacity is driven by the same paused/visibility-aware clock as the field. */
+#section-pantheon .pantheon-heading{opacity:var(--pantheon-title,0)}
+.constellation-wall .star-node{will-change:transform,opacity}
+@media(prefers-reduced-motion:reduce){#section-pantheon .pantheon-heading{opacity:1}}
+
+.constellation-wall .star-card::before{opacity:var(--pantheon-stars,0)}

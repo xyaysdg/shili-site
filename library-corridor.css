@@ -1,0 +1,180 @@
+/* V9: a physical aisle, with four discoverable article volumes at a time. */
+#section-writing{height:max(820px,calc(100svh - 62px));min-height:820px;background:#fffefa;color:#a47039;isolation:isolate}
+#section-writing .section-content{perspective:none}
+#section-writing .page-heading{left:6%;top:37%;width:26%;z-index:6}
+#section-writing .page-title-row h1{font-size:clamp(25px,2vw,34px);font-weight:600;letter-spacing:1px;color:#b47a28}
+#section-writing .page-heading>p{font-size:clamp(12px,.9vw,15px);color:#ba853e;line-height:2.2}
+#section-writing .writing-tools{left:5%;bottom:9%;width:27%;z-index:7}
+#section-writing .shelf-results{inset:0;transform:none;perspective:none;transform-style:flat}
+#section-writing .shelf-results-heading{top:25px;right:28px;left:auto;z-index:6;margin:0;font-size:10px;gap:25px}
+#section-writing .section-content::after{z-index:4;background:linear-gradient(90deg,#fffefa 24%,#fffefaf7 32%,#fffefaad 40%,#fffefa33 54%,transparent 68%)}
+.library-viewport{position:absolute;inset:0;perspective:1200px;perspective-origin:30% 51%;touch-action:pan-y;cursor:grab;outline-offset:-4px;user-select:none;-webkit-user-select:none}
+.library-viewport.is-dragging{cursor:grabbing}
+.library-plane{position:absolute;width:2000px;height:135%;right:-150px;top:-17.5%;transform:rotateY(-55deg);transform-origin:100% 50%;transform-style:preserve-3d}
+.library-row{position:absolute;left:0;width:100%;height:25%;transform-style:preserve-3d}
+.library-row:nth-child(1){top:0}.library-row:nth-child(2){top:25%}.library-row:nth-child(3){top:50%}.library-row:nth-child(4){top:75%}
+.library-fillers{position:absolute;inset:0 0 20px;transform-style:preserve-3d;pointer-events:none}
+.library-dummy{position:absolute;bottom:0;width:var(--dummy-w);height:var(--dummy-h);transform-style:preserve-3d}
+.library-dummy i{position:absolute;display:block;border:1px solid #d6aa7580;background:#fffefa;box-shadow:inset 1px 0 #ead4b844}
+.dummy-spine{inset:0;border-radius:5px 3px 0 0;background:linear-gradient(90deg,#f8f1e5,#fffefa 28%,#fffefa 80%,#f5e8d6)!important}
+.dummy-spine::before,.dummy-spine::after{content:'';position:absolute;left:0;right:0;height:5px;border-block:1px solid #dbb78577}.dummy-spine::before{top:12%}.dummy-spine::after{bottom:13%}
+.dummy-cover{left:100%;top:0;width:160px;height:100%;transform-origin:left center;transform:rotateY(90deg);background:linear-gradient(90deg,#fffdf8,#faf5ed)!important}
+.dummy-top{left:0;top:0;width:100%;height:160px;transform-origin:center top;transform:rotateX(-90deg);background:repeating-linear-gradient(0deg,#fffefa 0 3px,#dfc7a34d 3px 4px)!important}
+.library-plank{position:absolute;left:-800px;bottom:20px;width:3400px;height:180px;transform-origin:center bottom;transform:rotateX(90deg);background:linear-gradient(#f7ebd9,#fffdfa);border:1px solid #d8b17a88;box-shadow:0 5px 22px #c49a6920}
+.library-plank-edge{position:absolute;left:-800px;bottom:0;width:3400px;height:20px;border-block:1px solid #d8b17a88;background:linear-gradient(#fffdf9,#f4e6d0);box-shadow:0 12px 18px #a7743a0c}
+.library-article-slot{position:absolute;bottom:20px;height:85%;width:42px;transform:translateZ(2px);transform-style:preserve-3d}
+#section-writing .library-article-slot .shelf-book{position:absolute;inset:0;display:block;width:42px;height:100%;z-index:auto;transform-style:preserve-3d;--cover-width:165px;--book-depth:165px;outline-offset:7px}
+#section-writing .library-article-slot .book-object{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 60%;transform:translateZ(0)!important;transition:transform 820ms cubic-bezier(.18,.75,.2,1);pointer-events:auto;opacity:1!important;will-change:auto}
+#section-writing .library-article-slot .shelf-book.is-previewed .book-object{transform:translateZ(180px) translateY(-8px) rotateZ(-2deg) rotateY(calc(-32deg + var(--pointer-yaw,0deg))) rotateX(var(--pointer-pitch,0deg))!important}
+#section-writing .library-article-slot .book-spine{border:1px solid #7b553c4d;background:linear-gradient(90deg,#fff4 0%,transparent 16%,#0001 82%,#0002),var(--book-color);backface-visibility:visible;border-radius:6px 2px 0 0;padding:20px 6px 15px;box-shadow:inset 3px 0 #fff3,inset -3px 0 #0001}
+#section-writing .library-article-slot .book-spine-title{font-size:14px;letter-spacing:1px;line-height:1.3;max-height:calc(100% - 35px)}
+#section-writing .library-article-slot .book-cover{visibility:visible;display:flex;position:absolute;left:100%;right:auto;top:0;width:165px;height:100%;padding:25px 20px;transform-origin:left center;transform:rotateY(90deg);backface-visibility:visible;background:linear-gradient(90deg,#0001,transparent 10%,#fff2),var(--book-color);border:1px solid #624a3333;box-shadow:inset -3px 0 #0001,inset 2px 0 #fff3;color:var(--book-ink);pointer-events:auto}
+#section-writing .library-article-slot .book-cover-title{font-size:18px;line-height:1.65;letter-spacing:1px;overflow-wrap:anywhere}.library-article-slot .book-cover-category{font-size:10px}.library-article-slot .book-cover-bottom{font-size:10px}
+.book-pages{position:absolute;display:block;background:repeating-linear-gradient(0deg,#fff9eb 0 2px,#ded0b24d 2px 3px);border:1px solid #b59b7040}
+.book-pages-top{left:3px;top:2px;width:36px;height:160px;transform-origin:center top;transform:rotateX(-90deg)}
+.book-pages-side{left:3px;top:3px;width:36px;height:calc(100% - 6px);transform:translateZ(-163px)}
+.book-back{position:absolute;left:0;top:0;width:165px;height:100%;transform-origin:left center;transform:rotateY(90deg);background:var(--book-color);border:1px solid #79543833}
+.library-controls{position:absolute;z-index:7;right:25px;bottom:20px;display:flex;align-items:center;gap:14px;color:#a58253;font-size:10px}
+.library-controls button{min-width:40px;min-height:40px;border:1px solid #c49c6333;background:#fffefaad;border-radius:50%;font-size:16px}.library-controls .library-index-toggle{border:0;border-radius:0;font-size:11px;padding:0 12px}
+.library-index{position:absolute;right:28px;bottom:72px;z-index:8;width:min(380px,85vw);max-height:65%;overflow:auto;padding:20px;background:#fffdf6f5;border:1px solid #d3b48766;box-shadow:0 16px 50px #79583816}.library-index:not([hidden]){display:grid;gap:16px}.library-index a{font:13px/1.6 var(--serif);color:#826443}
+#section-writing .empty-state{position:absolute;left:50%;top:40%;color:#90744b}
+/* Opening fills the viewport; the article is no longer squeezed into a small book. */
+.book-reader{padding:0;width:100vw;height:100dvh;background:#fffcf5;overflow:hidden}
+.book-reader::backdrop{background:#fffdf8}
+.book-reader-close{position:fixed;top:14px;right:24px;color:#65513b;z-index:6;background:#fffaf1d9;padding:0 15px;border-radius:22px}
+.book-spread{width:100vw;height:100dvh;max-height:none;max-width:none;margin:0;grid-template-columns:32% 68%;border-radius:0;box-shadow:none}
+.book-reader-folio{padding:clamp(28px,5vw,100px);background:linear-gradient(90deg,#f5efe1,#fffaf0 95%,#e3d7c2)}
+.book-reader-folio h2{font:400 clamp(26px,2.8vw,52px)/1.6 var(--serif)}
+.book-reader-content{padding:80px clamp(30px,5vw,115px) 80px;scrollbar-gutter:stable;background:linear-gradient(90deg,#ede1cc,#fffdf7 3%)}
+.book-reader-content .article-heading{display:none}.book-reader-content .article-body{font-size:clamp(18px,1.1vw,23px);line-height:2.05}.book-reader-content .article-body.large-type{font-size:26px}
+.book-reader-content .reading-page{max-width:none}.book-reader-content .reading-top{margin-bottom:32px}.book-reader-content .article-body p{margin-bottom:1.7em}
+.book-turn-cover{width:68%;transition:transform 1.15s cubic-bezier(.22,.7,.2,1),opacity .5s .6s}
+@media(max-width:900px){#section-writing .page-heading{left:4%;width:29%;top:34%}#section-writing .writing-tools{width:28%;left:4%;bottom:12%}.library-plane{right:-260px}.library-viewport{perspective:950px;perspective-origin:25% 50%}.book-spread{grid-template-columns:30% 70%}.book-reader-folio{padding:28px}.book-reader-content{padding:76px 28px 45px}.book-reader-folio h2{font-size:27px}}
+@media(max-width:600px){#section-writing{padding:0;height:calc(100svh - 62px);min-height:780px}#section-writing .page-heading{position:absolute;top:30px;left:20px;width:calc(100% - 40px);margin:0;text-align:left}#section-writing .page-title-row{justify-content:flex-start}#section-writing .page-heading>p{font-size:11px;max-width:300px}#section-writing .writing-tools{position:absolute;left:20px;bottom:76px;width:calc(100% - 40px);margin:0;display:flex;gap:10px;align-items:center}#section-writing .filter-list{flex-wrap:nowrap;overflow:auto;max-width:65%;gap:5px}#section-writing .filter{white-space:nowrap}#section-writing .inline-search{width:30%;margin:0}#section-writing .shelf-results{position:absolute;inset:180px 0 0;height:auto}#section-writing .shelf-results-heading{display:none}#section-writing .section-content::after{display:block;background:linear-gradient(180deg,#fffefa 0,transparent 25%,transparent 73%,#fffefa 91%);z-index:4}.library-plane{width:2000px;height:110%;top:-10%;right:-340px;transform:rotateY(-62deg)}.library-viewport{perspective:650px;perspective-origin:0 50%}.library-article-slot{height:83%}#section-writing .library-article-slot .book-cover-title{font-size:14px}.library-controls{bottom:14px;left:14px;right:14px;gap:7px;justify-content:space-between}.library-controls span{font-size:9px}.library-controls button{min-width:32px;min-height:36px}.library-index{bottom:58px;max-height:75%}.book-spread{display:grid;grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}.book-reader-folio{display:block;padding:58px 24px 18px;max-height:32dvh;overflow:auto;border:0;background:#f7f0e3}.book-reader-folio>span{display:none}.book-reader-folio h2{font-size:22px;margin:0 0 8px;line-height:1.5}.book-reader-folio p{margin:0;font-size:10px}.book-reader-content{padding:20px 24px 45px;height:auto}.book-reader-content .article-body{font-size:18px}.book-reader-close{top:8px;right:12px}.book-turn-cover{width:100%;padding:28px}}
+@media(prefers-reduced-motion:reduce){#section-writing .library-article-slot .book-object{transition:none}.book-turn-cover{transition:none}}
+@media(max-width:600px){.library-plane{right:-210px;height:94%;top:-9%}}
+@media(max-width:360px){.library-plane{right:-170px}}
+/* V10: only the architectural line work dissolves into the mist. */
+#section-writing .section-content::after{display:none}
+#section-writing .page-title-row h1{color:#c6ab73}
+.library-backplane{z-index:1;pointer-events:none}
+.library-fog{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(90deg,#fffefa 24%,#fffefaf7 32%,#fffefaad 40%,#fffefa33 54%,transparent 68%)}
+.library-articles-plane{z-index:3;pointer-events:none}
+.library-book-row{position:absolute;left:0;width:100%;height:25%;transform-style:preserve-3d}
+.library-book-row:nth-child(1){top:0}.library-book-row:nth-child(2){top:25%}.library-book-row:nth-child(3){top:50%}.library-book-row:nth-child(4){top:75%}
+.library-article-slot{pointer-events:auto}
+#section-writing .library-article-slot .shelf-book{--cover-width:inherit;--book-depth:inherit}
+#section-writing .library-article-slot .book-cover,.library-article-slot .book-back{width:var(--cover-width)}
+.library-article-slot .book-pages-top{height:calc(var(--book-depth) - 5px)}
+.library-article-slot .book-pages-side{transform:translateZ(calc(-1 * var(--book-depth) + 2px))}
+#section-writing .library-article-slot .book-cover,.library-article-slot .book-back,.library-article-slot .book-pages{visibility:hidden}
+#section-writing .library-article-slot .shelf-book.is-previewed :is(.book-cover,.book-back,.book-pages){visibility:visible}
+#section-writing .library-article-slot .shelf-book.is-previewed .book-object{transform:translateX(calc(-.82 * var(--cover-width))) translateZ(125px) translateY(-8px) rotateZ(-2deg) rotateY(calc(-32deg + var(--pointer-yaw,0deg))) rotateX(var(--pointer-pitch,0deg))!important}
+.library-letters{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden;user-select:none;color:#d1b57c;font-family:var(--serif)}
+.library-letters span{position:absolute;opacity:0;animation:library-letter-drift 18s ease-in-out infinite;will-change:transform,opacity}
+@keyframes library-letter-drift{0%,100%{opacity:0;transform:translateY(16px) rotate(var(--letter-angle))}30%{opacity:.25}65%{opacity:.18}90%{opacity:0;transform:translateY(-36px) rotate(calc(var(--letter-angle) + var(--letter-turn)))}}
+@media(max-width:600px){.library-fog{background:linear-gradient(180deg,#fffefa,transparent 25%,transparent 73%,#fffefa 91%)}.library-letters span{font-size:24px!important}}
+@media(prefers-reduced-motion:reduce){.library-letters span{animation:none;opacity:.13;transform:rotate(var(--letter-angle));will-change:auto}}
+/* V11: one shared depth scene; distance is a surface colour, never an opacity
+   or filter on a preserve-3d ancestor (those would flatten the book geometry). */
+#section-writing .page-heading>p{color:#ac9468;line-height:2.1}
+#section-writing .page-title-row h1{font-weight:400;color:#bfa66f}
+.library-plane{height:150%;top:-25%;transform-style:preserve-3d}
+.library-row{top:calc(var(--row) * 100% / 6)!important;height:calc(100% / 6);transform-style:preserve-3d}
+.library-fillers{pointer-events:none}
+.library-dummy{left:0;will-change:transform;--distance-fog:0%;--line-ink:color-mix(in srgb,#d4b488, #fffefa var(--distance-fog))}
+.library-dummy i{border-color:var(--line-ink);box-shadow:none}
+.dummy-spine{background:linear-gradient(90deg,color-mix(in srgb,#ead9bf,#fffefa var(--distance-fog)),#fffefa 22%,#fffefa 85%,color-mix(in srgb,#f2e5d1,#fffefa var(--distance-fog)))!important;box-shadow:2px 0 3px color-mix(in srgb,#96794b12,#fffefa var(--distance-fog))!important}
+.dummy-spine::before,.dummy-spine::after{border-color:color-mix(in srgb,var(--line-ink),#fffefa 35%)}
+.dummy-cover{background:linear-gradient(90deg,#fffefa,color-mix(in srgb,#eee2cd,#fffefa var(--distance-fog)))!important}
+.dummy-top{background:repeating-linear-gradient(0deg,#fffefa 0 3px,color-mix(in srgb,#e7d5b9,#fffefa var(--distance-fog)) 3px 4px)!important}
+.library-plank{background:linear-gradient(90deg,#fffefa 25%,#faf4e9 70%,#efe0c7);border-color:#e7d6ba88;box-shadow:0 5px 12px #aa885a0c}
+.library-plank-edge{border-color:#e7d6ba88;background:linear-gradient(90deg,#fffefa 24%,#faf5eb 55%,#f1e5d3);box-shadow:0 8px 14px #9473420c}
+.library-article-slot{left:0;--distance-fog:0%;--preview-scale:1;will-change:transform}
+#section-writing .library-article-slot .shelf-book{--surface:color-mix(in srgb,var(--book-color),#fffefa var(--distance-fog));--ink:color-mix(in srgb,var(--book-ink),#fffefa var(--distance-fog))}
+#section-writing .library-article-slot .book-object{transform-origin:50% 50%;transition:transform 950ms cubic-bezier(.22,.7,.2,1);will-change:transform}
+#section-writing .library-article-slot .book-spine{background:linear-gradient(90deg,#ffffff35,transparent 22%,#00000009 80%,#00000016),var(--surface);color:var(--ink);border-color:color-mix(in srgb,#755f48,#fffefa var(--distance-fog));border-radius:5px 2px 2px 4px;box-shadow:inset 3px 0 #fff3,inset -2px 0 #0001}
+#section-writing .library-article-slot .book-cover,.library-article-slot .book-back,.library-article-slot .book-pages{visibility:visible!important;backface-visibility:visible}
+#section-writing .library-article-slot .book-cover{padding:var(--cover-padding);background:linear-gradient(90deg,#00000018,transparent 9%,#ffffff12 90%,#00000012),var(--surface);color:var(--ink);border-color:color-mix(in srgb,#866e55,#fffefa var(--distance-fog));overflow:hidden;box-shadow:inset 3px 0 #ffffff30,inset -2px 0 #00000015;gap:0}
+.library-article-slot .book-back{background:var(--surface);border-color:color-mix(in srgb,#866e55,#fffefa var(--distance-fog))}
+.library-article-slot .book-pages{background:repeating-linear-gradient(0deg,#fff9eb 0 2px,#e2d7c5 2px 3px);border-color:#cab79c80}
+.library-article-slot .book-pages-bottom{left:3px;top:calc(100% - 2px);width:36px;height:calc(var(--book-depth) - 5px);transform-origin:center top;transform:rotateX(-90deg);background:#cfc1aa}
+#section-writing .library-article-slot .book-cover-title{font-size:var(--cover-title-size);line-height:1.5;letter-spacing:.03em;margin-top:.7em;min-height:0;overflow-wrap:anywhere}
+#section-writing .library-article-slot .book-cover-category{font-size:var(--cover-small-size);line-height:1.3;padding-bottom:.5em;flex-shrink:0}
+#section-writing .library-article-slot .book-cover-bottom{font-size:var(--cover-small-size);line-height:1.4;letter-spacing:0;padding-top:.8em;gap:.2em;flex-shrink:0}
+#section-writing .library-article-slot .book-cover-bottom time{font-size:inherit}
+#section-writing .library-article-slot .book-cover::before{inset:4%;border-color:#ffffff33}
+#section-writing .library-article-slot .shelf-book.is-previewed{--surface:var(--book-color);--ink:var(--book-ink)}
+#section-writing .library-article-slot .shelf-book.is-previewed .book-object{transform:translateX(calc(-.55 * var(--cover-width) + var(--preview-shift,0px))) translateZ(calc(var(--book-depth) + 32px)) translateY(calc(-10px + var(--preview-lift,0px))) rotateZ(-2deg) rotateY(calc(-32deg + var(--pointer-yaw,0deg))) rotateX(var(--pointer-pitch,0deg)) scale(var(--preview-scale))!important}
+#section-writing .library-article-slot .shelf-book:focus-visible{outline:none}
+#section-writing .library-article-slot .shelf-book:focus-visible .book-cover{outline:2px solid #a08b62;outline-offset:3px}
+.library-letters{z-index:0}
+#section-writing .writing-tools{bottom:6%;width:28%;padding:12px 0;border-top:1px solid #cfb58230}
+#section-writing .filter.active{background:#b8a277;color:#fffdf7}
+.library-controls{color:#9c8967;bottom:24px;gap:10px}
+.library-controls button{border-color:#c5b28d44;background:#fffefaee}
+#section-writing .shelf-results-heading{color:#a9987c;opacity:.8}
+@media(max-width:900px){.library-plane{right:-200px}.library-viewport{perspective-origin:25% 50%}}
+@media(max-width:600px){
+ #section-writing .shelf-results{inset:220px 0 0}
+ .library-plane{height:146%;top:-25%;right:-220px;transform:rotateY(-50deg)}
+ .library-viewport{perspective:900px;perspective-origin:20% 50%}
+ .library-article-slot{--preview-scale:2}
+ #section-writing .library-article-slot .book-object{transition-duration:650ms}
+ #section-writing .library-article-slot .book-spine{padding:9px 4px 6px}
+ #section-writing .library-article-slot .book-spine-title{font-size:10px;max-height:calc(100% - 20px)}
+ #section-writing .writing-tools{bottom:66px;width:calc(100% - 40px);padding:8px 0;background:#fffefaf2}
+ .library-controls{bottom:14px}
+ .library-letters{mask-image:linear-gradient(transparent 22%,#000 36%,#000 70%,transparent 83%)}
+}
+
+/* V24: a single motion shell keeps all book faces in the shared depth scene. */
+.library-article-slot .book-motion{position:absolute;inset:0;display:block;transform-style:preserve-3d;transform:translate3d(0,0,0)}
+#section-writing .library-article-slot .book-object,
+#section-writing .library-article-slot .shelf-book.is-previewed .book-object{transform:none!important;transition:none;will-change:auto}
+#section-writing .library-article-slot .shelf-book.is-previewed .book-motion{transform:translateX(calc(-.55 * var(--cover-width) + var(--preview-shift,0px))) translateZ(max(calc(var(--book-depth) + 40px),calc(var(--book-depth) * var(--preview-scale) + 40px))) translateY(calc(-10px + var(--preview-lift,0px))) rotateZ(-2deg) rotateY(-32deg) scale(var(--preview-scale))}
+.library-plank{height:var(--shelf-depth,180px)}
+@media(max-width:360px){.library-plane{right:-240px}}
+@media(prefers-reduced-motion:reduce){#section-writing .library-article-slot .book-object{transition:none;will-change:auto}}
+
+/* V12: preserve the original four-row camera; decoration continues outside it. */
+.library-plane{height:135%;top:-17.5%}
+.library-row{top:calc((var(--row) - 1) * 25%)!important;height:25%}
+/* Fade flat faces only. Opacity on a 3D parent would flatten the cuboid. */
+.library-dummy>i{opacity:var(--distance-alpha,1)}
+#section-writing .library-article-slot .book-object>span{opacity:var(--distance-alpha,1)}
+#section-writing .library-article-slot .shelf-book.is-previewed .book-object>span{opacity:1}
+#section-writing .shelf-book[data-distance-hidden]:not(.is-previewed),
+#section-writing .shelf-book[data-distance-hidden]:not(.is-previewed) *{pointer-events:none}
+#section-writing .library-article-slot .book-cover-title{line-height:1.35;letter-spacing:.015em;margin-top:.45em;flex-shrink:0}
+#section-writing .library-article-slot .book-cover-bottom{padding-top:.5em}
+.library-letters{z-index:5;color:#cfb16d;text-shadow:0 1px 10px #dfc78728}
+@keyframes library-letter-drift{
+ 0%,100%{opacity:0;transform:translate(0,35px) rotate(var(--letter-angle))}
+ 22%{opacity:.6}
+ 65%{opacity:.48}
+ 90%{opacity:0;transform:translate(var(--letter-dx),var(--letter-dy)) rotate(calc(var(--letter-angle) + var(--letter-turn)))}
+}
+@media(max-width:600px){
+ .library-plane{height:110%;top:-10%}
+ .library-letters span{font-size:32px!important}
+ .library-letters{mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent)}
+}
+@media(prefers-reduced-motion:reduce){.library-letters span{opacity:.35}}
+/* V15: the same world-space fade envelope on planks and book faces. */
+.library-plank,.library-plank-edge{mask-image:linear-gradient(90deg,transparent 26.47%,#00000021 34.56%,#00000066 42.65%,#000000c4 50.74%,#000 58.82%);border-color:#d4b488;box-shadow:none}
+#section-writing>.library-letters{z-index:20;color:#ffed8d;text-shadow:0 0 7px #ffed8d65,0 0 22px #ffed8d33;pointer-events:none}
+#section-writing{overflow:clip visible;z-index:1}
+.library-letters span{animation-timing-function:linear}
+.modal-open .library-letters span{animation-play-state:paused!important}
+@keyframes library-letter-drift{
+ 0%{opacity:0;transform:translate(0,35px) rotate(var(--letter-angle))}
+ 18%{opacity:.55}
+ 42%{opacity:.72}
+ 65%{opacity:.5}
+ 88%{opacity:0}
+ 100%{opacity:0;transform:translate(var(--letter-dx),var(--letter-dy)) rotate(calc(var(--letter-angle) + var(--letter-turn)))}
+}
+/* Pointer tilt lives inside the finished flight, so cancelling WAAPI cannot jump to a new pose. */
+#section-writing .library-article-slot .shelf-book .book-object,#section-writing .library-article-slot .shelf-book.is-previewed .book-object{transform:rotateY(var(--pointer-yaw,0deg)) rotateX(var(--pointer-pitch,0deg))!important;transition:transform 160ms ease-out}
+@media(prefers-reduced-motion:reduce){#section-writing .library-article-slot .book-object{transition:none}}

@@ -1,0 +1,59 @@
+/* Quiet, content-first interactions; no generated author copy. */
+.lightbox::backdrop{background:transparent}
+.lightbox .image-flight{position:fixed!important;z-index:8;max-width:none!important;max-height:none!important;object-fit:cover;pointer-events:none;visibility:visible!important;margin:0!important;box-shadow:0 18px 80px #0003}
+.lightbox-stage{overscroll-behavior:contain;scroll-behavior:auto;min-height:0}
+.lightbox-stage:focus-visible{outline-offset:-5px}
+.poetry-pages[hidden]{display:none}
+.poetry-pages{flex-shrink:0;display:flex;gap:4px;justify-content:flex-start;overflow-x:auto;width:max-content;max-width:calc(100% - 32px);margin:0 auto;padding:12px 0 20px;scrollbar-width:thin}
+.poetry-pages button{flex:0 0 40px;height:40px;font:12px Georgia,serif;border:1px solid transparent;border-radius:50%;transition:background .2s}
+.poetry-pages button:hover{background:var(--soft)}
+.poetry-pages [aria-current]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.poetry-reading{background:var(--paper);color:var(--ink)}
+.poetry-reading .lightbox-top{border-color:var(--line);min-height:68px;flex-shrink:0}
+.poetry-reading .lightbox-tool,.poetry-reading .icon-button{color:var(--ink)}
+.poetry-reading .lightbox-stage{display:block;padding:36px 70px 48px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.poetry-reading #lightbox-image{width:620px;max-width:100%;height:auto;max-height:none;margin:0 auto;box-shadow:0 5px 30px #202d2310}
+.poetry-reading.poetry-fit .lightbox-stage{display:flex;align-items:center;justify-content:center}
+.poetry-reading.poetry-fit #lightbox-image{width:auto;height:auto;max-height:100%;object-fit:contain;margin:0}
+.poetry-reading .image-prev,.poetry-reading .image-next{color:var(--ink);border-color:var(--line)}
+.poetry-reading .lightbox-caption:empty{display:none}
+.poetry-resume{display:block;margin:-6px 0 24px auto;border-bottom:1px solid var(--line);padding:9px 0;letter-spacing:.7px}
+.reading-meter{position:fixed;z-index:35;top:0;left:var(--side-width);right:0;height:2px;background:transparent;pointer-events:none}
+.reading-meter span{display:block;width:100%;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0)}
+.reading-top>div{flex-wrap:wrap;justify-content:flex-end}
+.reading-top button{min-height:40px}
+.article-body.relaxed-leading{line-height:2.5}
+.article-body .reading-anchor{scroll-margin-top:30px}
+.article-body h1.reading-anchor:first-child{display:block}
+.article-body h1.reading-anchor{font-size:1.5em;line-height:1.65}
+.article-toc{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0;margin:0 0 30px;font-family:var(--sans)}
+.article-toc summary{cursor:pointer;font-size:11px;letter-spacing:1px;min-height:24px}
+.article-toc nav{display:flex;flex-direction:column;gap:3px;padding-top:15px;max-height:55vh;overflow:auto;scrollbar-width:thin}
+.article-toc button{text-align:left;font-size:11px;line-height:1.8;color:var(--muted);border-left:1px solid var(--line);padding:8px 12px;overflow-wrap:anywhere}
+.article-toc button:hover,.article-toc [aria-current]{color:var(--ink);border-color:var(--accent);background:var(--soft)}
+@media(min-width:1250px){
+ .reading-page.has-toc{max-width:1040px;display:grid;grid-template-columns:minmax(0,760px) 175px;column-gap:46px;align-items:start}
+ .has-toc>.reading-top{grid-column:1/-1}
+ .has-toc>.article-heading,.has-toc>.article-body,.has-toc>.article-end,.has-toc>.article-neighbors{grid-column:1;min-width:0}
+ .has-toc>.article-toc{grid-column:2;grid-row:3;position:sticky;top:55px;margin:0;border-bottom:0;padding-top:18px}
+ .article-toc summary{list-style:none}
+ .article-toc summary::-webkit-details-marker{display:none}
+}
+@media(max-width:900px){.reading-meter{left:0}}
+@media(max-width:600px){
+ .poetry-reading .lightbox-top{padding:8px 13px;gap:4px;align-content:center}
+ .poetry-reading .lightbox-top>div{gap:10px}
+ .poetry-reading #lightbox-count{font-size:10px}
+ .poetry-reading .lightbox-stage{padding:20px 34px 30px}
+ .poetry-pages{padding:8px 0 12px;gap:2px}
+ .poetry-pages button{flex-basis:40px}
+ .reading-top{gap:10px;align-items:flex-start}
+ .reading-top>a{white-space:nowrap;padding-top:12px}
+ .reading-top>div{gap:0 12px}
+ .article-toc button{min-height:44px}
+}
+@media(prefers-reduced-motion:reduce){.poetry-pages button{transition:none}}
+@media print{.article-toc,.reading-meter{display:none!important}.reading-page.has-toc{display:block;max-width:none}}
+
+/* Keep source coordinates stable when opening a modal hides the page scrollbar. */
+html{scrollbar-gutter:stable}

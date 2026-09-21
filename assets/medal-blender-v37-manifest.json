@@ -1,0 +1,11 @@
+{
+  "sourceSha256": "3b6bfd1d80558984c54325245b882bcdb336fac7d9cf863879d49ea38e9bd512",
+  "glbSha256": "83341addb5c6031db0e581c4fb60dbe090d57cce7b739ee2d8a604878d3b5596",
+  "sourceModified": "2026-09-20T17:30:56.730577",
+  "blender": "5.2.2 LTS",
+  "sourceMeshes": 24,
+  "meshes": 27,
+  "triangles": 24826,
+  "materials": 11,
+  "images": 1
+}

@@ -1,0 +1,16 @@
+import * as T from './three.module.min.js';
+import {GLTFLoader} from './GLTFLoader.js';
+export async function loadChestnutModel(host){
+ const gltf=await new GLTFLoader().loadAsync('./assets/chestnut-v39.glb');
+ let renderer;
+ try{renderer=new T.WebGLRenderer({alpha:true,antialias:true,powerPreference:'low-power'});}catch(e){gltf.scene.traverse(o=>{o.geometry?.dispose();if(o.material)for(const m of(Array.isArray(o.material)?o.material:[o.material])){for(const t of Object.values(m))if(t?.isTexture)t.dispose();m.dispose();}});throw e;}
+ renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setClearColor(0,0);renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=.9;
+ const el=renderer.domElement;el.className='chestnut-model';el.setAttribute('aria-hidden','true');host.append(el);
+ const scene=new T.Scene(),camera=new T.PerspectiveCamera(32,1,.1,30),pivot=new T.Group();scene.add(pivot);camera.position.set(0,.15,4.4);camera.lookAt(0,0,0);
+ const box=new T.Box3().setFromObject(gltf.scene),size=box.getSize(new T.Vector3()),center=box.getCenter(new T.Vector3()),s=2.05/Math.max(size.x,size.y,size.z);
+ gltf.scene.scale.setScalar(s);gltf.scene.position.copy(center).multiplyScalar(-s);pivot.add(gltf.scene);pivot.rotation.z=-.22;
+ scene.add(new T.HemisphereLight(0xffedcb,0x543523,1.3));const light=new T.DirectionalLight(0xffe7c3,2.1);light.position.set(-2,4,5);scene.add(light);const rim=new T.DirectionalLight(0xffb254,1.8);rim.position.set(3,-1,-2);scene.add(rim);
+ gltf.scene.traverse(o=>{if(o.isMesh){o.material.roughness=Math.max(.55,o.material.roughness);o.material.metalness=Math.min(.25,o.material.metalness);}});
+ let previousSize=0,angle=.3,disposed=false;
+ return {draw({time,paused,handle,delta,clickAge=100,clickPointer=[0,0],holeScreen=[0,0],aspect=1,entrance=20,reduced=false}){if(disposed||!handle)return;const size=parseFloat(handle.style.width)*.76;if(size<1)return;if(Math.abs(size-previousSize)>2){renderer.setSize(size,size,false);previousSize=size;}el.style.width=el.style.height=size+'px';el.style.left=handle.style.left;el.style.top=handle.style.top;if(!paused)angle-=Math.min(delta,.1)*.075;pivot.rotation.y=angle;pivot.rotation.x=.12+Math.sin(time*.24)*.065;const distance=Math.hypot((holeScreen[0]-clickPointer[0])*aspect,holeScreen[1]-clickPointer[1]);const wave=Math.exp(-Math.pow((distance-clickAge*1.15)*4,2))*Math.exp(-clickAge*.8);light.intensity=2.1+wave*4;rim.intensity=1.8+wave*3;pivot.scale.setScalar(1+wave*.055);const arrive=reduced?1:T.MathUtils.smoothstep(entrance,1.3,3.7);el.style.opacity=arrive;el.style.translate='0 '+((1-arrive)*180).toFixed(2)+'px';host.dataset.modelPulse=wave.toFixed(4);host.dataset.modelPulsePeak=Math.max(+(host.dataset.modelPulsePeak||0),wave).toFixed(4);renderer.render(scene,camera);host.dataset.modelRotation=angle.toFixed(4);},destroy(){disposed=true;const resources=new Set();gltf.scene.traverse(o=>{if(o.geometry)resources.add(o.geometry);if(o.material)for(const m of(Array.isArray(o.material)?o.material:[o.material])){resources.add(m);for(const t of Object.values(m))if(t?.isTexture)resources.add(t);}});resources.forEach(o=>o.dispose());renderer.dispose();renderer.forceContextLoss();el.remove();}};
+}

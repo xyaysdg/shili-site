@@ -1,0 +1,107 @@
+/* Warm paper, braided ropes and clipped original photographs. */
+#section-photography{padding:0;height:100svh;min-height:740px;background:#fcfaf6;overflow:clip visible;z-index:2;isolation:isolate}
+#section-photography .section-content{position:relative;width:100%;height:100%;max-width:none;opacity:1;transform:none;translate:none}
+.photo-hanging,.photo-depths,.photo-depth{position:absolute;inset:0}
+.photo-hanging{--photo-fog:#fcfaf6;background:linear-gradient(var(--photo-fog),transparent 18%,transparent 82%,var(--photo-fog)),radial-gradient(ellipse at 48% 40%,#fffefa00,#ece5d71a 100%);isolation:isolate}
+.photo-depths{overflow:visible;clip-path:inset(-420px 0 -420px);cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.photo-depth{opacity:1;pointer-events:none}
+.photo-depth-far,.photo-depth-distant{filter:none}
+.photo-rope{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.photo-rope path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.rope-shadow{stroke:#6340222b;stroke-width:calc(var(--rope-width) + 2px);transform:translateY(2px)}
+.rope-body{stroke:#b98a59;stroke-width:var(--rope-width)}
+.rope-fibre{stroke:#e2b787;stroke-width:calc(var(--rope-width) * .85);stroke-dasharray:1.5 3.5;stroke-linecap:butt}
+.rope-light{stroke:#f5d5a9;stroke-width:calc(var(--rope-width) * .17);transform:translateY(-1px);opacity:.7}
+.photo-print{position:absolute;top:0;left:0;display:block;padding:5px 5px 9px;margin:0;border:1px solid #e1ddd4;background:#fffcf5;box-shadow:1px 3px 5px #53463413;transform-origin:50% -10px;color:inherit;pointer-events:none;will-change:transform}
+button.photo-print{cursor:grab;pointer-events:auto}
+.photo-print img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.photo-pin{position:absolute;left:calc(50% - 5px);top:-25px;width:10px;height:34px;transform:rotate(4deg);background:repeating-linear-gradient(90deg,#bf875200 0 2px,#e6b07b55 2px 3px),linear-gradient(90deg,#a36e41,#e2b382 34%,#b57f4c 83%,#92603a);border:1px solid #a67d5340;box-shadow:1px 2px 2px #60442140;border-radius:1px;pointer-events:none}
+.photo-pin::after{content:'';position:absolute;top:15px;left:0;right:0;height:2px;background:#7b573b8a}
+.photo-depth-middle .photo-pin{width:7px;height:25px;left:calc(50% - 3.5px);top:-19px}
+.photo-depth-far .photo-pin,.photo-depth-distant .photo-pin{width:4px;height:16px;left:calc(50% - 2px);top:-14px}
+.photo-depth-far .photo-pin::after,.photo-depth-distant .photo-pin::after{top:7px;height:1px}
+.photo-depth-far .photo-print{padding:2px 2px 4px;box-shadow:none}
+.photo-depth-distant .photo-print{padding:1px 1px 3px;box-shadow:none}
+.photo-depth-distant .photo-pin{width:2px;height:8px;left:calc(50% - 1px);top:-6px}
+.photo-depth-distant .photo-pin::after{display:none}
+.photo-copy{position:absolute;z-index:8;left:5.5%;top:13%;width:25%;max-width:360px;pointer-events:none;text-align:left;color:#8c795f}
+.photo-copy::before{content:none}
+#section-photography .photo-copy .page-heading{margin:0;padding:0;pointer-events:auto}
+#section-photography .photo-copy .eyebrow{font-size:9px;letter-spacing:3px;opacity:.58}
+#section-photography .photo-copy .page-title-row{justify-content:flex-start;margin:16px 0 22px}
+#section-photography .photo-copy h1{font:400 clamp(25px,2.3vw,38px)/1.6 var(--serif);color:#9c8260;letter-spacing:4px}
+#section-photography .photo-copy .page-heading>p{font:12px/2.4 var(--serif);color:#94816b;margin:0}
+.photo-wall-link{display:inline-flex;align-items:center;min-height:44px;font:11px var(--serif);letter-spacing:1px;margin-top:14px;color:inherit;pointer-events:auto;border-bottom:1px solid #aa947444}
+.photo-corner{position:absolute;z-index:9;bottom:66px;right:30px;display:flex;align-items:center;gap:25px;font:10px/1.5 var(--serif);letter-spacing:1px;color:#9c896e}
+.photo-corner a{padding:12px 0}
+.photo-hanging.is-dragging .photo-depths,.photo-hanging.is-dragging .photo-print{cursor:grabbing}
+.photo-print:focus-visible{outline:2px solid #b49569;outline-offset:6px}
+@media(hover:hover){button.photo-print:hover{box-shadow:0 9px 24px #54402d33;border-color:#baa07d}}
+:root[data-theme=dark] #section-photography{background:#20241f}
+:root[data-theme=dark] .photo-hanging{--photo-fog:#20241f}
+:root[data-theme=dark] #section-photography .photo-copy h1{color:#dac4a1}
+:root[data-theme=dark] #section-photography .photo-copy .page-heading>p,:root[data-theme=dark] .photo-corner{color:#b6aa96}
+@media(max-width:700px){
+ #section-photography.long-section{padding:0;height:max(900px,100svh);min-height:900px}
+ .photo-copy{left:25px;top:165px;width:calc(100% - 70px);max-width:310px}
+ #section-photography .photo-copy .eyebrow{font-size:8px}
+ #section-photography .photo-copy .page-title-row{margin:10px 0 12px}
+ #section-photography .photo-copy h1{font-size:25px}
+ #section-photography .photo-copy .page-heading>p{font-size:11px;line-height:2}
+ .photo-wall-link{font-size:10px;margin-top:10px}
+ .photo-corner{right:22px;bottom:max(66px,calc(900px - 100svh + 66px));gap:18px;font-size:9px}
+ .photo-print{padding:4px 4px 7px}
+ .photo-pin{height:27px;top:-20px;width:8px;left:calc(50% - 4px)}
+}
+@media(prefers-reduced-motion:reduce){.photo-print{will-change:auto}}
+@media print{#section-photography{height:1000px}.photo-corner,.photo-instruction{display:none}}
+
+/* Opaque atmospheric perspective: distant prints lose contrast, never their surface. */
+.photo-string{position:absolute;inset:0;animation:photo-string-breathe 16s ease-in-out infinite;animation-play-state:var(--photo-play-state,paused)}
+.photo-depth-foreground img{filter:saturate(.96)}
+.photo-depth-foreground .photo-print{box-shadow:1px 5px 12px #80674520,0 1px 2px #65513915}
+.photo-depth-middle .photo-print{box-shadow:1px 3px 6px #80674512}
+.photo-depth-middle .photo-print{background:#f7f3eb;border-color:#e9e1d6}
+.photo-depth-middle img{filter:saturate(.95) contrast(.88) brightness(1.06)}
+.photo-depth-far .photo-print,.photo-depth-distant .photo-print{background:var(--photo-fog);border-color:var(--photo-fog)}
+.photo-depth-far img{filter:saturate(.72) sepia(.08)}
+.photo-depth-distant img{filter:grayscale(.55) sepia(.14) saturate(.6)}
+/* Tint over an opaque photograph, so overlap never reveals another picture. */
+.photo-depth-far .photo-print::after,.photo-depth-distant .photo-print::after{content:'';position:absolute;inset:0;pointer-events:none;background:var(--photo-fog);opacity:var(--distance-veil,.58)}
+.photo-depth-distant .rope-shadow,.photo-depth-distant .rope-fibre,.photo-depth-distant .rope-light{display:none}
+.photo-depth-far .rope-body,.photo-depth-far .rope-shadow{stroke:#d6c7b1}
+.photo-depth-far .rope-fibre,.photo-depth-far .rope-light{stroke:#ebe0cf}
+.photo-depth-distant .rope-body,.photo-depth-distant .rope-shadow{stroke:#e9e1d5}
+.photo-depth-distant .rope-fibre,.photo-depth-distant .rope-light{stroke:#f4f0e9}
+.photo-depth-far .photo-pin{background:#d7c7af;border-color:#d7c7af;box-shadow:none}
+.photo-depth-distant .photo-pin{background:#e5dbcb;border-color:#e5dbcb;box-shadow:none}
+.photo-depth-far .photo-pin::after,.photo-depth-distant .photo-pin::after{background:#e2d7c7}
+@keyframes photo-string-breathe{0%,100%{translate:calc(var(--float-distance) * -.3) calc(-1 * var(--float-distance));rotate:-.2deg}38%{translate:calc(var(--float-distance) * .32) calc(var(--float-distance) * .8);rotate:.16deg}65%{translate:calc(var(--float-distance) * .18) var(--float-distance);rotate:.23deg}}
+:root[data-theme=dark] .photo-depth-far img{filter:saturate(.6) brightness(.68)}
+:root[data-theme=dark] .photo-depth-distant img{filter:grayscale(.7) brightness(.55)}
+:root[data-theme=dark] .photo-depth-far .rope-body,:root[data-theme=dark] .photo-depth-far .rope-shadow{stroke:#45494c}
+:root[data-theme=dark] .photo-depth-far .rope-fibre,:root[data-theme=dark] .photo-depth-far .rope-light{stroke:#52575a}
+:root[data-theme=dark] .photo-depth-distant .photo-rope path{stroke:#292e31}
+:root[data-theme=dark] .photo-depth-far .photo-pin{background:#41474a;border-color:#41474a}
+:root[data-theme=dark] .photo-depth-distant .photo-pin{background:#292e31;border-color:#292e31}
+
+
+/* Planar hanging photographs: keep motion and opaque distance, without a 3D room. */
+.photo-string{transform:translateY(calc(var(--photo-drag-y,0px) * var(--row-parallax,1)))}
+.photo-string:focus-within{animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){.photo-string{animation:none!important;rotate:none}}
+@media print{.photo-string{animation:none}}
+
+@media(max-width:700px){.photo-copy{top:140px}.photo-wall-link{min-height:36px;margin-top:6px}}
+/* The bridge keeps sparse far ropes visible independently of the section entrance. */
+.photo-bridge-decor{position:absolute;left:0;right:0;pointer-events:none;overflow:hidden;--photo-fog:#fcfaf6;--rope-width:1px;mask-image:linear-gradient(transparent,#000)}
+.photo-bridge-decor[data-edge=before]{bottom:0}
+.photo-bridge-decor[data-edge=after]{top:0;mask-image:linear-gradient(#000,transparent)}
+.photo-bridge-string{position:absolute;inset:0;pointer-events:none}
+.photo-bridge-decor .photo-print{will-change:auto;box-shadow:none;pointer-events:none}
+:root[data-theme=dark] .photo-bridge-decor{--photo-fog:#20241f}
+/* Bridge decoration shares the photograph entrance; it waits until the copy is legible. */
+.photo-bridge-decor{opacity:0}
+.photo-bridge-decor[data-scene-entrance="ready"]{opacity:1}
+.photo-hanging>.photo-wall-link{position:absolute;left:74px;bottom:14px;z-index:9;margin:0;min-height:40px;border:0;font-size:13px;line-height:1.5;display:inline-flex;align-items:center}
+@media(max-width:700px){.photo-hanging>.photo-wall-link{left:70px;font-size:12px;bottom:max(14px,calc(900px - 100svh + 14px))}}

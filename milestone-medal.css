@@ -1,0 +1,81 @@
+.medal-exhibit{--medal-size:390px;--medal-depth:12px;--medal-light-x:40%;--medal-light-angle:115deg;position:relative;isolation:isolate;border:1px solid var(--line);overflow:hidden;background:var(--paper);color:var(--ink)}
+.medal-exhibit-heading{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:24px 28px;border-bottom:1px solid var(--line)}
+.medal-exhibit-heading .eyebrow{font-size:9px;color:var(--muted);letter-spacing:2px;white-space:nowrap}
+.medal-exhibit-heading h2{font:12px/1.8 var(--sans);text-align:right;letter-spacing:.5px}
+.medal-stage{height:520px;display:grid;place-items:center;position:relative;perspective:1200px;background:radial-gradient(ellipse at 48% 33%,#fafbf5,transparent 70%),linear-gradient(135deg,#e6e8df,#d7dbd2)}
+.medal-shadow{position:absolute;bottom:38px;width:235px;height:27px;background:#172f2640;border-radius:50%;filter:blur(19px);pointer-events:none}
+.medal-orbit{width:var(--medal-size);height:var(--medal-size);position:relative;cursor:grab;touch-action:pan-y;user-select:none;transform-style:preserve-3d;outline-offset:10px}
+.medal-orbit:focus-visible{outline:1px dashed var(--muted);border-radius:50%}
+.is-dragging .medal-orbit{cursor:grabbing}
+.medal-rotor,.medal-edge{position:absolute;inset:0;transform-style:preserve-3d}
+.medal-face{position:absolute;inset:0;border-radius:50%;backface-visibility:hidden;background:conic-gradient(from var(--medal-light-angle),#dbe1d6,#69766e 8%,#e8eadd 17%,#b7b393 27%,#f8f6e5 35%,#78877f 45%,#e4e6d8 51%,#59675f 64%,#e3dfc3 76%,#9aa69d 88%,#dbe1d6);border:1px solid #cdd4c8;box-shadow:inset 0 0 0 2px #ffffef88,inset 0 0 0 5px #26383088}
+.medal-front{transform:translateZ(calc(var(--medal-depth) / 2))}
+.medal-back{transform:rotateY(180deg) translateZ(calc(var(--medal-depth) / 2))}
+.medal-face::after{content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none;background:linear-gradient(var(--medal-light-angle),transparent 28%,#eaf7e51a 43%,#ffffff1f 48%,transparent 57%),radial-gradient(circle at var(--medal-light-x) 16%,#ffffff16,transparent 65%)}
+.medal-face svg{display:block;width:100%;height:100%;border-radius:50%}
+.medal-edge i{position:absolute;left:50%;top:50%;width:calc(var(--medal-size) * .033);height:var(--medal-depth);transform:translate(-50%,-50%) rotateZ(var(--edge-angle)) translateY(calc(var(--medal-size) / -2)) rotateX(90deg);background:linear-gradient(#5c6a60,#d0d7c8 18%,#7f8c80 45%,#3d4d43 54%,#bdc5b4 83%,#4d5e50);filter:brightness(var(--edge-light));backface-visibility:hidden}
+.medal-face text{font-family:var(--sans);fill:#cdd7cd}
+.medal-face .medal-svg-value{font-family:Arial,var(--sans);font-size:114px;font-weight:800;font-style:italic;letter-spacing:-7px}
+.medal-face .medal-value-shadow{fill:#071612}
+.medal-face .medal-value-front{fill:url(#medal-silver-false)}
+.medal-svg-label{font-size:15px;letter-spacing:3px}
+.medal-face .medal-svg-year{font-size:15px;letter-spacing:5px;fill:#a8b8aa}
+.medal-svg-unit{font-size:24px;letter-spacing:3px}
+.medal-svg-small{font-size:15px;letter-spacing:1.5px}
+.medal-face .medal-svg-issued{fill:#9eaea0;font-size:13px;letter-spacing:3px}
+.medal-svg-back-title{font-size:33px;font-style:italic;font-weight:600;letter-spacing:1px}
+.medal-svg-date{font-size:27px;font-weight:500;letter-spacing:2px}
+.medal-controls{display:flex;justify-content:space-between;align-items:center;gap:16px;border-top:1px solid var(--line);padding:13px 25px}
+.medal-controls p{font-size:11px;color:var(--muted);letter-spacing:.5px}
+.medal-controls>div{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:flex-end}
+.medal-controls button{min-height:44px;font-size:11px;padding:0 3px}
+.medal-controls button:hover{color:var(--accent)}
+.medal-controls .medal-image{border-bottom:1px solid var(--line)}
+:root[data-theme=dark] .medal-stage{background:radial-gradient(ellipse at 48% 33%,#414b43,transparent 70%),linear-gradient(135deg,#252e28,#17221c)}
+@media(max-width:1100px){.medal-exhibit{--medal-size:350px}.medal-stage{height:480px}.medal-exhibit-heading{align-items:flex-start;flex-direction:column;gap:8px}.medal-exhibit-heading h2{text-align:left}.medal-controls{flex-wrap:wrap}}
+@media(max-width:600px){.medal-exhibit{--medal-size:min(70vw,300px);--medal-depth:10px}.medal-stage{height:360px;perspective:900px}.medal-exhibit-heading{padding:20px 17px}.medal-exhibit-heading h2{font-size:11px;letter-spacing:0}.medal-exhibit-heading .eyebrow{font-size:8px}.medal-shadow{width:165px;bottom:37px}.medal-controls{padding:10px 12px;flex-direction:column;gap:2px}.medal-controls>div{width:100%;gap:0;justify-content:space-between}.medal-controls button{font-size:10px}.medal-controls p{font-size:10px}}
+@media print{.medal-controls,.medal-shadow{display:none}.medal-rotor{transform:none!important}}
+@media(max-width:600px){.journey-story>aside{display:block}.journey-story>aside h2{margin-top:8px}}
+
+/* Emerald shield, metal frame and running-track relief from the supplied reference. */
+.medal-exhibit{--medal-size:370px;--medal-depth:16px}
+.medal-stage{height:550px;background:radial-gradient(ellipse at 50% 34%,#f4fff7,transparent 72%),linear-gradient(135deg,#e4ece6,#dae3de)}
+.medal-orbit{height:calc(var(--medal-size) * 1.12)}
+.medal-orbit:focus-visible{border-radius:8px;outline-offset:8px}
+.medal-face{border-radius:0;background:none;border:0;box-shadow:none}
+.medal-face svg{border-radius:0}
+.medal-face::after{display:none}
+.medal-glint{position:absolute;inset:0;pointer-events:none;clip-path:polygon(23% 8%,77% 8%,85% 15%,92% 70%,87% 76%,50% 99%,13% 76%,8% 70%,15% 15%);opacity:.5;background:linear-gradient(var(--medal-light-angle),transparent 25%,#e5ffdd28 45%,transparent 60%)}
+.medal-edge i{transform:translate(-50%,-50%) rotateZ(var(--edge-angle)) rotateX(90deg);background:linear-gradient(#edf5f5 0%,#faffff 9%,#71858c 13%,#bdcacc 28%,#566b72 42%,#344a51 55%,#92a5aa 71%,#ecf7f8 87%,#536b72 93%)}
+.medal-face .shield-value{font-family:Arial,var(--sans);font-size:89px;font-weight:700;letter-spacing:-5px;fill:url(#shield-letter-false);stroke:#c5d8bc;stroke-width:.7;paint-order:stroke fill}
+.medal-face .shield-km{font-size:39px;letter-spacing:-1px}
+.medal-face .shield-value-shadow{fill:#07553f;stroke:#07553f;opacity:.7}
+.medal-face .shield-running{font:600 30px Arial,var(--sans);letter-spacing:4px;fill:url(#shield-letter-false)}
+.medal-face .shield-running.shield-value-shadow{fill:#07553f}
+.shield-track{fill:none;stroke:url(#shield-letter-false);stroke-width:6;stroke-linejoin:round}
+.shield-track-shadow{fill:none;stroke:#075640;stroke-width:10;stroke-linejoin:round;opacity:.65}
+.shield-track .shield-track-ridge{stroke:#f4ffff;stroke-width:1.25;opacity:.85}
+.medal-face .shield-value:not(.shield-value-shadow),.medal-face .shield-running:not(.shield-value-shadow){stroke:#edfaf8;stroke-width:.65;paint-order:stroke fill;filter:url(#shield-relief-false)}
+.medal-face .shield-value-shadow{fill:#38564f;stroke:#29473f;opacity:1}
+.medal-webgl{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.has-webgl-medal .medal-rotor{visibility:hidden}
+.has-webgl-medal .medal-orbit{z-index:1}
+.medal-exhibit[data-medal-renderer=fallback] .medal-stage::after{content:'当前设备未能启用 3D，显示兼容预览';position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:10px;color:var(--muted);pointer-events:none}
+.medal-face .shield-back-label{font-size:16px;letter-spacing:2px;fill:#cee6d3}
+.medal-face .shield-back-title{font:700 42px Arial,var(--sans);fill:url(#shield-letter-true);letter-spacing:0}
+.medal-face .shield-date{font:500 28px Arial,var(--sans);fill:#e0ecda;letter-spacing:2px}
+@media(max-width:1100px){.medal-exhibit{--medal-size:340px}.medal-stage{height:510px}}
+@media(max-width:600px){.medal-exhibit{--medal-size:min(69vw,290px);--medal-depth:12px}.medal-stage{height:400px}.medal-shadow{bottom:37px}}
+.medal-front>svg{opacity:0}.medal-reference-front{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.journey-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(28px,5vw,90px);align-items:center}
+.journey-copy .page-heading{padding-top:0}.journey-milestone-title{font:400 22px/1.7 var(--serif);margin-bottom:30px}
+.journey-copy .journey-story{display:block;margin-top:0}.journey-copy .journey-story aside h2{font:16px/1.6 var(--serif);margin:0 0 18px}.journey-copy .prose{font-size:15px;line-height:2.2}
+.journey-layout .medal-exhibit{border:0;background:none;overflow:visible;--medal-size:clamp(300px,29vw,510px)}
+.journey-layout .medal-exhibit-heading{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);border:0}
+.journey-layout .medal-stage{height:clamp(500px,66vh,780px);background:none}
+.journey-layout .medal-controls{padding:10px 0;flex-direction:column;border:0}.journey-layout .medal-controls>div{justify-content:center;gap:16px}
+@media(max-width:850px){.journey-layout{grid-template-columns:1fr;gap:20px}.journey-copy .prose{font-size:14px}.journey-layout .medal-stage{height:460px}.journey-layout .medal-exhibit{--medal-size:min(72vw,350px)}}
+
+/* Blender model renders are used only while loading or when WebGL is unavailable. */
+[data-medal-asset="blender-v13"] .medal-back>svg,[data-medal-asset="blender-v13"] .medal-edge,[data-medal-asset="blender-v13"] .medal-glint{display:none}
+.medal-reference-back{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}

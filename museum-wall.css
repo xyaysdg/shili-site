@@ -1,0 +1,71 @@
+#section-art{padding:0;min-height:0;background:#102b3a;color:#e9e3d6}
+#section-art .section-content{max-width:none;opacity:1;transform:none}
+.museum-stage{height:calc(100svh - 62px);min-height:560px;position:relative;overflow:clip visible;isolation:isolate;opacity:var(--museum-presence,1);transition:opacity .18s ease-out}
+.museum-backdrop{position:absolute;inset:0;background:#102b3a;pointer-events:none}
+.museum-viewport{position:absolute;inset:0;overflow:clip visible;clip-path:inset(calc(-1 * var(--museum-overhang,4000px)) 0 0);cursor:grab;touch-action:pan-y;user-select:none;outline-offset:-4px;border:0}
+.museum-viewport.is-dragging,.museum-viewport.is-dragging button{cursor:grabbing}
+.museum-pictures{position:absolute;inset:0;pointer-events:none}
+.museum-frame{position:absolute;left:0;top:0;pointer-events:auto;display:block;padding:32px;background:#d7c7a7;border:0;border-radius:1px;box-shadow:0 13px 24px #0008,0 3px 5px #000a,inset 0 0 0 1px #493018,inset 0 0 0 2px #bf9958,inset 0 0 0 3px #d7b675,inset 0 0 0 4px #806036,inset 0 0 0 5px #47321e,inset 0 0 0 6px #654925,inset 0 0 0 7px #ad8242,inset 0 0 0 8px #d0a45b,inset 0 0 0 9px #b48a45,inset 0 0 0 10px #92703b,inset 0 0 0 11px #91703c,inset 0 0 0 12px #95713c,inset 0 0 0 13px #99733d,inset 0 0 0 14px #99743e,inset 0 0 0 15px #98733b,inset 0 0 0 16px #91703a,inset 0 0 0 17px #846235,inset 0 0 0 18px #6e4f2a,inset 0 0 0 19px #533a22,inset 0 0 0 20px #b98e4b,inset 0 0 0 21px #d4ae6d,inset 0 0 0 22px #c49e5e,inset 0 0 0 23px #876235,inset 0 0 0 24px #4f3720,inset 0 0 0 25px #bd975d,inset 0 0 0 26px #d6b881,inset 0 0 0 27px #79603a,inset 0 0 0 28px #d9ccad,inset 0 0 0 29px #c6b593,inset 0 0 0 30px #d7c7a7,inset 0 0 0 31px #d7c7a7,inset 0 0 0 32px #907b58;cursor:grab;will-change:transform}
+.museum-frame::after{content:'';position:absolute;inset:0;pointer-events:none;border:1px solid #987740;background:linear-gradient(135deg,transparent 40%,#63401c 44%,#d5b373 48%,#a6732e 52%,transparent 57%) top left/32px 32px no-repeat,linear-gradient(225deg,transparent 40%,#63401c 44%,#f5d795 48%,#a6732e 52%,transparent 57%) top right/32px 32px no-repeat,linear-gradient(45deg,transparent 40%,#63401c 44%,#f5d795 48%,#a6732e 52%,transparent 57%) bottom left/32px 32px no-repeat,linear-gradient(315deg,transparent 40%,#63401c 44%,#f5d795 48%,#a6732e 52%,transparent 57%) bottom right/32px 32px no-repeat}
+.museum-frame img{width:100%;height:100%;object-fit:contain;background:#eeeae3;pointer-events:none;user-select:none}
+.museum-frame:focus-visible{z-index:2;outline:2px solid #f5d795;outline-offset:4px}
+.museum-wall-label{position:absolute;left:0;top:0;pointer-events:auto;color:#e9e3d6;text-align:left;cursor:grab;padding:12px 10px;align-content:center}
+.museum-wall-label h1,.museum-label-title{font:400 var(--label-title,28px)/1.5 var(--serif);letter-spacing:3px;margin:0 0 14px}
+.museum-wall-label p{font:var(--label-body,13px)/1.9 var(--serif);letter-spacing:.4px;margin:0}
+.museum-wall-label .museum-drag-hint{margin-top:14px;font-size:11px;letter-spacing:1px;color:#b7c7cd}
+.museum-floor{position:absolute;z-index:3;inset:auto 0 0;height:56px;pointer-events:none;overflow:hidden;border-top:0;background:linear-gradient(180deg,#727c82,#9da6a9 64%,#818d93)}
+.museum-floor::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,#17232c22,transparent 30%),url("assets/museum-marble-v28.svg") 0 0/1100px 110px repeat-x;pointer-events:none}
+.museum-reflection{width:100%;height:56px;display:block;filter:blur(1.4px);opacity:.52;mask-image:linear-gradient(#000f,#000b 48%,transparent 100%)}
+.museum-visitor{position:absolute;z-index:4;left:29%;bottom:42px;width:32px!important;height:48px!important;min-width:32px;max-width:none;object-fit:contain;transform:translateX(-50%);pointer-events:none}
+.museum-tools{position:absolute;z-index:5;bottom:0;left:20px;right:20px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#deddd6;gap:20px;pointer-events:none}
+.museum-tools a{min-height:42px;display:flex;align-items:center;pointer-events:auto}.museum-tools p{margin:0}.museum-touch-help{display:none}
+.museum-floor{opacity:var(--entrance-floor,1)}
+.museum-visitor{opacity:var(--entrance-person,1)}
+/* The visitor faces the wall; the cast shadow trails straight behind their feet on the floor. */
+.museum-stage::after{content:'';position:absolute;z-index:3;left:29%;bottom:3px;width:18px;height:44px;transform:translateX(-50%);transform-origin:50% 3.5px;background:radial-gradient(ellipse 5px 3px at 50% 3.5px,#29261f75,transparent 100%),radial-gradient(ellipse 8px 34px at 50% 7px,#322d254d, #322d251c 48%,transparent 100%);filter:blur(1.9px);pointer-events:none;opacity:var(--entrance-person,1)}
+.museum-stage[data-departure]::after{transform:translate(-50%,calc(var(--departure-retreat,0)*160px));opacity:clamp(0,calc((1 - var(--departure-retreat,0))*3),1)}
+.museum-wall-label{opacity:var(--entrance-label,1)}
+.museum-frame{opacity:var(--painting-opacity,1)}
+.museum-reflection{opacity:calc(.52 * var(--entrance-reflection,1))}
+.museum-tools{opacity:var(--entrance-tools,1)}
+.museum-stage[data-entrance="waiting"] :is(.museum-floor,.museum-visitor,.museum-wall-label,.museum-frame,.museum-tools){opacity:0}
+.museum-stage[data-entrance="waiting"]::after{opacity:0}
+.museum-stage[data-entrance="playing"] .museum-frame{mask-image:none}
+.museum-stage:not([data-entrance="ready"]) .museum-viewport{cursor:default}
+/* Perspective is applied to a frozen copy of the wall; the live drag layout stays intact. */
+.museum-flight{position:absolute;inset:-62px 0 0;overflow:hidden;perspective:900px;perspective-origin:50% calc(50% + 31px);pointer-events:none;z-index:2}
+.museum-flight-world{position:absolute;inset:62px 0 0;transform-style:preserve-3d;will-change:transform}
+.museum-flight-canvas{display:block;width:100%;height:100%}
+.museum-flight-card{position:absolute;left:0;top:0;display:block;padding:32px;background:#98733b;border:0;border-radius:0;backface-visibility:hidden;will-change:transform;pointer-events:none;box-shadow:0 12px 28px #16151140,inset 0 0 0 1px #ceb37a}
+.museum-flight-card img{width:100%;height:100%;object-fit:contain;background:#eeeae3}
+.museum-stage[data-departure] .museum-pictures{visibility:hidden}
+.museum-stage[data-departure] .museum-wall-label{visibility:visible;opacity:calc(1 - var(--departure-lift,0))}
+.museum-stage[data-departure] .museum-floor{transform:translateY(calc(var(--departure-retreat,0)*160px));opacity:clamp(0,calc((1 - var(--departure-retreat,0))*3),1)}
+.museum-stage[data-departure] .museum-visitor{transform:translate(-50%,calc(var(--departure-retreat,0)*160px));opacity:clamp(0,calc((1 - var(--departure-retreat,0))*3),1)}
+.museum-stage[data-departure] .museum-tools{opacity:calc(1 - var(--departure-lift,0))}
+.museum-stage[data-departure="complete"] .museum-flight{visibility:hidden}
+/* Requested 25x document distance, not 50x waiting time. */
+.section-bridge{height:clamp(4000px,700svh,8000px);position:relative;pointer-events:none;background:linear-gradient(180deg,var(--bridge-from),color-mix(in srgb,var(--bridge-from) 60%,var(--bridge-to)) 40%,var(--bridge-to));overflow:hidden}
+.section-bridge[data-from="art"][data-to="photography"]{height:clamp(2200px,330svh,4400px);min-height:0}
+
+.intro-sequence::after{content:'';position:absolute;bottom:0;left:0;right:0;height:18svh;background:linear-gradient(transparent,#20170f);pointer-events:none}
+.long-section .section-content{translate:0 calc(-1 * var(--magnet-pull,0px));transition:translate .2s ease-out,opacity .4s ease-out,transform .5s ease-out}
+.intro-scene{translate:0 calc(-1 * var(--magnet-pull,0px));transition:translate .2s ease-out}
+@media(max-width:700px){.museum-stage{min-height:520px}.museum-tools{left:12px;right:12px;font-size:9px;gap:10px}.museum-mouse-help{display:none}.museum-touch-help{display:inline}.museum-wall-label{padding:10px 8px}.section-bridge{height:550svh;min-height:3500px}}
+@media(prefers-reduced-motion:reduce){.intro-scene,.long-section .section-content{translate:none!important;transition:none}}
+@media(prefers-reduced-motion:reduce){.museum-stage{opacity:1;transition:none}.museum-stage :is(.museum-floor,.museum-visitor,.museum-wall-label,.museum-frame,.museum-tools){opacity:1!important;mask-image:none!important}.museum-reflection{opacity:.52!important}}
+@media print{.museum-stage,.museum-stage :is(.museum-floor,.museum-visitor,.museum-wall-label,.museum-frame){opacity:1!important;mask-image:none!important}}
+
+/* Visible soles end 1.5px above the PNG box; keep this contact point during retreat. */
+.museum-visitor{transform-origin:50% calc(100% - 1.5px)}
+/* Eased color progression meets both solid sections without a hard change at either end. */
+.section-bridge[data-from="art"][data-to="photography"]{background:linear-gradient(180deg in oklab,var(--bridge-from) 0%,color-mix(in oklab,var(--bridge-from) 97%,var(--bridge-to)) 12%,color-mix(in oklab,var(--bridge-from) 86%,var(--bridge-to)) 25%,color-mix(in oklab,var(--bridge-from) 50%,var(--bridge-to)) 50%,color-mix(in oklab,var(--bridge-from) 14%,var(--bridge-to)) 75%,color-mix(in oklab,var(--bridge-from) 3%,var(--bridge-to)) 88%,var(--bridge-to) 100%)}
+
+#section-art{--bridge-bottom:#102b3a}
+#section-art:has(.museum-stage[data-departure])+.section-bridge{--bridge-from:#102b3a!important}
+.section-bridge{background:linear-gradient(180deg in oklab,var(--bridge-from) 0%,var(--bridge-from) 3%,color-mix(in oklab,var(--bridge-from) 92%,var(--bridge-to)) 22%,color-mix(in oklab,var(--bridge-from) 50%,var(--bridge-to)) 50%,color-mix(in oklab,var(--bridge-from) 8%,var(--bridge-to)) 78%,var(--bridge-to) 97%,var(--bridge-to) 100%)}
+
+/* V40: reflected visitor silhouette replaces the cast shadow. */
+.museum-stage::after{left:29%;bottom:-1px;width:32px;height:43px;transform:translateX(-50%) scaleY(-1);transform-origin:center;background:url('assets/museum-visitor-v29.png') center/32px 43px no-repeat;filter:blur(.45px);mask-image:linear-gradient(transparent,#0009 60%,#000d);opacity:calc(.5 * var(--entrance-person,1))}
+.museum-stage[data-departure]::after{transform:translate(-50%,calc(var(--departure-retreat,0)*160px)) scaleY(-1)}
+.museum-reflection{filter:blur(.55px);opacity:calc(.65 * var(--entrance-reflection,1));mask-image:linear-gradient(#000e,#0009 45%,transparent)}

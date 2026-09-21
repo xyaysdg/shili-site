@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f5f3ec">
+  <meta name="description" content="欢迎来到十里的内陆帝国。绘画、摄影、诗歌、文字与生活的个人记录。">
+  <title>十里 · 内陆帝国</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="reading-experience.css">
+  <link rel="stylesheet" href="constellation.css">
+  <link rel="stylesheet" href="milestone-medal.css">
+  <link rel="stylesheet" href="article-shelf.css">
+  <link rel="stylesheet" href="long-page.css">
+  <link rel="stylesheet" href="museum-wall.css">
+  <link rel="stylesheet" href="library-corridor.css">
+  <link rel="stylesheet" href="journey-stage.css">
+  <link rel="stylesheet" href="corner-layout.css">
+  <link rel="stylesheet" href="photography-hanging.css">
+  <script src="photography-hanging.js" defer></script>
+  <script src="section-entrance.js" defer></script>
+  <script src="journey-stage.js" defer></script>
+  <script src="content.js" defer></script>
+  <script src="wall-motion.js" defer></script>
+  <script src="constellation.js" defer></script>
+  <script src="reading-experience.js" defer></script>
+  <script src="milestone-medal.js" defer></script>
+  <script src="article-shelf.js" defer></script>
+  <script src="library-corridor.js" defer></script>
+  <script src="long-page.js" defer></script>
+  <script src="magnetic-scroll.js" defer></script>
+  <script src="museum-wall.js" defer></script>
+  <link rel="stylesheet" href="poetry-garden.css">
+  <script src="poetry-garden.js" defer></script>
+  <link rel="stylesheet" href="chestnut-gravity.css">
+  <script src="chestnut-gravity.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <div class="mobile-shade" id="mobile-shade"></div>
+  <div class="site-shell">
+    <div class="site-corners"><a class="corner-brand" href="#/home" aria-label="十里先生，返回首页">十里<br>先生</a><span id="breadcrumb" hidden></span><nav id="navigation" aria-label="主导航"></nav><div class="corner-tools"><button id="theme-toggle" class="text-tool" aria-label="切换深色模式">◐ <span>夜读模式</span></button></div></div>
+    <main id="main" tabindex="-1"></main>
+    <footer class="footer"><a href="#/home">十里 <span>SHILI</span></a><p>嘿嘿，有人知道我为什么名为十里吗</p><a href="#/contact">超微型栗子对撞机 ↗</a></footer>
+  </div>
+  <dialog id="lightbox" class="lightbox" aria-label="作品大图"><div class="lightbox-top"><span id="lightbox-count"></span><div><a id="lightbox-wall" class="lightbox-tool" hidden></a><button id="zoom-toggle" class="lightbox-tool" aria-label="放大作品">放大 ＋</button><a id="image-download" class="lightbox-tool" download>下载 ↓</a><button id="lightbox-close" class="icon-button" aria-label="关闭大图">×</button></div></div><button id="lightbox-prev" class="image-prev" aria-label="上一张作品">←</button><div class="lightbox-stage"><img id="lightbox-image" alt=""></div><button id="lightbox-next" class="image-next" aria-label="下一张作品">→</button><div class="lightbox-caption" id="lightbox-caption"></div></dialog>
+  <dialog id="search-dialog" class="search-dialog" aria-label="搜索文章和栏目"><form method="dialog" class="search-heading"><span>搜索文章和栏目</span><button class="icon-button" aria-label="关闭搜索">×</button></form><label class="visually-hidden" for="global-search">搜索关键词</label><input id="global-search" type="search" placeholder="搜索文章、关键词或栏目…" autocomplete="off"><div id="search-results" aria-live="polite"></div><p class="search-hint">输入关键词搜索全文 · 按 Esc 返回</p></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <noscript><div class="noscript">请启用 JavaScript 阅读完整作品集，或<a href="https://xyay.mysxl.cn/">访问原站</a>。</div></noscript>
+</body>
+</html>

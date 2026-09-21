@@ -1,0 +1,94 @@
+/* The sidebar is replaced by a corner index; no content is a fixed-height trap. */
+html{scroll-behavior:auto;scroll-padding-top:76px}
+body{overflow-x:clip}
+.site-shell{margin-left:0;min-width:0}
+.main-content{max-width:1440px;margin:auto;padding:80px 64px 0}
+.main-content.long-page{max-width:none;padding:0}
+.topbar{position:fixed;inset:0 0 auto;z-index:25;height:66px;display:flex;justify-content:space-between;padding:0 34px;background:color-mix(in srgb,var(--paper) 94%,transparent);border-bottom:1px solid var(--line);transition:background .65s,color .65s,border-color .65s;backdrop-filter:blur(14px)}
+.corner-brand{font:19px var(--serif);letter-spacing:3px}
+.corner-tools{display:flex;align-items:center;gap:24px}
+.topbar .menu-toggle{display:inline-flex;width:auto;min-width:44px;font:12px var(--sans);margin:0}
+.topbar #theme-toggle,.topbar #search-open{font-size:11px;min-height:44px}
+#navigation{display:none;position:absolute;right:25px;top:76px;width:400px;padding:22px;background:var(--paper);border:1px solid var(--line);box-shadow:0 15px 60px #0002;max-height:calc(100dvh - 95px);overflow:auto}
+.menu-open #navigation{display:grid;grid-template-columns:1fr 1fr;gap:5px 14px}
+#navigation .nav-link{padding:12px 8px;font-size:12px;min-height:44px;white-space:normal;display:block;background:none;box-shadow:none;transition:color .4s,opacity .4s}
+#navigation .nav-link.active{color:var(--accent)}
+.mobile-shade{display:none!important}
+.menu-open #mobile-shade{display:block!important;position:fixed;inset:66px 0 0;background:#0005;z-index:24}
+.intro-active .topbar{background:transparent;color:white;border-color:transparent;backdrop-filter:none}
+.intro-active .corner-brand{opacity:0;pointer-events:none;visibility:hidden}
+.intro-active .corner-tools{opacity:0;pointer-events:none;visibility:hidden}
+.intro-active #navigation{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;top:22px;right:28px;width:48%;max-height:none;overflow:visible;padding:0;background:none;border:0;box-shadow:none}
+.intro-active #navigation .nav-link{writing-mode:vertical-rl;text-orientation:upright;letter-spacing:4px;line-height:1.55;padding:0 9px;font-size:12px;color:#fff;opacity:.43;max-height:320px}
+.intro-active #navigation .nav-link.active,.intro-active #navigation .nav-link:hover,.intro-active #navigation .nav-link:focus-visible{opacity:1;color:#fff}
+.intro-active #navigation .nav-link.active{font-size:15px}
+.intro-sequence{position:relative;background:#20170f;color:#fff}
+.intro-backdrop{position:sticky;top:0;height:100svh;overflow:hidden;pointer-events:none}
+.intro-atmosphere{position:absolute;inset:0;background:url('assets/hero-warm-cafe-v1.webp') center/cover no-repeat}
+.intro-portrait{position:absolute;left:0;top:0;width:57%;height:100%;object-fit:cover;object-position:center 43%;mask-image:linear-gradient(90deg,#000 80%,transparent 100%)}
+.intro-shade{position:absolute;inset:0;background:linear-gradient(90deg,transparent 42%,#160b0505 65%,#160b051c 100%)}
+.intro-signature{position:absolute;bottom:25px;left:25px;color:#fff9;font:25px/1.55 var(--serif);letter-spacing:4px}
+.intro-story{position:relative;margin-top:-100svh}
+.merged-intro{min-height:100svh;padding-top:42svh;padding-bottom:9svh;align-items:flex-start}
+.merged-intro .intro-about{margin-top:48px}
+.merged-intro .intro-about p{font-size:12px;line-height:1.85}
+.merged-intro .intro-about h2{font-size:15px;margin-bottom:12px}
+.merged-intro .intro-about h3{font-size:13px;margin-bottom:8px}
+.merged-intro .intro-bio{margin-top:20px}
+.merged-intro .intro-bio p+p{margin-top:8px}
+.merged-intro .intro-welcome>p{margin-top:8px;font-size:15px}
+.intro-scene{position:relative;display:flex;justify-content:flex-end;padding-left:52%;padding-right:4%;color:#fff}
+.welcome-scene{min-height:66svh;align-items:flex-end;padding-bottom:10svh}
+.intro-copy{width:100%;text-align:center}
+.intro-copy h1{font:400 clamp(23px,2.15vw,42px)/1.4 'Times New Roman',var(--serif);white-space:nowrap;letter-spacing:0}
+.intro-copy h2{font:400 18px/1.8 var(--serif);margin-bottom:12px}
+.intro-copy h3{font:400 15px/1.8 var(--serif);margin-bottom:10px}
+.intro-copy p{font:14px/2 var(--serif);margin:0}
+.welcome-scene .intro-copy>p{font-size:16px;margin-top:8px}
+.about-scene{min-height:112svh;padding-top:0;padding-bottom:32svh;align-items:flex-start}
+.intro-about-title{margin-bottom:8px}
+.intro-bio{margin-top:26px}
+.intro-bio p+p{margin-top:12px}
+.focus-copy{color:#fff;will-change:opacity;opacity:.15}
+.long-section{--section-arrival:1;position:relative;min-height:100svh;padding:62px max(6vw,28px) 100px;background:var(--paper);scroll-margin-top:64px}
+.long-section:nth-child(odd){background:color-mix(in srgb,var(--paper) 95%,var(--ink) 5%)}
+.section-content{max-width:1320px;margin:auto;opacity:calc(.5 + var(--section-arrival)*.5);transform:translateY(calc((1 - var(--section-arrival))*35px));transition:opacity .4s ease-out,transform .5s ease-out}
+.long-section .page-heading{padding-top:35px}
+.long-section .page-title-row h1{font-size:40px}
+.long-section .page-heading>.eyebrow{font-size:10px}
+.long-section .friend-feature{max-width:1000px;margin:0 auto}
+.long-section.pantheon-page{--paper:#090f21;--ink:#e3e9f7;--muted:#a6b2cd;--line:#33415e;--accent:#d1c3a1;--white:#152039;--soft:#1c2b47;color:var(--ink);background-color:#090f21;background-image:radial-gradient(circle at 27px 43px,#cad9fb66 .7px,transparent 1.3px),radial-gradient(circle at 137px 109px,#a9c2f147 .8px,transparent 1.5px),radial-gradient(ellipse at 68% 34%,#22335b66,transparent 63%);background-size:213px 257px,337px 311px,100% 100%}
+.sky-active .topbar{background:#0b1326dc;color:#e3e9f7;border-color:#33415e}
+.sky-active #navigation{background:#0b1326;color:#e3e9f7;border-color:#33415e}
+.long-page+.footer{margin:0;padding:35px max(6vw,28px);background:var(--paper)}
+.footer{margin:50px 64px 0}
+@media(min-width:1800px){.intro-copy h1{font-size:42px}.intro-copy p{font-size:16px}}
+@media(max-width:1100px) and (min-width:701px){.intro-active #navigation{width:54%;gap:2px;right:15px}.intro-active #navigation .nav-link{font-size:10px;padding:0 6px;letter-spacing:3px}.intro-active #navigation .nav-link.active{font-size:12px}.intro-scene{padding-left:47%;padding-right:3%}.intro-copy h1{font-size:clamp(19px,2.5vw,26px)}.intro-copy p{font-size:12px}.intro-portrait{width:61%}}
+@media(max-width:700px){.main-content{padding:85px 22px 0}.topbar{padding:0 20px;height:62px}.corner-tools{gap:16px}.corner-tools #theme-toggle{display:none}.corner-brand{font-size:17px}.intro-active .corner-tools{opacity:1;pointer-events:auto}.intro-active .corner-tools #search-open{display:none}.intro-active .corner-brand{opacity:.8;pointer-events:auto}.intro-active #navigation,#navigation{display:none;writing-mode:horizontal-tb;right:14px;top:72px;width:min(360px,calc(100vw - 28px));padding:18px;background:var(--paper);border:1px solid var(--line);max-height:calc(100dvh - 90px);overflow:auto}.menu-open #navigation,.intro-active.menu-open #navigation{display:grid;grid-template-columns:1fr 1fr;gap:3px 9px}.intro-active #navigation{background:#191310f5;border-color:#ffffff30}.intro-active #navigation .nav-link{writing-mode:horizontal-tb;text-orientation:mixed;font-size:12px!important;letter-spacing:0;padding:12px 8px;line-height:1.8;max-height:none;opacity:.65}.intro-active #navigation .nav-link.active{opacity:1}.intro-portrait{width:100%;object-position:43% center;mask-image:none;opacity:.8}.intro-shade{background:linear-gradient(180deg,#0003,#0001 25%,#140c08b8 55%,#140c08ed)}.intro-atmosphere{display:none}.intro-scene{padding-left:8%;padding-right:8%}.welcome-scene{min-height:82svh;padding-bottom:8svh}.intro-copy h1{font-size:clamp(19px,5.1vw,29px);white-space:normal;text-wrap:balance}.welcome-scene .intro-copy>p{font-size:13px}.intro-copy p{font-size:14px;line-height:2}.about-scene{min-height:112svh;padding-top:4svh;padding-bottom:26svh}.intro-bio{margin-top:25px}.intro-signature{left:18px;bottom:20px;font-size:18px;opacity:.6}.long-section{padding:48px 22px 70px;min-height:100svh}.long-section .page-title-row h1{font-size:30px}.section-content{transform:none}.long-section .page-heading{padding-top:20px}.footer{margin:40px 22px 0}.long-page+.footer{padding:28px 22px}}
+@media(prefers-reduced-motion:reduce){.focus-copy{opacity:1!important;filter:none!important}.section-content{transform:none!important;opacity:1!important;transition:none}.topbar,#navigation .nav-link{transition:none}}
+@media(max-width:700px){.intro-active .corner-brand,.intro-active .corner-tools{visibility:visible}}
+@media(max-width:700px){.welcome-scene{min-height:74svh;padding-bottom:18svh}.merged-intro{padding-top:40svh;padding-bottom:10svh}.merged-intro .intro-about{margin-top:35px}.merged-intro .intro-about p{font-size:13px;line-height:1.95}.merged-intro .intro-welcome>p{font-size:13px}}
+@media print{.topbar,.intro-backdrop{display:none}.intro-story{margin:0}.intro-scene{padding:20px;min-height:0;color:#111}.focus-copy{color:#111;opacity:1!important;filter:none!important}.long-section{min-height:0;padding:20px;break-before:page}.section-content{opacity:1;transform:none}.intro-sequence{background:white}}
+/* The last biography block must be able to reach the reading centre before snapping. */
+.merged-intro{padding-bottom:56svh}
+.merged-intro .intro-about{margin-top:21svh}
+.merged-intro .intro-bio{margin-top:5.5svh}
+#welcome-title{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;font-size:clamp(18px,2.05vw,42px);font-weight:400}
+.nav-number{display:inline-block;font:9px/1.5 var(--sans);opacity:.6;margin-right:8px;letter-spacing:1px}
+@media(min-width:701px){
+ .intro-active #navigation{width:auto;left:68.2%;right:28px;top:clamp(12px,1.75vh,22px);gap:0;justify-content:space-between}
+ .intro-active #navigation .nav-link{display:flex;flex-direction:column;align-items:center;writing-mode:horizontal-tb;padding:0 4px;margin:0;gap:0;min-width:20px;min-height:44px;max-height:none;font-size:clamp(9px,.52vw,12px);letter-spacing:2px;line-height:1.6;transform:rotate(5deg);transform-origin:50% 0;opacity:.58}
+ .intro-active #navigation .nav-link.active{font-size:clamp(11px,.61vw,14px)}
+ .intro-active #navigation .nav-number{font-size:clamp(9px,.48vw,11px);letter-spacing:.5px;margin:0 0 9px;writing-mode:horizontal-tb;color:inherit}
+ .intro-active #navigation .nav-label{writing-mode:vertical-rl;text-orientation:upright}
+}
+@media(max-width:700px){.merged-intro{padding-bottom:56svh}.merged-intro .intro-about{margin-top:24svh}.merged-intro .intro-bio{margin-top:4.5svh}#welcome-title{font-size:clamp(18px,4.6vw,26px)}}
+@media print{.merged-intro{padding:20px}.merged-intro .intro-about,.merged-intro .intro-bio{margin-top:20px}}
+.intro-signature{left:16px;bottom:16px;font:10px/1.5 var(--serif);letter-spacing:2px}
+/* V15: compact top spacing and a gentle counterclockwise hover. */
+.nav-number{margin:0 0 0 8px}
+#navigation .nav-link{transition:opacity .35s ease,transform .45s cubic-bezier(.2,.7,.2,1)}
+@media(hover:hover){#navigation .nav-link:hover{transform:rotate(-5deg) scale(1.07);opacity:1}}
+@media(min-width:701px){.intro-active #navigation .nav-number{margin:9px 0 0}.intro-active #navigation .nav-link:hover,.intro-active #navigation .nav-link:focus-visible{transform:rotate(-5deg) scale(1.07);opacity:1}}
+@media(max-width:700px){.merged-intro .intro-about{margin-top:20svh}}
+@media(prefers-reduced-motion:reduce){#navigation .nav-link{transition:none}}
