@@ -178,3 +178,9 @@
 /* Pointer tilt lives inside the finished flight, so cancelling WAAPI cannot jump to a new pose. */
 #section-writing .library-article-slot .shelf-book .book-object,#section-writing .library-article-slot .shelf-book.is-previewed .book-object{transform:rotateY(var(--pointer-yaw,0deg)) rotateX(var(--pointer-pitch,0deg))!important;transition:transform 160ms ease-out}
 @media(prefers-reduced-motion:reduce){#section-writing .library-article-slot .book-object{transition:none}}
+
+/* V41: the decorative aisle moves as six strips instead of 396 independent layers. */
+.library-fillers{left:-852px;right:auto;width:3828px;mask-image:linear-gradient(90deg,transparent 0,transparent 24.87%,#0000004d 35.32%,#000000bf 45.77%,#000 53.61%,#000 92.27%,transparent 98.54%,transparent 100%)}
+.library-filler-track{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
+.library-dummy{will-change:auto}
+.library-dummy>i{opacity:1}
