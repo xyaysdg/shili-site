@@ -2,7 +2,7 @@
 class ConstellationWall {
  constructor(wall,items,order,onOpen){
   this.wall=wall;this.items=items;this.onOpen=onOpen;this.viewport=wall.querySelector('.flow-viewport');this.layer=wall.querySelector('.flow-field');this.toggle=wall.querySelector('.flow-toggle');this.listeners=[];this.nodes=[];this.time=0;this.frame=0;this.visible=false;this.entranceTime=0;this.section=wall.closest("[data-section]");
-  this.motion=matchMedia('(prefers-reduced-motion: reduce)');this.manualPause=this.motion.matches;wall.constellation=this;
+  this.entranceControls=[...wall.querySelectorAll('.flow-bottom,.flow-wall-link')];this.motion=matchMedia('(prefers-reduced-motion: reduce)');this.manualPause=this.motion.matches;wall.constellation=this;
   this.stars=Array.from({length:280},()=>({x:Math.random(),y:Math.random(),radius:.35+Math.pow(Math.random(),3)*1.1,alpha:.13+Math.random()*.4}));
   wall.classList.add('constellation-wall');wall.setAttribute('aria-label','万艺殿星群作品');
   this.canvas=document.createElement('canvas');this.canvas.className='constellation-lines';this.canvas.setAttribute('aria-hidden','true');this.viewport.prepend(this.canvas);this.ctx=this.canvas.getContext('2d');
@@ -63,7 +63,8 @@ class ConstellationWall {
  release(n){if(this.selected!==n)return;n.shell.classList.remove('is-selected');this.selected=null;this.paint();}
  update(){
   if(this.destroyed)return;
-  this.stopped=(this.manualPause&&this.entranceTime>=9.4)||this.motion.matches||!this.visible||document.hidden||document.body.classList.contains('modal-open');
+  if(document.body.classList.contains('site-editor-active')){this.entranceTime=20;this.paint();}
+  this.stopped=document.body.classList.contains('site-editor-active')||(this.manualPause&&this.entranceTime>=9.4)||this.motion.matches||!this.visible||document.hidden||document.body.classList.contains('modal-open');
   this.wall.dataset.motion=this.stopped?'paused':'running';this.toggle.disabled=this.motion.matches;this.toggle.textContent=this.motion.matches?'已减少动态':this.manualPause?'继续漂浮 ▷':'暂停漂浮 Ⅱ';this.toggle.setAttribute('aria-pressed',String(this.manualPause||this.motion.matches));
   if(!this.stopped&&!this.frame){this.previous=0;this.frame=requestAnimationFrame(t=>this.tick(t));}
   if(this.stopped){cancelAnimationFrame(this.frame);this.frame=0;}
@@ -91,12 +92,15 @@ class ConstellationWall {
   if(!this.ctx||!this.width)return;const ctx=this.ctx;ctx.clearRect(0,0,this.width,this.height);
   const t=this.motion.matches?20:this.entranceTime;
   const ease=(a,b)=>{const p=Math.max(0,Math.min(1,(t-a)/(b-a)));return p*p*(3-2*p);};
-  this.section?.style.setProperty('--pantheon-title',ease(.15,1.35));
   const linkProgress=ease(5.9,7.8),finish=ease(7.9,9.4);
+  if(!this.entrancePainted||t<9.4){
+  this.section?.style.setProperty('--pantheon-title',ease(.15,1.35));
   this.wall.dataset.entrance=t>=9.4?'ready':t<1.4?'title':t<5.9?'pictures':t<7.9?'lines':'stars';
   this.sky.style.opacity=finish;this.wall.style.setProperty("--pantheon-stars",finish);
-  for(const el of this.wall.querySelectorAll('.flow-bottom,.flow-wall-link')){el.style.opacity=finish;el.inert=finish<.1;}
+  for(const el of this.entranceControls){el.style.opacity=finish;el.inert=finish<.1;}
   for(const n of this.nodes){const opacity=ease(1.4+n.index*.43,2.8+n.index*.43);for(const el of [n.shell,...n.copies.map(c=>c.shell)]){el.style.opacity=opacity;el.inert=opacity<.3;}}
+   this.entrancePainted=t>=9.4;
+  }
   // Draw connections outward only after the individual images arrive.
   const edges=new Set();
   this.nodes.forEach(n=>{

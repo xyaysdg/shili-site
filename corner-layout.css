@@ -47,7 +47,7 @@ body:not(.long-mode) .main-content{padding-top:210px}
 @media(max-width:850px){#section-journey .journey-copy{max-width:500px;padding-bottom:0}#section-journey .journey-copy .prose{font-size:13px}#section-journey .medal-exhibit{margin-top:65px}#section-journey .journey-layout{gap:55px}}
 @media(max-width:700px){
  body .site-corners #navigation{left:12px;right:12px;top:12px}
- body .site-corners #navigation .nav-link,body .site-corners #navigation .nav-link.active{font-size:9px!important;letter-spacing:1px;padding:10px 5px;line-height:1.4;min-width:26px}
+ body .site-corners #navigation .nav-link,body .site-corners #navigation .nav-link.active{font-size:11px!important;letter-spacing:.5px;padding:10px 5px;line-height:1.4;min-width:30px;opacity:.78}
  body .site-corners #navigation .nav-link.active{opacity:1}
  body .site-corners #navigation .nav-number{font-size:9px}
  body .site-corners .corner-tools{right:14px}
@@ -78,3 +78,14 @@ body:has(#navigation a.active[href="#/art"]) .site-corners #navigation:is(:hover
 
 .site-corners{transition:color 1.15s ease}
 @media(prefers-reduced-motion:reduce){.site-corners{transition:none}}
+@media(pointer:coarse){
+ .poetry-reader-top button{min-width:44px;min-height:44px}
+ .library-index-toggle,.writing-tools .filter,.reading-top .text-tool,.theme-toggle{min-height:44px}
+}
+
+/* Let the mobile article directory leave with the page; keep corner tools fixed. */
+@media(max-width:700px){
+ body:has(#main.reading-main) .site-corners{position:absolute;overflow:clip}
+ body:has(#main.reading-main) .site-corners :is(.corner-brand,.corner-tools){position:fixed}
+}
+

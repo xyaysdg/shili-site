@@ -13,13 +13,18 @@ body.long-mode #section-poetry.long-section{padding:0!important;background:#fbfb
 .poetry-thread{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.48}
 .poetry-thread path{fill:none;stroke:#998979;stroke-width:1.4;stroke-dasharray:1 10;stroke-linecap:round}
 .poetry-leaf{position:absolute;left:0;top:0;padding:0;border:0;background:none;cursor:pointer;transform-origin:center;will-change:transform;text-align:left;color:#3a3631;font-family:var(--serif);filter:blur(var(--paper-blur));opacity:var(--paper-alpha)}
-.poetry-leaf-paper{position:absolute;inset:0;display:block;padding:calc(25px * var(--page-unit));background:#f6f1e7 url("assets/poetry-ink-v29.png") center bottom/100% 100%;box-shadow:7px 15px 30px #5544310d,0 1px 2px #6d5a3812;isolation:isolate}
+.poetry-leaf-paper{position:absolute;inset:0;display:block;padding:calc(25px * var(--page-unit));background:var(--poem-paper-color,#f6f1e7);box-shadow:7px 15px 30px #5544310d,0 1px 2px #6d5a3812;isolation:isolate}
+.poetry-leaf-paper::after{content:"";position:absolute;inset:0;z-index:-2;background-image:var(--poem-paper-image,var(--poetry-default-image,none));background-position:center bottom;background-size:100% 100%;opacity:var(--poem-paper-opacity,1);pointer-events:none}
 .poetry-leaf-paper::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(#faf6ee22 30%,#faf6ee77 70%,transparent)}
-.poetry-leaf:nth-of-type(3n) .poetry-leaf-paper{background-size:125% 115%;background-position:left bottom}
+.poetry-leaf:nth-of-type(3n) .poetry-leaf-paper::after{background-size:125% 115%;background-position:left bottom}
 .poetry-leaf-number{display:block;font:calc(12px * var(--page-unit))/1.4 Georgia,serif;letter-spacing:1px;margin-bottom:calc(17px * var(--page-unit))}
 .poetry-leaf strong{display:block;font-size:calc(23px * var(--page-unit));line-height:1.55;font-weight:400;letter-spacing:1px}
 .poetry-rule{display:block;width:calc(23px * var(--page-unit));height:1px;background:#9a8a77;margin:calc(20px * var(--page-unit)) 0}
 .poetry-leaf-lines{display:block;white-space:pre-wrap;line-height:1.85;overflow-wrap:anywhere;letter-spacing:.35px}
+.poetry-upload-image{display:block;width:100%;height:auto;object-fit:contain}
+.poetry-leaf-paper:has(.poetry-upload-image) .poetry-leaf-lines{position:absolute;inset:40% 10% 8%}
+.poetry-leaf-paper .poetry-upload-image{width:100%;height:100%}
+.poetry-reader-lines>.poetry-upload-image{max-height:55svh;margin-bottom:16px}
 .poetry-signature{position:absolute;bottom:calc(15px * var(--page-unit));left:calc(25px * var(--page-unit));font-size:calc(8px * var(--page-unit));letter-spacing:2px;color:#8c7c68}
 .poetry-leaf:not(.poetry-ghost):hover,.poetry-leaf:not(.poetry-ghost):focus-visible{filter:none;opacity:1}
 .poetry-leaf:focus-visible{outline:1px solid #9b896d;outline-offset:6px}
@@ -34,7 +39,7 @@ body.long-mode #section-poetry.long-section{padding:0!important;background:#fbfb
 .poetry-reader-lines{white-space:pre-wrap;font-size:16px;line-height:2.1;letter-spacing:1px;overflow-wrap:anywhere}
 .poetry-reader-author{font-size:11px;margin-top:25px;color:#897d6d}
 .poetry-original{font:11px var(--serif);padding:12px 0!important;border-bottom:1px solid #b8ac96!important}
-.poetry-reader-landscape{height:240px;margin:30px -26px -20px;background:url("assets/poetry-ink-v29.png") center bottom/100% auto;opacity:.65;mask-image:linear-gradient(transparent,#000 30%)}
+.poetry-reader-landscape{height:240px;margin:30px -26px -20px;background:var(--poetry-default-image,none) center bottom/100% auto;opacity:.65;mask-image:linear-gradient(transparent,#000 30%)}
 .poetry-browse{position:absolute;left:4%;bottom:76px;display:flex;align-items:center;gap:25px;color:#89847c;font-size:12px;letter-spacing:1px;pointer-events:none}
 .poetry-browse>span{font:11px Georgia,serif;letter-spacing:2px}
 .poetry-wall-link{position:absolute;left:74px;bottom:14px;min-height:40px;display:flex;align-items:center;font-size:13px;letter-spacing:1px}
@@ -57,7 +62,7 @@ body.long-mode #section-poetry.long-section{padding:0!important;background:#fbfb
 .poetry-world{position:absolute;inset:0;transform-style:preserve-3d}
 .poetry-thread{transform:translateZ(-80px);opacity:.5}
 .poetry-leaf{transform-style:preserve-3d}
-.poetry-leaf-paper{box-shadow:inset -1px 0 1px #c8bba255,1px 1px 0 #d8cbb555,12px 25px 35px #7667540a;background-color:#f9f5ed}
+.poetry-leaf-paper{box-shadow:inset -1px 0 1px #c8bba255,1px 1px 0 #d8cbb555,12px 25px 35px #7667540a;background-color:var(--poem-paper-color,#f9f5ed)}
 .poetry-leaf-paper::before{background:linear-gradient(115deg,#fff5,#fff0 45%,#80735d0a),linear-gradient(#faf6ee11 30%,#faf6ee44 80%,#faf6ee33)}
 @media(min-width:761px){.poetry-about{right:25%;bottom:57px}.poetry-reader-scroll{display:flex;flex-direction:column}.poetry-reader-landscape{flex-shrink:0;margin-top:auto}.poetry-original{align-self:flex-start}.poetry-reader h2{margin-top:30px}.poetry-reader-lines{margin-bottom:18px}}
 

@@ -1,4 +1,4 @@
-function museumMarkup(){return `<div class="museum-stage" data-entrance="waiting"><div class="museum-backdrop" aria-hidden="true"></div><div class="museum-viewport" data-museum-wall tabindex="0" role="region" aria-label="可拖动画廊"><div class="museum-pictures"></div></div><div class="museum-floor" aria-hidden="true"><canvas class="museum-reflection"></canvas></div><img class="museum-visitor" src="assets/museum-visitor-v29.png" alt="" aria-hidden="true"><div class="museum-tools"><a href="#/wall/art">完整作品墙 ↗</a></div></div>`;}
+function museumMarkup(){return `<div class="museum-stage" data-entrance="waiting"><div class="museum-backdrop" aria-hidden="true"></div><div class="museum-viewport" data-museum-wall tabindex="0" role="region" aria-label="可拖动画廊"><div class="museum-pictures"></div></div><div class="museum-floor" aria-hidden="true"><canvas class="museum-reflection"></canvas></div><img class="museum-visitor" data-scene-src="assets/museum-visitor-v29.png" alt="" aria-hidden="true"><div class="museum-tools"><a href="#/wall/art">完整作品墙 ↗</a></div></div>`;}
 
 // Keep the live frame, reflected frame and flight frame on the same thirty-two-pixel profile.
 const MUSEUM_FRAME_RIM=32;
@@ -15,12 +15,13 @@ class MuseumWall {
  constructor(viewport,items){
   this.viewport=viewport;viewport.museumWall=this;this.layer=viewport.querySelector('.museum-pictures');this.items=items;this.nodes=[];this.listeners=[];this.x=0;this.y=0;this.tx=0;this.ty=0;this.vx=0;this.vy=0;this.frame=0;this.reduced=matchMedia('(prefers-reduced-motion: reduce)');this.canvas=viewport.parentElement.querySelector('.museum-reflection');this.ctx=this.canvas.getContext('2d');
   this.stage=viewport.parentElement;this.tools=this.stage.querySelector('.museum-tools');this.entranceFrame=0;this.entranceElapsed=0;this.waitForEntrance();
-  items.forEach((item,i)=>{const button=document.createElement('button');button.className='museum-frame';button.dataset.gallery='art';button.dataset.index=i;button.setAttribute('aria-label','查看'+(item.caption||'画作 '+(i+1)));const img=document.createElement('img');img.src=item.thumb||item.src;img.alt=item.caption||'';img.draggable=false;img.decoding='async';button.append(img);this.layer.append(button);const n={button,index:i};this.nodes.push(n);
+  items.forEach((item,i)=>{const button=document.createElement('button');button.className='museum-frame';button.dataset.gallery='art';button.dataset.index=i;button.setAttribute('aria-label','查看'+(item.caption||'画作 '+(i+1)));const img=document.createElement('img');img.dataset.sceneSrc=item.thumb||item.src;img.alt=item.caption||'';img.draggable=false;img.decoding='async';button.append(img);this.layer.append(button);const n={button,index:i};this.nodes.push(n);
    this.listen(button,'click',e=>{if(this.suppressClick){e.preventDefault();return;}openGallery(items,i,button);});this.listen(img,'load',()=>this.paint());
    this.listen(button,'focus',()=>{if(!button.matches(':focus-visible'))return;const r=button.getBoundingClientRect(),v=viewport.getBoundingClientRect();if(r.left<v.left||r.right>v.right||r.top<v.top||r.bottom>v.bottom){this.stop();this.tx=this.x=viewport.clientWidth/2-n.w/2-n.bx;this.ty=this.y=viewport.clientHeight/2-n.h/2-n.by;this.paint();viewport.scrollLeft=viewport.scrollTop=0;}});
   });
   const label=document.createElement('div');label.className='museum-wall-label';label.innerHTML='<h1>说来“画”长</h1><p>从小热爱画画，系统学过美术，也凭着热爱创作出了许多的画作，且看我一一“道”来。</p><p class="museum-drag-hint">左键摁住拖动画作</p>';this.layer.append(label);this.nodes.push({button:label,isLabel:true,index:-1});
   this.compose();
+  this.assetCleanup=prepareSceneAssets(this.stage,()=>{this.assetsReady=true;this.stage.style.setProperty('--museum-visitor-image','url("assets/museum-visitor-v29.png")');this.stage.querySelectorAll('img[data-scene-src]').forEach(img=>{img.src=img.dataset.sceneSrc;delete img.dataset.sceneSrc;});});
   this.listen(viewport,'dragstart',e=>e.preventDefault());
   this.listen(viewport,'pointerdown',e=>{if(e.button!==0||!e.isPrimary)return;this.stop();this.suppressClick=false;this.drag={id:e.pointerId,x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,time:e.timeStamp,touch:e.pointerType==='touch',moved:false};this.drag.capture=e.target.closest('.museum-frame')||viewport;this.drag.capture.setPointerCapture(e.pointerId);});
   this.listen(viewport,'pointermove',e=>{const d=this.drag;if(!d||e.pointerId!==d.id)return;const dx=e.clientX-d.x,dy=d.touch?0:e.clientY-d.y,dt=Math.max(8,e.timeStamp-d.time);if(Math.hypot(e.clientX-d.startX,e.clientY-d.startY)>6){d.moved=true;viewport.classList.add('is-dragging');}this.tx+=dx*.48;this.ty+=dy*.48;this.vx=Math.max(-1.5,Math.min(1.5,dx/dt))*.28;this.vy=Math.max(-1.5,Math.min(1.5,dy/dt))*.28;d.x=e.clientX;d.y=e.clientY;d.time=e.timeStamp;this.wake();});
@@ -110,10 +111,12 @@ class MuseumWall {
   const originals=this.nodes.filter(n=>!n.isLabel);this.label=this.nodes.find(n=>n.isLabel);this.layoutSeed=Math.floor(Math.random()*0x100000000);
   const random=this.randomLayout(),shuffle=values=>{const a=[...values];for(let i=a.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
   this.composition=[];
+  originals.forEach(n=>n.inactive=true);
   // Three shuffled decks retain every original, each with independently varied dimensions.
   for(let deck=0;deck<3;deck++)for(const base of shuffle(originals)){
-   const n=deck?{button:this.copy(base),index:base.index}:base;
-   if(deck)this.nodes.push(n);
+   const chance=this.items[base.index].displayChance??100;if(chance===0||(chance<100&&random()*100>=chance))continue;
+   const n=base.inactive?base:{button:this.copy(base),index:base.index};
+   if(n!==base)this.nodes.push(n);n.inactive=false;
    n.area=65000+random()*150000;n.order=random();this.composition.push(n);
   }
  }
@@ -174,9 +177,10 @@ class MuseumWall {
    const cavities=free.filter(r=>r.w>180*scale&&r.h>180*scale&&r.w*r.h>50000*scale*scale).sort((a,b)=>b.w*b.h-a.w*a.h);
    let match;
    for(const r of cavities){
-    const start=Math.floor(random()*this.items.length);
-    for(let k=0;k<this.items.length;k++){
-     const index=(start+k)%this.items.length,item=this.items[index],ratio=item.width/item.height;
+    const candidates=[...new Set(this.composition.map(n=>n.index))],custom=candidates.some(i=>(this.items[i].displayChance??100)!==100);
+    const start=Math.floor(random()*candidates.length),choices=custom?candidates.map(i=>({i,score:-Math.log(Math.max(1e-9,random()))/(this.items[i].displayChance??100)})).sort((a,b)=>a.score-b.score).map(x=>x.i):candidates.map((_,k)=>candidates[(start+k)%candidates.length]);
+    for(const index of choices){
+     const item=this.items[index],ratio=item.width/item.height;
      let h=Math.min(r.h-gap-rim,480*scale),w=h*ratio;
      if(w>r.w-gap-rim){w=r.w-gap-rim;h=w/ratio;}
      if(w>640*scale){h*=640*scale/w;w=640*scale;}
@@ -203,12 +207,12 @@ class MuseumWall {
    const title=Math.min(48,Math.max(18,n.w*.07)),body=Math.min(18,Math.max(10,n.w*.036));
    for(const e of [n.button,...(n.copies||[])]){
     e.style.width=n.w+'px';e.style.height=n.h+'px';
-    if(!n.isLabel){const img=e.querySelector('img'),item=this.items[n.index],src=n.w>600||n.h>760?item.src:item.thumb||item.src;if(img.getAttribute('src')!==src)img.src=src;}
+    if(!n.isLabel){const img=e.querySelector('img'),item=this.items[n.index],src=n.w>600||n.h>760?item.src:item.thumb||item.src;if(this.assetsReady){if(img.getAttribute('src')!==src)img.src=src;}else img.dataset.sceneSrc=src;}
     e.style.setProperty('--label-title',title+'px');e.style.setProperty('--label-body',body+'px');
    }
   }
   this.canvas.width=width;this.canvas.height=56;this.floorY=height-56;
-  this.viewport.style.setProperty('--museum-overhang',(Math.ceil(Math.max(...this.nodes.map(n=>n.h)))+80)+'px');
+  this.viewport.style.setProperty('--museum-overhang',(Math.ceil(Math.max(...this.nodes.filter(n=>!n.inactive).map(n=>n.h)))+80)+'px');
   for(const e of [label.button,...(label.copies||[])]){e.style.setProperty('--label-title',Math.min(32,Math.max(24,label.w*.11))+'px');e.style.setProperty('--label-body',Math.min(14,Math.max(12,label.w*.05))+'px');}
   if(this.layoutWidth!==width||this.stage.dataset.entrance!=='ready'){this.resetComposition();this.layoutWidth=width;}
   this.paint();
@@ -217,11 +221,11 @@ class MuseumWall {
  paint(){if(!this.worldW||!this.worldH)return;const mod=(n,d)=>((n%d)+d)%d,w=this.viewport.clientWidth,h=this.viewport.clientHeight,c=this.ctx;if(c)c.clearRect(0,0,w,56);this.rendered=[];
   this.nodes.forEach(n=>{if(n.inactive)return;const bx=mod(n.bx+this.x,this.worldW),by=mod(n.by+this.y,n.period),positions=[];for(let x=bx-this.worldW;x<w;x+=this.worldW)for(let y=by-n.period;y<h;y+=n.period)if(x+n.w>0&&y+n.h>0)positions.push({x,y});n.copies??=[];
    while(n.copies.length<positions.length-1)n.copies.push(this.copy(n));const views=[n.button,...n.copies];views.forEach((e,i)=>{const p=positions[i];e.style.display=i===0||p?'block':'none';e.style.transform=p?`translate3d(${p.x.toFixed(2)}px,${p.y.toFixed(2)}px,0)`:'translate3d(-3000px,-3000px,0)';if(p)this.rendered.push({e,n,...p});});
-   const img=n.button.querySelector('img');if(c&&img?.complete&&img.naturalWidth){c.save();c.setTransform(1,0,0,-.36,0,this.floorY*.36);positions.forEach(p=>{paintMuseumFrame(c,p.x,p.y,n.w,n.h);c.drawImage(img,p.x+MUSEUM_FRAME_RIM,p.y+MUSEUM_FRAME_RIM,n.w-MUSEUM_FRAME_RIM*2,n.h-MUSEUM_FRAME_RIM*2);});c.restore();}
+   const img=n.button.querySelector('img');if(c&&img?.complete&&img.naturalWidth){c.save();c.setTransform(1,0,0,-.36,0,this.floorY*.36);positions.forEach(p=>{if(p.y>=this.floorY||p.y+n.h<=this.floorY-this.canvas.height/.36)return;paintMuseumFrame(c,p.x,p.y,n.w,n.h);c.drawImage(img,p.x+MUSEUM_FRAME_RIM,p.y+MUSEUM_FRAME_RIM,n.w-MUSEUM_FRAME_RIM*2,n.h-MUSEUM_FRAME_RIM*2);});c.restore();}
   });
  }
  wake(){if(!this.frame){this.last=0;this.frame=requestAnimationFrame(t=>this.tick(t));}}
- tick(t){this.frame=0;if(this.destroyed)return;const dt=this.last?Math.min(t-this.last,40):16;this.last=t;if(!this.drag){if(this.reduced.matches)this.vx=this.vy=0;this.tx+=this.vx*dt;this.ty+=this.vy*dt;const decay=Math.exp(-dt/300);this.vx*=decay;this.vy*=decay;}const ease=this.reduced.matches?1:1-Math.exp(-dt/165);this.x+=(this.tx-this.x)*ease;this.y+=(this.ty-this.y)*ease;this.paint();if(Math.hypot(this.tx-this.x,this.ty-this.y)>.15||Math.hypot(this.vx,this.vy)>.002)this.frame=requestAnimationFrame(n=>this.tick(n));}
+ tick(t){this.frame=0;if(document.body.classList.contains('site-editor-active')){this.vx=this.vy=0;this.tx=this.x;this.ty=this.y;return;}if(this.destroyed)return;const dt=this.last?Math.min(t-this.last,40):16;this.last=t;if(!this.drag){if(this.reduced.matches)this.vx=this.vy=0;this.tx+=this.vx*dt;this.ty+=this.vy*dt;const decay=Math.exp(-dt/300);this.vx*=decay;this.vy*=decay;}const ease=this.reduced.matches?1:1-Math.exp(-dt/165);this.x+=(this.tx-this.x)*ease;this.y+=(this.ty-this.y)*ease;this.paint();if(Math.hypot(this.tx-this.x,this.ty-this.y)>.15||Math.hypot(this.vx,this.vy)>.002)this.frame=requestAnimationFrame(n=>this.tick(n));}
  stop(){cancelAnimationFrame(this.frame);this.frame=0;this.vx=this.vy=0;this.tx=this.x;this.ty=this.y;}
- destroy(){this.destroyed=true;this.stop();this.clearDeparture();cancelAnimationFrame(this.entranceFrame);delete this.viewport.museumWall;clearTimeout(this.clickTimer);this.resize.disconnect();this.visibility.disconnect();this.listeners.forEach(off=>off());}
+ destroy(){this.destroyed=true;this.assetCleanup?.();this.stop();this.clearDeparture();cancelAnimationFrame(this.entranceFrame);delete this.viewport.museumWall;clearTimeout(this.clickTimer);this.resize.disconnect();this.visibility.disconnect();this.listeners.forEach(off=>off());}
 }

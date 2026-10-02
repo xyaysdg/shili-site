@@ -1,14 +1,25 @@
+// Load heavy scene artwork before it becomes visible, including direct navigation and print.
+function prepareSceneAssets(root,load){
+ let started=false,observer;const section=root.closest('[data-section]'),id=section?.dataset.section;
+ const cleanup=()=>{observer?.disconnect();window.removeEventListener('shili:scene-prepare',prepare);window.removeEventListener('beforeprint',start);};
+ const start=()=>{if(started)return;started=true;cleanup();load();};
+ const prepare=e=>{if(e.detail.id===id)start();};
+ observer=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting))start();},{rootMargin:'200% 0px'});
+ observer.observe(root);window.addEventListener('shili:scene-prepare',prepare);window.addEventListener('beforeprint',start);
+ if(location.protocol==='file:'||document.body.classList.contains('site-editor-active'))start();
+ return cleanup;
+}
 /* One continuous document. The original sections and content remain the source. */
 function longPageMarkup(){
  const p=D.sections.about.paragraphs;
- const sections={art:()=>museumMarkup(),photography:()=>galleryPage('photography'),poetry:()=>galleryPage('poetry'),writing:writingPage,journey:journeyPage,pantheon:pantheonPage,contact:contactPage,friend:friendPage};
+ const sections={art:()=>museumMarkup(),photography:()=>galleryPage('photography'),poetry:()=>galleryPage('poetry'),writing:writingPage,journey:journeyPage,pantheon:pantheonPage,contact:contactPage};
  return `<div class="intro-sequence"><div class="intro-backdrop" aria-hidden="true"><div class="intro-atmosphere"></div><img class="intro-portrait" src="${E(D.sections.home.images[0])}" alt="" fetchpriority="high"><div class="intro-shade"></div></div><div class="intro-story"><section id="section-home" class="intro-scene merged-intro" data-section="home" aria-label="让我想想说什么比较好"><div class="intro-copy"><div class="focus-copy intro-welcome"><h1 id="welcome-title">${E(D.sections.home.headings[0])}</h1><p>花径不曾缘客扫，蓬门今始为君开</p></div><div class="intro-about"><div class="focus-copy intro-about-title"><h2>${E(p[0])}</h2><p>${E(p[2])}</p></div><p class="focus-copy">${E(p[3])}</p><div class="focus-copy intro-bio"><h3>${E(p[4])}</h3>${p.slice(5).map(t=>`<p>${E(t)}</p>`).join('')}</div></div></div></section></div></div>${navigation.filter(n=>sections[n.id]).map(n=>`${sectionBridge(navigation[navigation.findIndex(x=>x.id===n.id)-1].id,n.id)}<section id="section-${n.id}" class="long-section ${n.id==='pantheon'?'pantheon-page':''}" data-section="${n.id}" aria-label="${E(n.label)}"><div class="section-content">${sections[n.id]()}</div></section>`).join('')}`;
 }
 
 class LongPageController {
  constructor(){
   this.sections=[...document.querySelectorAll('[data-section]')];this.copies=[...document.querySelectorAll('.focus-copy')];this.reduced=matchMedia('(prefers-reduced-motion: reduce)');this.listeners=[];this.frame=0;this.scrollFrame=0;this.current='';this.target=scrollY;
-  this.listen(window,'scroll',()=>this.request(),{passive:true});this.listen(window,'resize',()=>{this.cancel();this.request();},{passive:true});
+  this.listen(window,'scroll',()=>this.request(),{passive:true});this.listen(window,'resize',()=>this.resize(),{passive:true});
   this.listen(window,'wheel',e=>this.wheel(e),{passive:false});
   this.listen(window,'touchstart',()=>this.cancel(),{passive:true});
   this.listen(window,'pointerdown',()=>this.cancel(),{passive:true});
@@ -17,6 +28,7 @@ class LongPageController {
   this.request();
  }
  listen(el,event,fn,opts){el.addEventListener(event,fn,opts);this.listeners.push(()=>el.removeEventListener(event,fn,opts));}
+ resize(){this.cancel();this.request();}
  request(){if(!this.frame)this.frame=requestAnimationFrame(()=>{this.frame=0;this.paint();});}
  paint(){
   const center=innerHeight*.5;
@@ -27,7 +39,7 @@ class LongPageController {
   if(!this.navigating&&active.dataset.section!==this.current)this.activate(active.dataset.section,true);
   for(const section of this.sections){if(section.classList.contains('intro-scene'))continue;const r=section.getBoundingClientRect();if(r.bottom<0||r.top>innerHeight)continue;const progress=Math.max(0,Math.min(1,(innerHeight-r.top)/(innerHeight*.68)));section.style.setProperty('--section-arrival',this.reduced.matches?1:progress);}
  }
- activate(id,updateHash=false){document.body.classList.toggle('journey-active',id==='journey');this.current=id;activeRoute=id;document.querySelectorAll('#navigation a').forEach(a=>{const on=a.getAttribute('href')==='#/'+id;a.classList.toggle('active',on);if(on)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current');});document.title=displayTitles[id]+' · 十里 · 内陆帝国';if(updateHash)history.replaceState(null,'','#/'+id);}
+ activate(id,updateHash=false){document.body.classList.toggle('journey-active',id==='journey');this.current=id;activeRoute=id;document.querySelectorAll('#navigation a').forEach(a=>{const on=a.getAttribute('href')==='#/'+id;a.classList.toggle('active',on);if(on)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current');});document.title=displayTitles[id]+' · 十里 · 内陆帝国';if(updateHash)history.replaceState(null,'','#/'+id);window.dispatchEvent(new CustomEvent('shili:section-active',{detail:{id}}));}
  cancel(){cancelAnimationFrame(this.scrollFrame);this.scrollFrame=0;this.navigating=false;this.target=scrollY;}
  scrollToSection(id,animate=true,restore){
   const el=document.querySelector('#section-'+id);if(!el)return;

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+ <defs>
+  <radialGradient id="vinyl"><stop stop-color="#363b3c"/><stop offset=".46" stop-color="#101415"/><stop offset=".94" stop-color="#202627"/><stop offset="1" stop-color="#070a0b"/></radialGradient>
+  <linearGradient id="light" x2="1" y2="1"><stop stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".17"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+ </defs>
+ <circle cx="50" cy="50" r="49" fill="url(#vinyl)" stroke="#a49b86" stroke-width=".8"/>
+ <g fill="none" stroke="#bcbcae" stroke-opacity=".17" stroke-width=".6">
+  <circle cx="50" cy="50" r="44"/><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="38"/><circle cx="50" cy="50" r="35"/><circle cx="50" cy="50" r="32"/><circle cx="50" cy="50" r="29"/><circle cx="50" cy="50" r="26"/>
+ </g>
+ <path d="M16 16A48 48 0 0 1 50 2L50 29ZM84 84A48 48 0 0 1 50 98L50 71Z" fill="url(#light)"/>
+ <circle cx="50" cy="50" r="21" fill="#d9c5a0"/>
+ <path d="M30 43Q50 32 70 43L70 46Q50 39 30 46Z" fill="#8d4f35"/>
+ <text x="50" y="60" text-anchor="middle" font-size="8" letter-spacing="1.5" font-family="Georgia,serif" fill="#47372a">SHILI</text>
+ <circle cx="50" cy="50" r="3.3" fill="#131818" stroke="#f5e7ce" stroke-width="1"/>
+</svg>

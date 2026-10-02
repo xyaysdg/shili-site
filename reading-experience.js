@@ -19,14 +19,15 @@ class ShiliExperience {
   this.dialog.addEventListener('cancel',e=>{e.preventDefault();this.close();});
   this.dialog.addEventListener('close',()=>{
    if(this.dialog.open)return;
-   this.surfaceAnimation?.cancel();
+   this.surfaceAnimation?.cancel();this.surfaceAnimation=null;
    this.ready=false;this.blankPress=null;this.cancelFlight();document.body.classList.toggle('modal-open',!!document.querySelector('dialog[open]'));
-   if(this.trigger?.isConnected)this.trigger.focus({preventScroll:true});
+   const trigger=this.trigger;this.trigger=null;
+   if(trigger?.isConnected)trigger.focus({preventScroll:true});
    this.resumeButton();
   });
  }
  reduced(){return matchMedia('(prefers-reduced-motion: reduce)').matches;}
- cancelFlight(){this.serial++;this.animation?.cancel();this.flight?.remove();this.flight=null;this.image.style.visibility='';}
+ cancelFlight(){this.serial++;this.animation?.cancel();this.animation=null;this.flight?.remove();this.flight=null;this.image.style.visibility='';}
  sourceImage(){
   if(this.index===this.startIndex&&this.trigger?.isConnected&&(!this.trigger.matches('.photo-print')||Number(this.trigger.dataset.photoIndex)===this.index))return this.trigger.matches('img')?this.trigger:this.trigger.querySelector('img');
   if(this.group==='photography'){const candidates=[...document.querySelectorAll('button.photo-print')].filter(e=>Number(e.dataset.photoIndex)===this.index).map(e=>e.querySelector('img'));const visible=candidates.find(e=>this.visible(e));if(visible)return visible;}
@@ -43,8 +44,10 @@ class ShiliExperience {
   const clone=this.image.cloneNode();clone.removeAttribute('id');clone.alt='';clone.setAttribute('aria-hidden','true');clone.className='image-flight';
   const frame=r=>({left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px',transform:'rotate('+(r.angle||0)+'deg)',filter:r.filter||'none'});
   Object.assign(clone.style,frame(from),{objectFit:'contain',transformOrigin:'50% 50%'});this.dialog.append(clone);this.flight=clone;this.image.style.visibility='hidden';
-  this.animation=clone.animate([frame(from),frame(to)],{duration:620,easing:'cubic-bezier(.45,0,.25,1)',fill:'forwards'});
-  try{await this.animation.finished;}catch{}
+  const animation=clone.animate([frame(from),frame(to)],{duration:620,easing:'cubic-bezier(.45,0,.25,1)',fill:'forwards'});
+  this.animation=animation;
+  try{await animation.finished;}catch{}
+  animation.cancel();if(this.animation===animation)this.animation=null;
   clone.remove();if(this.flight===clone){this.flight=null;if(!this.closing)this.image.style.visibility='';}
  }
  surface(out=false){
@@ -126,7 +129,7 @@ class ShiliExperience {
  }
  mountArticle(){
   this.pageCleanup();this.resumeButton();
-  const article=document.querySelector('.reading-page'),body=article?.querySelector('.article-body');if(!body)return;
+  const article=document.querySelector('#main .reading-page'),body=article?.querySelector('.article-body');if(!body)return;
   const normalize=s=>s.replace(/\s+/g,' ').trim();
   const candidates=[...body.querySelectorAll('h1,h2,h3,h4,p')].filter(el=>{
    const text=normalize(el.textContent);if(!text||text.length>65)return false;

@@ -178,3 +178,12 @@
 /* Pointer tilt lives inside the finished flight, so cancelling WAAPI cannot jump to a new pose. */
 #section-writing .library-article-slot .shelf-book .book-object,#section-writing .library-article-slot .shelf-book.is-previewed .book-object{transform:rotateY(var(--pointer-yaw,0deg)) rotateX(var(--pointer-pitch,0deg))!important;transition:transform 160ms ease-out}
 @media(prefers-reduced-motion:reduce){#section-writing .library-article-slot .book-object{transition:none}}
+
+/* V41: the decorative aisle moves as six strips instead of 396 independent layers. */
+.library-fillers{left:-852px;right:auto;width:3828px;mask-image:none}
+.library-filler-track{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
+/* V48: masks on the shared 3D parent flatten all covers and break occlusion.
+   Keep the six moving tracks; fade only each book's flat faces in world space.
+   Both recycling edges are fully invisible before their coordinates wrap. */
+.library-dummy{will-change:auto;--dummy-world:calc(var(--dummy-x,0) + var(--filler-phase,0) + var(--dummy-wrap,0));--dummy-in:clamp(0,calc((var(--dummy-world) - 100) / 1100),1);--dummy-out:clamp(0,calc((2920 - var(--dummy-world)) / 240),1);--dummy-alpha:calc(var(--dummy-in) * var(--dummy-in) * (3 - 2 * var(--dummy-in)) * var(--dummy-out) * var(--dummy-out) * (3 - 2 * var(--dummy-out)))}
+.library-dummy>i{opacity:var(--dummy-alpha,1)}

@@ -22,6 +22,11 @@
   <script src="section-entrance.js" defer></script>
   <script src="journey-stage.js" defer></script>
   <script src="content.js" defer></script>
+  <script src="local-edits.js" defer></script>
+  <script src="chestnut-keywords.js" defer></script>
+  <script src="editor-store.js" defer></script>
+  <script src="editor-panels.js" defer></script>
+  <script src="site-editor.js" defer></script>
   <script src="wall-motion.js" defer></script>
   <script src="constellation.js" defer></script>
   <script src="reading-experience.js" defer></script>
@@ -34,12 +39,23 @@
   <link rel="stylesheet" href="poetry-garden.css">
   <script src="poetry-garden.js" defer></script>
   <link rel="stylesheet" href="chestnut-gravity.css">
+  <link rel="stylesheet" href="site-editor.css">
   <script src="chestnut-gravity.js" defer></script>
   <script src="app.js" defer></script>
+  <link rel="stylesheet" href="record-player.css">
+  <script src="record-player.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">跳到正文</a>
   <div class="mobile-shade" id="mobile-shade"></div>
+  <div class="record-player" data-record-player data-playing="false">
+    <button type="button" class="record-toggle" aria-label="播放音乐：Red Rock Riviera — Sea Power" aria-pressed="false" title="播放 · Red Rock Riviera — Sea Power">
+  <span class="record-ripples" aria-hidden="true"><i></i><i></i><i></i></span>
+  <img class="record-disc" src="assets/shili-record-v52.svg" width="48" height="48" alt="" draggable="false">
+    </button>
+    <audio src="assets/red-rock-riviera-sea-power.mp3" preload="none" loop></audio>
+    <span class="record-status" data-record-status role="status" aria-live="polite" hidden></span>
+  </div>
   <div class="site-shell">
     <div class="site-corners"><a class="corner-brand" href="#/home" aria-label="十里先生，返回首页">十里<br>先生</a><span id="breadcrumb" hidden></span><nav id="navigation" aria-label="主导航"></nav><div class="corner-tools"><button id="theme-toggle" class="text-tool" aria-label="切换深色模式">◐ <span>夜读模式</span></button></div></div>
     <main id="main" tabindex="-1"></main>

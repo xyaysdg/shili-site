@@ -5,13 +5,15 @@ function libraryBookMarkup(a,index){
  const [color,ink]=articleBookPalette.get(a.slug);
  return `<a class="shelf-book" href="#/article/${E(a.slug)}" data-book-slug="${E(a.slug)}" aria-label="阅读：${E(a.title)}" style="--book-color:${color};--book-ink:${ink}"><span class="book-motion"><span class="book-object"><span class="book-spine"><span class="book-spine-rule"></span><span class="book-spine-title">${E(a.title)}</span><span class="book-spine-number">${String(index+1).padStart(2,'0')}</span></span><span class="book-cover"><span class="book-cover-category">${E(a.category)}</span><span class="book-cover-title">${E(a.title)}</span><span class="book-cover-bottom"><span>十里先生</span><time>${E(a.date.replaceAll('-','.'))}</time></span></span><span class="book-pages book-pages-top"></span><span class="book-pages book-pages-bottom"></span><span class="book-pages book-pages-side"></span><span class="book-back"></span></span></span></a>`;
 }
+function libraryIndexLinks(matching){return matching.map(a=>`<a href="#/article/${E(a.slug)}">${E(a.title)}</a>`).join('');}
 function corridorMarkup(all,matching){
- const rows=Array.from({length:6},(_,row)=>`<div class="library-row ${row===0||row===5?'library-decoration-row':''}" data-row="${row}" style="--row:${row}"><div class="library-fillers" aria-hidden="true">${Array.from({length:66},()=>'<span class="library-dummy"><i class="dummy-spine"></i><i class="dummy-cover"></i><i class="dummy-top"></i></span>').join('')}</div><div class="library-plank"></div><div class="library-plank-edge"></div>${row>0&&row<5?'<div class="library-article-slot"></div>':''}</div>`).join('');
- return `<div class="library-viewport" tabindex="0" role="region" aria-label="无限立体书架，左右拖动或使用左右方向键探索" data-articles="${E(JSON.stringify(matching.map(a=>a.slug)))}"><div class="library-plane">${rows}</div></div><div class="library-letters" aria-hidden="true">${Array.from({length:9},()=>'<span></span>').join('')}</div><div class="library-index" id="library-index" hidden>${matching.map(a=>`<a href="#/article/${E(a.slug)}">${E(a.title)}</a>`).join('')}</div>`;
+ const rows=Array.from({length:6},(_,row)=>`<div class="library-row ${row===0||row===5?'library-decoration-row':''}" data-row="${row}" style="--row:${row}"><div class="library-fillers" aria-hidden="true"><div class="library-filler-track">${Array.from({length:66},()=>'<span class="library-dummy"><i class="dummy-spine"></i><i class="dummy-cover"></i><i class="dummy-top"></i></span>').join('')}</div></div><div class="library-plank"></div><div class="library-plank-edge"></div>${row>0&&row<5?'<div class="library-article-slot"></div>':''}</div>`).join('');
+ return `<div class="library-viewport" tabindex="0" role="region" aria-label="无限立体书架，左右拖动或使用左右方向键探索" data-articles="${E(JSON.stringify(matching.map(a=>a.slug)))}"><div class="library-plane">${rows}</div></div><div class="library-letters" aria-hidden="true">${Array.from({length:9},()=>'<span></span>').join('')}</div><div class="library-index" id="library-index" hidden>${libraryIndexLinks(matching)}</div>`;
 }
 class InfiniteLibrary {
- constructor(element,interaction){
-  this.element=element;this.interaction=interaction;this.root=interaction.root;this.pool=JSON.parse(element.dataset.articles).map(slug=>D.articles.find(a=>a.slug===slug));this.offset=this.target=this.velocity=0;this.listeners=[];this.slots=[...element.querySelectorAll('.library-article-slot')];this.bookFlights=new Map();this.fillers=[...element.querySelectorAll('.library-fillers')].map(e=>[...e.children]);element.library=this;
+  constructor(element,interaction){
+   this.element=element;this.interaction=interaction;this.root=interaction.root;this.pool=JSON.parse(element.dataset.articles).map(slug=>D.articles.find(a=>a.slug===slug));this.offset=this.target=this.velocity=0;this.listeners=[];this.slots=[...element.querySelectorAll('.library-article-slot')];this.bookFlights=new Map();this.fillerTracks=[...element.querySelectorAll('.library-filler-track')];this.fillers=this.fillerTracks.map(e=>[...e.children]);this.hiddenFillers=this.fillers.map(()=>new Set());this.fillerWrapCount=0;this.sizeFrame=0;this.needsSizing=false;element.library=this;
+   this.initFillers();
   const listen=(el,type,fn,options)=>{el.addEventListener(type,fn,options);this.listeners.push(()=>el.removeEventListener(type,fn,options));};
   listen(element,'pointerdown',e=>{if(e.button!==0||!e.isPrimary)return;this.drag={id:e.pointerId,x:e.clientX,y:e.clientY,lastX:e.clientX,lastTime:performance.now(),start:this.target,moved:false};this.velocity=0;});
   listen(element,'pointermove',e=>{const d=this.drag;if(!d||d.id!==e.pointerId)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;if(!d.moved&&Math.abs(dy)>Math.abs(dx)+8){this.drag=null;return;}if(!d.moved&&Math.abs(dx)>7){d.moved=true;element.setPointerCapture(e.pointerId);element.classList.add('is-dragging');interaction.hide();}if(!d.moved)return;e.preventDefault();const now=performance.now(),dt=Math.max(8,now-d.lastTime);this.velocity=.6*this.velocity+.4*(e.clientX-d.lastX)*2.4/dt;this.target=d.start+dx*2.4;d.lastX=e.clientX;d.lastTime=now;this.root.libraryDragUntil=now+400;this.wake();});
@@ -30,10 +32,33 @@ class InfiniteLibrary {
   const titleRGB=(getComputedStyle(this.section.querySelector('h1')).color.match(/[\d.]+/g)||[207,177,109]).slice(0,3).map(Number);
   this.letters.forEach((e,i)=>{const blend=Math.random(),color=[255,237,141].map((v,k)=>Math.round(v+(titleRGB[k]-v)*blend));e.style.color='rgb('+color.join(',')+')';e.style.textShadow='0 0 9px rgba('+color.join(',')+',.25)';e.textContent=characters[Math.floor(Math.random()*characters.length)];e.style.left=(i<7?3+i*6.5+Math.random()*4:64+(i-7)*18+Math.random()*6)+'%';e.style.top=(Math.random()<.5?12+Math.random()*18:75+Math.random()*12)+'%';e.style.fontSize=(30+Math.random()*22)+'px';e.style.setProperty('--letter-angle',(-180+Math.random()*360)+'deg');e.style.setProperty('--letter-turn',((Math.random()<.5?-1:1)*(45+Math.random()*65))+'deg');e.style.setProperty('--letter-dx',(-110+Math.random()*220)+'px');e.style.setProperty('--letter-dy',(-120-Math.random()*100)+'px');e.style.animationDuration=(24+Math.random()*12)+'s';e.style.animationDelay=(-Math.random()*36)+'s';});
   const pauseLetters=()=>this.letters.forEach(e=>e.style.animationPlayState=!this.visible||document.hidden?'paused':'running');listen(document,'visibilitychange',pauseLetters);
-  this.observer=new IntersectionObserver(es=>{this.visible=es[0].isIntersecting;pauseLetters();if(!this.visible){this.velocity=0;this.target=this.offset;if(this.drag&&element.hasPointerCapture(this.drag.id))element.releasePointerCapture(this.drag.id);this.drag=null;element.classList.remove('is-dragging');interaction.hide();cancelAnimationFrame(this.frame);this.frame=0;}},{threshold:0});this.observer.observe(element);this.visible=true;this.resize=new ResizeObserver(()=>this.sizeBooks());this.resize.observe(element);this.paint();this.sizeBooks();
+   this.observer=new IntersectionObserver(es=>{this.visible=es[0].isIntersecting;pauseLetters();if(!this.visible){this.velocity=0;this.target=this.offset;if(this.drag&&element.hasPointerCapture(this.drag.id))element.releasePointerCapture(this.drag.id);this.drag=null;element.classList.remove('is-dragging');interaction.hide();cancelAnimationFrame(this.frame);this.frame=0;this.finishMotion();}},{threshold:0});this.observer.observe(element);this.visible=true;this.resize=new ResizeObserver(()=>{this.needsSizing=true;this.queueSizeBooks();});this.resize.observe(element);this.paint();this.sizeBooks();
   this.entrance=new SectionEntrance(this.section,'library');
  }
- paint(){
+  replaceArticles(articles){
+   // Let the original lifecycle handle unfinished entrances and empty results.
+   if(this.destroyed||!articles.length||this.section.dataset.sceneEntrance!=='ready')return false;
+   this.interaction.hide();
+   this.bookFlights.forEach(animation=>animation.cancel());this.bookFlights.clear();
+   cancelAnimationFrame(this.frame);this.frame=0;
+   cancelAnimationFrame(this.sizeFrame);this.sizeFrame=0;
+   const drag=this.drag;this.drag=null;
+   if(drag&&this.element.hasPointerCapture(drag.id))this.element.releasePointerCapture(drag.id);
+   this.element.classList.remove('is-dragging');this.velocity=0;this.target=this.offset;
+   this.root.libraryDragUntil=0;
+   this.pool=articles;this.element.dataset.articles=JSON.stringify(articles.map(a=>a.slug));
+   this.paint();this.finishMotion();return true;
+  }
+  initFillers(){
+   this.fillers.forEach((books,row)=>books.forEach((element,index)=>{const seed=Math.sin(index*127.1+row*311.7)*43758.5453,random=seed-Math.floor(seed),width=32+((random*71)%17);element.style.left=index*58+'px';element.style.setProperty('--dummy-x',String(index*58-852));element.style.setProperty('--dummy-h',(76+random*21)+'%');element.style.setProperty('--dummy-w',width+'px');element.dataset.width=width.toFixed(3);element.style.transform='translate3d(0,0,0)';}));
+  }
+  syncFillers(positions){
+   const period=3828,phase=((this.offset%period)+period)%period,wrapCount=Math.max(0,Math.floor((phase-.0001)/58));
+   if(wrapCount!==this.fillerWrapCount){const start=Math.min(wrapCount,this.fillerWrapCount),end=Math.max(wrapCount,this.fillerWrapCount);for(const books of this.fillers)for(let count=start;count<end;count++){const element=books[65-count];if(element){const wrapped=wrapCount>this.fillerWrapCount;element.style.transform=wrapped?'translate3d(-3828px,0,0)':'translate3d(0,0,0)';element.style.setProperty('--dummy-wrap',wrapped?'-3828':'0');}}this.fillerWrapCount=wrapCount;}
+   this.fillerTracks.forEach(track=>{track.style.transform=`translate3d(${phase}px,0,0)`;track.style.setProperty('--filler-phase',String(phase));});
+   this.fillers.forEach((books,row)=>{const next=new Set(),articlePositions=positions[row]||[];for(const articleX of articlePositions){const center=Math.round((articleX+852-phase)/58);for(let delta=-2;delta<=2;delta++){const index=((center+delta)%66+66)%66,element=books[index];if(!element)continue;const x=index*58-852+phase-(index>=66-wrapCount?period:0),width=+element.dataset.width;if(x<articleX+43&&x+width>articleX-1)next.add(element);}}for(const element of this.hiddenFillers[row])if(!next.has(element))element.style.visibility='visible';for(const element of next)if(!this.hiddenFillers[row].has(element))element.style.visibility='hidden';this.hiddenFillers[row]=next;});
+  }
+  paint(){
   const period=4050,mod=(n,p)=>((n%p)+p)%p,positions=Array.from({length:6},()=>[]);
   const smooth=n=>{const t=Math.max(0,Math.min(1,n));return t*t*(3-2*t);};
   // Both ends are fully transparent before a world object is recycled.
@@ -46,10 +71,8 @@ class InfiniteLibrary {
    if(slot.dataset.slug!==a.slug){const focused=slot.contains(document.activeElement);slot.dataset.slug=a.slug;slot.innerHTML=libraryBookMarkup(a,D.articles.indexOf(a));changed=true;if(focused)this.element.focus({preventScroll:true});}
    slot.style.transform=`translate3d(${x}px,0,1px)`;slot.style.setProperty('--distance-fog',Math.max(0,Math.min(70,(1200-x)*.055))+'%');const alpha=fade(x,2920);slot.style.setProperty('--distance-alpha',alpha.toFixed(5));const book=slot.querySelector('.shelf-book');book.toggleAttribute('data-distance-hidden',alpha===0);book.tabIndex=alpha>.15?0:-1;positions[row+1].push(x);
   });
-  // Every volume keeps its own world position. Only recycle it outside the visible aisle.
-  // The previous modulo-58 strip reset replaced every silhouette once per book width.
-  this.fillers.forEach((books,row)=>books.forEach((e,i)=>{const base=i*58-852,x=mod(base+this.offset+852,3828)-852,world=Math.round((x-this.offset+852)/58),seed=Math.sin(world*127.1+row*311.7)*43758.5453,random=seed-Math.floor(seed),width=32+((random*71)%17);if(e.dataset.world!==String(world)){e.dataset.world=world;e.style.setProperty('--dummy-h',(76+random*21)+'%');e.style.setProperty('--dummy-w',width+'px');}e.style.transform=`translate3d(${x}px,0,0)`;e.style.setProperty('--distance-fog',Math.max(0,Math.min(45,(1200-x)*.04))+'%');e.style.setProperty('--distance-alpha',fade(x,2920).toFixed(5));e.style.visibility=positions[row].some(p=>x<p+43&&x+width>p-1)?'hidden':'visible';}));
-  this.element.dataset.position=this.offset.toFixed(1);if(changed)this.sizeBooks();this.updateFocusTargets();
+   this.syncFillers(positions);
+   this.element.dataset.position=this.offset.toFixed(1);if(changed){this.needsSizing=true;if(!this.frame&&!this.drag)this.queueSizeBooks();}
  }
  updateFocusTargets(){
   // Recycled volumes beyond the screen must not become invisible Tab stops.
@@ -75,16 +98,18 @@ class InfiniteLibrary {
   const animation=motion.animate(frames,{duration:850,easing:'cubic-bezier(.3,.65,.3,1)',fill:'both'});this.bookFlights.set(motion,animation);
   animation.onfinish=()=>{if(this.bookFlights.get(motion)===animation){animation.cancel();this.bookFlights.delete(motion);}};
  }
- sizeBooks(){let shelfDepth=180;this.slots.forEach(slot=>{
+  queueSizeBooks(){if(this.sizeFrame||this.destroyed)return;this.sizeFrame=requestAnimationFrame(()=>{this.sizeFrame=0;if(this.frame||this.drag)return;this.sizeBooks();});}
+  finishMotion(){if(this.needsSizing)this.sizeBooks();else this.updateFocusTargets();}
+  sizeBooks(){cancelAnimationFrame(this.sizeFrame);this.sizeFrame=0;this.needsSizing=false;let shelfDepth=180;this.slots.forEach(slot=>{
   const height=slot.clientHeight,cover=Math.round(height*(innerWidth<=600?1.05:.7));
   slot.style.setProperty('--cover-width',cover+'px');slot.style.setProperty('--book-depth',cover+'px');shelfDepth=Math.max(shelfDepth,cover+24);
-  let titleSize=Math.max(12,Math.min(27,height*.095));
-  slot.style.setProperty('--cover-title-size',titleSize+'px');slot.style.setProperty('--cover-small-size',Math.max(7,Math.min(12,height*.042))+'px');slot.style.setProperty('--cover-padding',Math.max(6,height*.06)+'px');
+   let titleSize=Math.max(12,Math.min(27,height*.095));
+   slot.style.setProperty('--cover-title-size',titleSize+'px');slot.style.setProperty('--cover-small-size',Math.max(7,Math.min(12,height*.042))+'px');slot.style.setProperty('--cover-padding',Math.max(6,height*.06)+'px');
   const face=slot.querySelector('.book-cover');
   // Start large, then fit the actual original title; long articles must not clip.
-  while(face&&face.scrollHeight>face.clientHeight+1&&titleSize>9){titleSize-=.5;slot.style.setProperty('--cover-title-size',titleSize+'px');}
- });this.element.style.setProperty('--shelf-depth',shelfDepth+'px');this.updateFocusTargets();}
+   if(face&&face.scrollHeight>face.clientHeight+1){let low=9,high=titleSize;while(high-low>.5){const middle=Math.floor((low+high)*2)/4;slot.style.setProperty('--cover-title-size',middle+'px');if(face.scrollHeight<=face.clientHeight+1)low=middle;else high=middle;}titleSize=low;slot.style.setProperty('--cover-title-size',titleSize+'px');}
+   });this.element.style.setProperty('--shelf-depth',shelfDepth+'px');this.updateFocusTargets();}
 
- wake(){if(this.frame||this.destroyed)return;let previous;const step=t=>{const dt=previous?Math.min(40,t-previous):16;previous=t;if(!this.drag){this.target+=this.velocity*dt;this.velocity*=Math.exp(-dt/220);}this.offset+=(this.target-this.offset)*(this.interaction.motion.matches?1:1-Math.exp(-dt/100));this.paint();if(Math.abs(this.target-this.offset)>.1||Math.abs(this.velocity)>.005)this.frame=requestAnimationFrame(step);else{this.frame=0;this.offset=this.target;this.paint();}};this.frame=requestAnimationFrame(step);}
- destroy(){this.bookFlights.forEach(a=>a.cancel());this.bookFlights.clear();this.destroyed=true;cancelAnimationFrame(this.frame);this.entrance.destroy();this.letterLayer.remove();this.observer.disconnect();this.resize.disconnect();this.listeners.forEach(off=>off());}
+  wake(){if(document.body.classList.contains('site-editor-active')||this.frame||this.destroyed)return;let previous;const step=t=>{if(document.body.classList.contains('site-editor-active')){this.frame=0;this.velocity=0;this.target=this.offset;return;}const dt=previous?Math.min(40,t-previous):16;previous=t;if(!this.drag){this.target+=this.velocity*dt;this.velocity*=Math.exp(-dt/220);}this.offset+=(this.target-this.offset)*(this.interaction.motion.matches?1:1-Math.exp(-dt/100));this.paint();if(Math.abs(this.target-this.offset)>.1||Math.abs(this.velocity)>.005)this.frame=requestAnimationFrame(step);else{this.frame=0;this.offset=this.target;this.paint();this.finishMotion();}};this.frame=requestAnimationFrame(step);}
+  destroy(){this.bookFlights.forEach(a=>a.cancel());this.bookFlights.clear();this.destroyed=true;cancelAnimationFrame(this.frame);cancelAnimationFrame(this.sizeFrame);this.entrance.destroy();this.letterLayer.remove();this.observer.disconnect();this.resize.disconnect();this.listeners.forEach(off=>off());}
 }

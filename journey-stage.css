@@ -49,9 +49,9 @@
 #section-journey .page-title-row h1{font-size:clamp(28px,2.5vw,40px)}
 #section-journey .journey-milestone-title{font-size:clamp(17px,1.4vw,20px)}
 #section-journey .journey-copy .prose{font-size:13px;max-width:42em;margin-inline:auto;line-height:2.15}
-#section-journey>.medal-controls{position:absolute;right:28px;bottom:24px;z-index:4;padding:0;border:0;max-width:calc(100% - 40px)}
-#section-journey>.medal-controls>div{justify-content:flex-end}
+#section-journey>.medal-controls{position:absolute;left:28px;right:auto;bottom:24px;z-index:4;padding:0;border:0;max-width:calc(100% - 40px);align-items:flex-start}
+#section-journey>.medal-controls>div{justify-content:flex-start}
 @media(min-width:851px){#section-journey .journey-layout{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(45px,7vw,120px)}#section-journey .medal-exhibit{margin-top:75px;top:135px}}
-@media(max-width:850px){#section-journey{padding-bottom:120px}#section-journey .journey-copy .prose{font-size:14px}#section-journey>.medal-controls{right:20px;bottom:22px}#section-journey .medal-exhibit{margin-top:25px}}
+@media(max-width:850px){#section-journey{padding-bottom:120px}#section-journey .journey-copy .prose{font-size:14px}#section-journey>.medal-controls{left:20px;right:auto;bottom:22px}#section-journey .medal-exhibit{margin-top:25px}}
 /* The medal, cone and copy share document movement during section transitions. */
 #section-journey .medal-exhibit{position:relative;top:auto}

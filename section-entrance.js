@@ -12,7 +12,7 @@ class SectionEntrance {
   listen(window,'shili:scene-arrive',e=>{if(e.detail.id===sceneId){this.navigationPending=false;this.wasOutside=false;this.visible=true;this.play();}});
   // Keep visible overhangs intact after the section's own box has left the viewport.
   this.extentObserver=new IntersectionObserver(entries=>{if(!entries[0].isIntersecting)this.reset();},{rootMargin:'100% 0px'});this.extentObserver.observe(section);
-  listen(this.motion,'change',()=>{if(this.motion.matches)this.finish();else if(this.visible)this.play();});
+  listen(this.motion,'change',()=>{if(this.motion.matches||document.body.classList.contains('site-editor-active'))this.finish();else if(this.visible)this.play();});
   listen(document,'visibilitychange',()=>this.sync());
   listen(window,'beforeprint',()=>this.finish());
   this.modal=new MutationObserver(()=>this.sync());this.modal.observe(document.body,{attributes:true,attributeFilter:['class']});
@@ -48,7 +48,7 @@ class SectionEntrance {
  play(){if(this.kind==='library')this.section.querySelector('.library-viewport')?.library?.updateFocusTargets();if(this.destroyed||this.section.dataset.sceneEntrance==='ready')return;if(this.motion.matches){this.finish();return;}if(this.section.dataset.sceneEntrance==='waiting'){
    this.section.dataset.sceneEntrance='playing';const last=this.animations.at(-1);if(last)last.onfinish=()=>this.finish();
   }this.sync();}
- sync(){if(this.destroyed||this.section.dataset.sceneEntrance!=='playing')return;const paused=!this.visible||document.hidden||document.body.classList.contains('modal-open');this.animations.forEach(a=>{if(a.playState==='finished')return;if(paused)a.pause();else if(a.playState!=='running')a.play();});}
+ sync(){if(document.body.classList.contains('site-editor-active')){this.finish();return;}if(this.destroyed||this.section.dataset.sceneEntrance!=='playing')return;const paused=!this.visible||document.hidden||document.body.classList.contains('modal-open');this.animations.forEach(a=>{if(a.playState==='finished')return;if(paused)a.pause();else if(a.playState!=='running')a.play();});}
  finish(){if(this.destroyed)return;this.section.dataset.sceneEntrance='ready';if(this.kind==='photography')this.section.photography?.bridgeLayers?.forEach(el=>el.dataset.sceneEntrance='ready');this.animations.forEach(a=>{a.onfinish=null;a.cancel();});this.animations=[];this.controls.forEach(e=>e.inert=false);if(this.kind==='photography')this.section.photography?.syncAtmosphere();}
  destroy(){this.finish();this.destroyed=true;this.observer.disconnect();this.extentObserver.disconnect();this.modal.disconnect();this.listeners.forEach(off=>off());}
 }

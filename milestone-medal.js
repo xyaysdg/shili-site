@@ -53,7 +53,7 @@ function milestoneMedalMarkup(){
 class MilestoneMedal {
  constructor(root){
   this.root=root;this.stage=root.querySelector('.medal-stage');this.orbit=root.querySelector('.medal-orbit');this.rotor=root.querySelector('.medal-rotor');this.pause=root.querySelector('.medal-pause');this.flip=root.querySelector('.medal-flip');this.reset=root.querySelector('.medal-reset');this.status=root.querySelector('.medal-status');
-  this.yaw=0;this.pitch=0;this.targetYaw=0;this.targetPitch=0;this.baseYaw=0;this.time=0;this.frame=0;this.listeners=[];this.visible=false;this.reduced=matchMedia('(prefers-reduced-motion: reduce)');this.paused=this.reduced.matches;
+  this.yaw=0;this.pitch=0;this.targetYaw=0;this.targetPitch=0;this.baseYaw=0;this.time=0;this.frame=0;this.listeners=[];this.visible=false;this.reduced=matchMedia('(prefers-reduced-motion: reduce)');this.paused=true;
   const edge=root.querySelector('.medal-edge');
   const outline=root.querySelector('.medal-outline'),length=outline.getTotalLength();
   for(let i=0;i<96;i++){
@@ -92,7 +92,7 @@ class MilestoneMedal {
  nearestFace(offset,reference){return Math.round((reference-offset)/360)*360+offset;}
  toggleMotion(){if(this.reduced.matches)return;if(this.paused){this.paused=false;this.baseYaw=this.nearestFace(Math.cos(this.yaw*Math.PI/180)>=0?0:180,this.yaw);this.time=0;}else{this.paused=true;this.targetYaw=this.yaw;this.targetPitch=this.pitch;}this.sync();this.wake();}
  cancelDrag(){if(!this.drag)return;const id=this.drag.id;this.drag=null;this.root.classList.remove('is-dragging');if(this.orbit.hasPointerCapture(id))this.orbit.releasePointerCapture(id);this.targetYaw=this.yaw;this.targetPitch=this.pitch;}
- sync(){this.pause.disabled=this.reduced.matches;this.pause.textContent=this.reduced.matches?'已减少动态':this.paused?'继续转动 ▷':'暂停转动 Ⅱ';this.pause.setAttribute('aria-pressed',String(this.paused));this.flip.textContent=Math.cos(this.targetYaw*Math.PI/180)>=0?'查看背面 ↻':'查看正面 ↻';}
+ sync(){this.pause.disabled=this.reduced.matches;this.pause.textContent=this.reduced.matches?'已减少动态':this.paused?'继续转动 ▷':'暂停转动 Ⅱ';this.pause.setAttribute('aria-pressed',String(this.paused));this.flip.dataset.face=Math.cos(this.targetYaw*Math.PI/180)>=0?'front':'back';this.flip.textContent=this.flip.dataset.face==='front'?'查看背面 ↻':'查看正面 ↻';}
  wake(){if(this.destroyed)return;if(!this.visible||document.hidden||document.body.classList.contains('modal-open')){cancelAnimationFrame(this.frame);this.frame=0;return;}if(!this.frame){this.previous=0;this.frame=requestAnimationFrame(t=>this.tick(t));}}
  tick(t){
   this.frame=0;if(this.destroyed||!this.visible||document.hidden||document.body.classList.contains('modal-open'))return;const dt=this.previous?Math.min((t-this.previous)/1000,.05):0;this.previous=t;
