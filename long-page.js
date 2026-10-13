@@ -32,12 +32,16 @@ class LongPageController {
  request(){if(!this.frame)this.frame=requestAnimationFrame(()=>{this.frame=0;this.paint();});}
  paint(){
   const center=innerHeight*.5;
-  this.copies.forEach(el=>{const r=el.getBoundingClientRect();const distance=Math.abs(r.top+r.height/2-center);const focus=Math.max(0,1-distance/(innerHeight*.48));const opacity=focus>.86?1:Math.max(.025,Math.pow(focus,2.6));el.style.opacity=this.reduced.matches?1:opacity.toFixed(3);el.style.filter=this.reduced.matches?'none':`blur(${((1-focus)*.55).toFixed(2)}px)`;});
-  let active=this.sections[0];for(const section of this.sections){if(section.getBoundingClientRect().top<=innerHeight*.40)active=section;}
-  const intro=document.querySelector('.intro-sequence');document.body.classList.toggle('intro-active',intro.getBoundingClientRect().bottom>innerHeight*.4);
+  // Read geometry together before changing filters/classes. Reuse section rectangles within this paint.
+  const copies=this.copies.map(el=>({el,r:el.getBoundingClientRect()}));
+  const sections=this.sections.map(el=>({el,r:el.getBoundingClientRect()}));
+  const introBottom=document.querySelector('.intro-sequence').getBoundingClientRect().bottom;
+  for(const {el,r} of copies){const distance=Math.abs(r.top+r.height/2-center),focus=Math.max(0,1-distance/(innerHeight*.48)),opacity=focus>.86?1:Math.max(.025,Math.pow(focus,2.6));el.style.opacity=this.reduced.matches?1:opacity.toFixed(3);el.style.filter=this.reduced.matches?'none':`blur(${((1-focus)*.55).toFixed(2)}px)`;}
+  let active=this.sections[0];for(const {el,r} of sections){if(r.top<=innerHeight*.40)active=el;}
+  document.body.classList.toggle('intro-active',introBottom>innerHeight*.4);
   document.body.classList.toggle('sky-active',active.dataset.section==='pantheon');document.body.classList.toggle('journey-active',active.dataset.section==='journey');
   if(!this.navigating&&active.dataset.section!==this.current)this.activate(active.dataset.section,true);
-  for(const section of this.sections){if(section.classList.contains('intro-scene'))continue;const r=section.getBoundingClientRect();if(r.bottom<0||r.top>innerHeight)continue;const progress=Math.max(0,Math.min(1,(innerHeight-r.top)/(innerHeight*.68)));section.style.setProperty('--section-arrival',this.reduced.matches?1:progress);}
+  for(const {el:section,r} of sections){if(section.classList.contains('intro-scene')||r.bottom<0||r.top>innerHeight)continue;const progress=Math.max(0,Math.min(1,(innerHeight-r.top)/(innerHeight*.68)));section.style.setProperty('--section-arrival',this.reduced.matches?1:progress);}
  }
  activate(id,updateHash=false){document.body.classList.toggle('journey-active',id==='journey');this.current=id;activeRoute=id;document.querySelectorAll('#navigation a').forEach(a=>{const on=a.getAttribute('href')==='#/'+id;a.classList.toggle('active',on);if(on)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current');});document.title=displayTitles[id]+' · 十里 · 内陆帝国';if(updateHash)history.replaceState(null,'','#/'+id);window.dispatchEvent(new CustomEvent('shili:section-active',{detail:{id}}));}
  cancel(){cancelAnimationFrame(this.scrollFrame);this.scrollFrame=0;this.navigating=false;this.target=scrollY;}

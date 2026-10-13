@@ -94,6 +94,7 @@ class ConstellationWall {
   const ease=(a,b)=>{const p=Math.max(0,Math.min(1,(t-a)/(b-a)));return p*p*(3-2*p);};
   const linkProgress=ease(5.9,7.8),finish=ease(7.9,9.4);
   if(!this.entrancePainted||t<9.4){
+  this.section?.style.setProperty('--pantheon-glow',ease(.5,1.7));
   this.section?.style.setProperty('--pantheon-title',ease(.15,1.35));
   this.wall.dataset.entrance=t>=9.4?'ready':t<1.4?'title':t<5.9?'pictures':t<7.9?'lines':'stars';
   this.sky.style.opacity=finish;this.wall.style.setProperty("--pantheon-stars",finish);
@@ -114,5 +115,5 @@ class ConstellationWall {
    n.copies.forEach(c=>{c.shell.classList.toggle('is-selected',n===this.selected);c.shell.style.transform=`translate3d(${(n.x+c.shift*this.width-n.w/2).toFixed(3)}px,${(n.y-n.h/2).toFixed(3)}px,0)`;});
   });
  }
- destroy(){this.destroyed=true;delete this.wall.constellation;cancelAnimationFrame(this.frame);this.resize.disconnect();this.intersection.disconnect();this.mutation.disconnect();this.listeners.forEach(off=>off());}
+ destroy(){this.destroyed=true;this.section?.style.removeProperty('--pantheon-glow');delete this.wall.constellation;cancelAnimationFrame(this.frame);this.resize.disconnect();this.intersection.disconnect();this.mutation.disconnect();this.listeners.forEach(off=>off());}
 }

@@ -57,7 +57,8 @@
 @media print{.museum-stage,.museum-stage :is(.museum-floor,.museum-visitor,.museum-wall-label,.museum-frame){opacity:1!important;mask-image:none!important}}
 
 /* Visible soles end 1.5px above the PNG box; keep this contact point during retreat. */
-.museum-visitor{transform-origin:50% calc(100% - 1.5px)}
+.museum-stage{--visitor-sole-inset:1.52px}
+.museum-visitor{transform-origin:50% calc(100% - var(--visitor-sole-inset))}
 /* Eased color progression meets both solid sections without a hard change at either end. */
 .section-bridge[data-from="art"][data-to="photography"]{background:linear-gradient(180deg in oklab,var(--bridge-from) 0%,color-mix(in oklab,var(--bridge-from) 97%,var(--bridge-to)) 12%,color-mix(in oklab,var(--bridge-from) 86%,var(--bridge-to)) 25%,color-mix(in oklab,var(--bridge-from) 50%,var(--bridge-to)) 50%,color-mix(in oklab,var(--bridge-from) 14%,var(--bridge-to)) 75%,color-mix(in oklab,var(--bridge-from) 3%,var(--bridge-to)) 88%,var(--bridge-to) 100%)}
 
@@ -67,9 +68,10 @@
 
 /* V43: longer museum dissolve and a solid night-sky handoff before Pantheon stars appear. */
 .section-bridge[data-from="art"][data-to="photography"]{background:linear-gradient(180deg in oklab,var(--bridge-from) 0 7%,color-mix(in oklab,var(--bridge-from) 96%,var(--bridge-to)) 16%,color-mix(in oklab,var(--bridge-from) 78%,var(--bridge-to)) 31%,color-mix(in oklab,var(--bridge-from) 48%,var(--bridge-to)) 50%,color-mix(in oklab,var(--bridge-from) 20%,var(--bridge-to)) 70%,color-mix(in oklab,var(--bridge-from) 4%,var(--bridge-to)) 86%,var(--bridge-to) 95% 100%)}
-.section-bridge[data-from="journey"][data-to="pantheon"]{height:clamp(3200px,480svh,6200px);background:linear-gradient(180deg in oklab,#030405 0 8%,#04060a 24%,#050a14 46%,#071020 70%,#090f21 92% 100%)}
+.section-bridge[data-from="journey"][data-to="pantheon"]{height:clamp(3200px,480svh,6200px);background:linear-gradient(180deg in oklab,#030405 0 8%,#04060a 24%,#050a14 46%,#071020 70%,var(--bridge-to,#090f21) 92% 100%)}
 
 /* V40: reflected visitor silhouette replaces the cast shadow. */
-.museum-stage::after{left:29%;bottom:-1px;width:32px;height:43px;transform:translateX(-50%) scaleY(-1);transform-origin:center;background:var(--museum-visitor-image,none) center/32px 43px no-repeat;filter:blur(.45px);mask-image:linear-gradient(transparent,#0009 60%,#000d);opacity:calc(.5 * var(--entrance-person,1))}
-.museum-stage[data-departure]::after{transform:translate(-50%,calc(var(--departure-retreat,0)*160px)) scaleY(-1)}
+/* Match the person's contain sizing and mirror around the visible soles, not the PNG box. */
+.museum-stage::after{left:29%;bottom:42px;width:32px;height:48px;transform:translateX(-50%) scaleY(-.8958333333);transform-origin:50% calc(100% - var(--visitor-sole-inset));background:var(--museum-visitor-image,none) center/contain no-repeat;filter:blur(.45px);mask-image:linear-gradient(transparent,#0009 60%,#000d);opacity:calc(.5 * var(--entrance-person,1))}
+.museum-stage[data-departure]::after{transform:translate(-50%,calc(var(--departure-retreat,0)*160px)) scaleY(-.8958333333)}
 .museum-reflection{filter:blur(.55px);opacity:calc(.65 * var(--entrance-reflection,1));mask-image:linear-gradient(#000e,#0009 45%,transparent)}

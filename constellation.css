@@ -52,8 +52,11 @@ body.pantheon-page{--paper:#090f21;--side:#0c1428;--ink:#e3e9f7;--muted:#a6b2cd;
 @media(max-width:600px){.pantheon-heading{padding-top:30px}.pantheon-heading h1{font-size:24px;letter-spacing:6px;padding-left:6px}.pantheon-heading p{font-size:10px;letter-spacing:2px}.pantheon-page .constellation-wall.diagonal-wall .flow-viewport{height:580px}}
 
 /* The section itself is the canvas: no inner 1320px window or clipped seams. */
-#section-pantheon{padding:0;height:calc(100svh - 62px);min-height:600px;overflow:hidden;background-color:#090f21;background-image:radial-gradient(ellipse at 68% 34%,#22335b66,transparent 63%),radial-gradient(ellipse at 18% 74%,#2a204c33,transparent 55%);background-size:100% 100%}
-#section-pantheon .section-content{position:relative;width:100%;height:100%;max-width:none;opacity:1;transform:none;translate:none}
+#section-pantheon{--bridge-top:#090f21;padding:0;height:calc(100svh - 62px);min-height:600px;overflow:hidden;background-color:#090f21;background-image:radial-gradient(ellipse at 68% 34%,#22335b66,transparent 63%),radial-gradient(ellipse at 18% 74%,#2a204c33,transparent 55%);background-size:100% 100%}
+/* Reveal the existing gradient through a solid veil; leave the editor's texture source intact. */
+#section-pantheon::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:#090f21;opacity:calc(1 - var(--pantheon-glow,0))}
+#section-pantheon[data-editor-background]::before{display:none}
+#section-pantheon .section-content{position:relative;z-index:1;width:100%;height:100%;max-width:none;opacity:1;transform:none;translate:none}
 #section-pantheon .pantheon-heading{position:absolute;z-index:9;inset:0 0 auto;padding:clamp(30px,4vh,52px) 0 0;pointer-events:none}
 #section-pantheon .constellation-wall{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;box-shadow:none;background:transparent}
 #section-pantheon .constellation-wall .flow-viewport{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:0}
@@ -64,6 +67,6 @@ body.pantheon-page{--paper:#090f21;--side:#0c1428;--ink:#e3e9f7;--muted:#a6b2cd;
 /* V40: opacity is driven by the same paused/visibility-aware clock as the field. */
 #section-pantheon .pantheon-heading{opacity:var(--pantheon-title,0)}
 .constellation-wall .star-node{will-change:transform,opacity}
-@media(prefers-reduced-motion:reduce){#section-pantheon .pantheon-heading{opacity:1}}
+@media(prefers-reduced-motion:reduce){#section-pantheon .pantheon-heading{opacity:1}#section-pantheon::before{opacity:0}}
 
 .constellation-wall .star-card::before{opacity:var(--pantheon-stars,0)}

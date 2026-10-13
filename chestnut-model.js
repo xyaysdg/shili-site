@@ -18,7 +18,7 @@ export async function loadChestnutModel(host){
   attach(sharedRenderer,K){renderer=sharedRenderer;target=new K.Target(1,1,{samples:4,depthBuffer:true,resolveDepthBuffer:false,resolveStencilBuffer:false});target.texture.generateMipmaps=false;this.texture=target.texture;host.dataset.modelRenderer='shared-context';},
   draw({time,paused,handle,delta,clickAge=100,clickPointer=[0,0],holeScreen=[0,0],aspect=1,entrance=20,reduced=false,diskLight=[-.5,1]}){
    if(disposed||!renderer||!handle)return;
-   const size=parseFloat(handle.style.width)*.92;if(size<1)return;
+   const size=parseFloat(handle.style.width)*.92*1.05;if(size<1)return;
    if(Math.abs(size-previousSize)>2){const pixels=Math.max(1,Math.round(size*Math.min(Math.max(devicePixelRatio||1,1.5),2)));target.setSize(pixels,pixels);previousSize=size;lastPose='';}
    if(!paused)angle-=Math.min(delta,.1)*.075;
    pivot.rotation.y=angle;pivot.rotation.x=.12+Math.sin(time*.24)*.065;

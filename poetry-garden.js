@@ -17,18 +17,19 @@ function poetryGardenMarkup(){
 }
 class PoetryGarden{
  constructor(root){
-  this.root=root;root.poetryGarden=this;this.space=root.querySelector('.poetry-space');this.leaves=[...root.querySelectorAll('[data-poem]')];this.pages=this.leaves.map(el=>({...POETRY_LEAVES[+el.dataset.poem],sourceIndex:+el.dataset.poem}));this.ghosts=[...root.querySelectorAll('.poetry-ghost')];this.bleed=650;this.reader=root.querySelector('.poetry-reader');this.cleanups=[];this.motion=matchMedia('(prefers-reduced-motion: reduce)');this.visible=false;this.frame=0;this.elapsed=0;this.pan=0;this.panTarget=0;this.mx=this.my=0;this.pointer={x:0,y:0};this.hover=null;this.focus=null;this.entranceTime=0;this.entered=false;this.readerRevealed=false;
+  this.root=root;root.poetryGarden=this;this.space=root.querySelector('.poetry-space');this.leaves=[...root.querySelectorAll('[data-poem]')];this.pages=this.leaves.map(el=>({...POETRY_LEAVES[+el.dataset.poem],sourceIndex:+el.dataset.poem}));this.ghosts=[...root.querySelectorAll('.poetry-ghost')];this.bleed=650;this.reader=root.querySelector('.poetry-reader');this.cleanups=[];this.motion=matchMedia('(prefers-reduced-motion: reduce)');this.visible=false;this.frame=0;this.elapsed=0;this.pan=0;this.panTarget=0;this.mx=this.my=0;this.pointer={x:0,y:0};this.hover=null;this.focus=null;this.entranceTime=0;this.entered=false;
   this.assetCleanup=prepareSceneAssets(root,()=>root.style.setProperty('--poetry-default-image','url("assets/poetry-ink-v29.png")'));
   const on=(el,type,fn,opts)=>{el.addEventListener(type,fn,opts);this.cleanups.push(()=>el.removeEventListener(type,fn,opts));};
   on(root.querySelector('[data-poem-prev]'),'click',()=>this.nextPoem(-1));
   on(root.querySelector('[data-poem-next]'),'click',()=>this.nextPoem(1));
-  on(root.querySelector('[data-poem-close]'),'click',()=>this.closeReader());
+  on(root.querySelector('[data-poem-close]'),'click',e=>this.closeReader(e.detail===0));
   on(root.querySelector('.poetry-original'),'click',e=>{e.currentTarget.dataset.gallery='poetry';openGallery(D.sections.poetry.gallery,this.pages[this.index]?.sourceIndex??0,e.currentTarget);});
-  on(root,'keydown',e=>{if(e.key==='Escape'&&!this.reader.hidden&&!document.body.classList.contains('modal-open')){e.preventDefault();e.stopPropagation();this.closeReader();}});
+  on(root,'keydown',e=>{if(e.key==='Escape'&&!this.reader.hidden&&!document.body.classList.contains('modal-open')){e.preventDefault();e.stopPropagation();this.closeReader(true);}});
   on(root.querySelector('.poetry-fall-toggle'),'click',e=>{this.paused=!this.paused;e.currentTarget.setAttribute('aria-pressed',String(this.paused));e.currentTarget.textContent=this.paused?'继续飘落':'暂停飘落';this.sync();});
   this.leaves.forEach((leaf,i)=>{
    on(leaf,'click',()=>{if(performance.now()>=(this.dragUntil||0))this.open(i);});
-   on(leaf,'pointerenter',e=>{if(e.pointerType==='mouse')this.hover=i;});
+   // A panel disappearing under a stationary pointer must not pause the revealed card.
+   on(leaf,'pointermove',e=>{if(e.pointerType==='mouse')this.hover=i;});
    on(leaf,'pointerleave',()=>{if(this.hover===i)this.hover=null;});
    on(leaf,'focus',()=>{this.focus=i;const item=this.nodes[i];if(item&&Math.abs(item.travel-item.margin-this.height/2)>this.height/2){item.travel=item.margin+this.height/2;item.pose=null;}if(leaf.matches(':focus-visible')){const n=this.nodes[i];this.panTarget=this.clamp(this.width/2-n.screenX);this.wake();}});
    on(leaf,'blur',()=>this.focus=null);
@@ -52,9 +53,29 @@ class PoetryGarden{
   [...this.leaves,...this.ghosts].forEach(el=>applyPoetryPaper(el,POETRY_LEAVES[+(el.dataset.poem??el.dataset.source)]));
   this.layout();this.resetEntrance();
  }
- open(i,focus=true){if(!this.pages.length)return;i=Math.max(0,Math.min(this.pages.length-1,i));this.readerRevealed=true;this.index=i;const p=this.pages[i];this.reader.querySelector('h2').textContent=p.title;this.reader.querySelector('.poetry-reader-lines').innerHTML=(p.kind==='image'?`<img class="poetry-upload-image" src="${E(p.src)}" alt="${E(p.title)}">`:'')+poetryLinesMarkup(p.body);this.reader.querySelector('.poetry-reader-author').hidden=p.kind==='image';this.reader.querySelector('.poetry-count').textContent=String(p.sourceIndex+1).padStart(2,'0')+' / '+POETRY_LEAVES.length;this.reader.querySelector('.poetry-reader-scroll').scrollTop=0;this.reader.hidden=false;this.leaves.forEach((e,j)=>e.setAttribute('aria-expanded',String(i===j)));if(focus)this.reader.querySelector('[data-poem-close]').focus({preventScroll:true});}
+ cancelReaderInk(){this.readerInkToken=(this.readerInkToken||0)+1;this.readerInk?.forEach(a=>a.cancel());this.readerInk=[];}
+ open(i,focus=true){
+  if(!this.pages.length)return;i=Math.max(0,Math.min(this.pages.length-1,i));
+  const switching=!this.reader.hidden&&this.index!==i;this.cancelReaderInk();this.index=i;this.hover=null;
+  const token=this.readerInkToken,p=this.pages[i],title=this.reader.querySelector('h2'),lines=this.reader.querySelector('.poetry-reader-lines'),texts=[title,lines];
+  const render=()=>{title.textContent=p.title;lines.innerHTML=(p.kind==='image'?`<img class="poetry-upload-image" src="${E(p.src)}" alt="${E(p.title)}">`:'')+poetryLinesMarkup(p.body);this.reader.querySelector('.poetry-reader-author').hidden=p.kind==='image';this.reader.querySelector('.poetry-count').textContent=String(p.sourceIndex+1).padStart(2,'0')+' / '+POETRY_LEAVES.length;this.reader.querySelector('.poetry-reader-scroll').scrollTop=0;this.reader.hidden=false;this.leaves.forEach((e,j)=>e.setAttribute('aria-expanded',String(i===j)));};
+  if(switching&&!this.motion.matches&&texts.every(e=>typeof e.animate==='function')){
+   // Only the ink changes; keep the paper panel and controls still and usable.
+   const outgoing=this.readerInk=texts.map(e=>e.animate([{opacity:1,filter:'blur(0px)'},{opacity:0,filter:'blur(3px)'}],{duration:120,easing:'ease-out',fill:'forwards'}));
+   Promise.all(outgoing.map(a=>a.finished)).then(()=>{
+    if(token!==this.readerInkToken||this.reader.hidden)return;
+    outgoing.forEach(a=>a.cancel());render();
+    const mask={maskImage:'linear-gradient(to bottom,#000 0%,#000 35%,transparent 65%,transparent 100%)',maskSize:'100% 300%',maskRepeat:'no-repeat'};
+    const frames=[{opacity:0,filter:'blur(6px)',maskPosition:'0% 100%'},{offset:.45,opacity:.72,filter:'blur(1.5px)',maskPosition:'0% 20%'},{opacity:1,filter:'blur(0px)',maskPosition:'0% 0%'}].map(f=>({...mask,...f}));
+    const incoming=this.readerInk=texts.map(e=>e.animate(frames,{duration:520,easing:'cubic-bezier(.2,.65,.3,1)',fill:'forwards'}));
+    Promise.all(incoming.map(a=>a.finished)).then(()=>{if(token===this.readerInkToken)this.cancelReaderInk();}).catch(()=>{});
+   }).catch(()=>{});
+  }else render();
+  if(focus)this.reader.querySelector('[data-poem-close]').focus({preventScroll:true});
+ }
+
  nextPoem(step){const source=this.pages[this.index]?.sourceIndex;for(let k=1;k<=this.pages.length;k++){const i=(this.index+step*k+this.pages.length)%this.pages.length;if(this.pages[i].sourceIndex!==source){this.open(i,false);return;}}}
- closeReader(){this.reader.hidden=true;const leaf=this.leaves[this.index];leaf?.setAttribute('aria-expanded','false');(leaf&&getComputedStyle(leaf).visibility!=='hidden'?leaf:this.space).focus({preventScroll:true});}
+ closeReader(restoreLeaf=false){this.cancelReaderInk();this.reader.hidden=true;this.hover=null;this.focus=null;this.leaves.forEach(e=>e.setAttribute('aria-expanded','false'));const leaf=this.leaves[this.index];(restoreLeaf&&leaf&&getComputedStyle(leaf).visibility!=='hidden'?leaf:this.space).focus({preventScroll:true});this.wake();}
  clamp(x){return Math.max(Math.min(0,this.width-this.worldWidth),Math.min(0,x));}
  layout(){
   const previous=this.nodes;
@@ -87,11 +108,11 @@ class PoetryGarden{
   });
   // One evenly spaced vertical loop prevents the old burst/empty rhythm.
   // Near and far papers are interleaved so depth also stays visually balanced.
+  this.flowNodes=[...this.nodes,...this.decorNodes];
   const flow=[],count=Math.max(this.nodes.length,this.decorNodes.length);
   for(let k=0;k<count;k++){if(this.nodes[k])flow.push(this.nodes[k]);if(this.decorNodes[k])flow.push(this.decorNodes[k]);}
   const flowTop=-this.height*.58,flowSpan=this.height*2.16;
   flow.forEach((n,k)=>{const old=n.decor?oldGhosts[n.i]:previous?.find(x=>x.i===n.i);let phase=old?.flowPhase??((k+.5)/flow.length);if(old?.flowSpan&&old.entryDone){phase=((old.travel-old.margin-old.flowTop)/old.flowSpan)%1;if(phase<0)phase+=1;}n.flowPhase=phase;n.flowTop=flowTop;n.flowSpan=flowSpan;n.screenY=flowTop+phase*flowSpan;n.travel=n.margin+n.screenY;n.fallSpeed=small?22:24;n.cycle=flowSpan;});
-  const intro=this.root.querySelector(".poetry-intro");this.copyZone={left:intro.offsetLeft,right:intro.offsetLeft+intro.offsetWidth,cy:(small?intro.offsetTop+intro.offsetHeight/2:this.root.clientHeight/2)-this.space.offsetTop,half:intro.offsetHeight/2,softness:small?40:180};
   this.pan=this.panTarget=this.clamp(this.panTarget);
   this.nodes.forEach(n=>{
    const e=this.leaves[n.i];e.classList.toggle('is-long',this.pages[n.i].body.length>250);e.style.width=n.w+'px';e.style.height=n.h+'px';e.style.zIndex='auto';
@@ -106,11 +127,12 @@ class PoetryGarden{
   this.draw();this.sync();
  }
  active(){return !document.body.classList.contains('site-editor-active')&&this.visible&&!this.blurred&&!document.hidden&&!document.body.classList.contains('modal-open');}
- sync(){if(document.body.classList.contains('site-editor-active')){this.entered=true;this.entranceTime=60;this.updateEntrance(0);this.draw();}if(this.motion.matches&&this.entered)this.updateEntrance(0);if(!this.active()){cancelAnimationFrame(this.frame);this.frame=0;this.last=0;return;}if(this.motion.matches){cancelAnimationFrame(this.frame);this.frame=0;this.pan=this.panTarget;this.draw();}else this.wake();}
+ sync(){if(this.motion.matches&&this.readerInk?.length)this.open(this.index,false);if(document.body.classList.contains('site-editor-active')){this.entered=true;this.entranceTime=60;this.updateEntrance(0);this.draw();}if(this.motion.matches&&this.entered)this.updateEntrance(0);if(!this.active()){cancelAnimationFrame(this.frame);this.frame=0;this.last=0;return;}if(this.motion.matches){cancelAnimationFrame(this.frame);this.frame=0;this.pan=this.panTarget;this.draw();}else this.wake();}
  wake(){if(!this.active())return;if(this.motion.matches){this.pan=this.panTarget;this.draw();return;}if(this.frame)return;this.last=0;const tick=t=>{this.frame=0;if(!this.active())return;const dt=this.last?Math.min(40,t-this.last):16;this.last=t;this.frameStep=dt/1000;this.elapsed+=dt/1000;this.updateEntrance(dt/1000);this.advanceFall(dt/1000);this.smoothing=1-Math.exp(-dt/170);const follow=1-Math.exp(-dt/210);this.mx+=(this.pointer.x-this.mx)*follow;this.my+=(this.pointer.y-this.my)*follow;this.pan+=(this.panTarget-this.pan)*(1-Math.exp(-dt/115));this.draw();if(this.paused&&this.entranceTime>5.5&&Math.abs(this.panTarget-this.pan)<.1&&Math.abs(this.pointer.x-this.mx)<.001&&Math.abs(this.pointer.y-this.my)<.001){this.last=0;return;}this.frame=requestAnimationFrame(tick);};this.frame=requestAnimationFrame(tick);}
  resetEntrance(){
-  this.entered=false;this.entranceTime=0;this.readerRevealed=false;this.reader.hidden=true;this.root.dataset.entrance='waiting';this.hover=null;this.focus=null;
-  [...(this.nodes||[]),...(this.decorNodes||[])].forEach((n,k)=>{n.travel=this.paused?n.margin+n.screenY:0;n.entryAge=-n.entryDelay;n.entryDone=!!this.paused;n.motionRate=1;n.age=0;n.pose=null;n.copyOffset=0;n.copySide=null;n.admitted=Math.random()*100<n.chance;if(!n.decor)this.leaves[n.i].setAttribute('aria-expanded','false');});
+  this.cancelReaderInk();
+  this.entered=false;this.entranceTime=0;this.reader.hidden=true;this.root.dataset.entrance='waiting';this.hover=null;this.focus=null;
+  (this.flowNodes||[]).forEach((n,k)=>{n.travel=this.paused?n.margin+n.screenY:0;n.entryAge=-n.entryDelay;n.entryDone=!!this.paused;n.motionRate=1;n.age=0;n.pose=null;n.admitted=Math.random()*100<n.chance;if(!n.decor)this.leaves[n.i].setAttribute('aria-expanded','false');});
   this.draw();
  }
  updateEntrance(dt){
@@ -118,11 +140,10 @@ class PoetryGarden{
   this.entranceTime=this.motion.matches?20:this.entranceTime+dt;
   const t=this.entranceTime,stage=t<.35?'waiting':t<1.65?'text':t<4.8?'pages':'ready';
   if(this.root.dataset.entrance!==stage)this.root.dataset.entrance=stage;
-  if(stage==='ready'&&!this.readerRevealed){this.readerRevealed=true;if(innerWidth>760)this.open(this.index??14,false);}
  }
  advanceFall(dt){
   if(this.motion.matches||this.paused||!this.entered||this.entranceTime<1.65)return;
-  const all=[...(this.nodes||[]),...(this.decorNodes||[])];
+  const all=this.flowNodes||[];
   for(const n of all){
    const held=(!n.decor&&this.focus===n.i)||!!this.drag,hovering=!n.decor&&this.hover===n.i;
    n.motionRate+=((hovering?0:1)-n.motionRate)*(1-Math.exp(-dt/(hovering?.22:.36)));
@@ -144,7 +165,7 @@ class PoetryGarden{
  }
  draw(){
   if(!this.nodes)return;const still=this.motion.matches;
-  [...this.nodes,...this.decorNodes].forEach(n=>{
+  this.flowNodes.forEach(n=>{
    const e=n.decor?this.ghosts[n.i]:this.leaves[n.i],frozen=this.paused||this.drag||(!n.decor&&this.focus===n.i)||(!n.decor&&this.hover===n.i&&n.motionRate<.002);
    if(still||!frozen||!n.pose){
     const t=n.age*.42+n.phase;
@@ -153,28 +174,13 @@ class PoetryGarden{
    }
    e.style.visibility=!n.admitted||!this.entered||this.entranceTime<1.65||(!still&&n.entryAge<0)?'hidden':'visible';
    const liveProjection=1000/(1000-n.pose.z),screenY=still?n.screenY:n.travel-n.margin;
-   let x=n.x+this.pan/n.projection+n.pose.x;const y=this.height/2+(screenY-this.height/2)/liveProjection+n.pose.y;
-   let avoidance=0;
-   if(this.copyZone){
-    const q=this.copyZone,extent=Math.hypot(n.w,n.h)*liveProjection/2+24,projectedX=this.width/2+(x-this.width/2)*liveProjection,mid=(q.left+q.right)/2;
-    const smooth=v=>{v=Math.max(0,Math.min(1,v));return v*v*(3-2*v);};
-    const angle=n.pose.angle*Math.PI/180,verticalExtent=innerWidth<=760?(Math.abs(Math.cos(angle))*n.h+Math.abs(Math.sin(angle))*n.w)*liveProjection/2+12:extent;
-    const vertical=smooth((q.half+verticalExtent+q.softness-Math.abs(screenY-q.cy))/q.softness);
-    // Pick one side for the whole pass; crossing a horizontal threshold must not flip it.
-    if(n.copySide==null||vertical===0)n.copySide=projectedX<mid?-1:1;
-    const horizontal=smooth(((q.right-q.left)/2+extent+160-Math.abs(projectedX-mid))/160);
-    const distance=n.copySide<0?Math.min(0,q.left-extent-projectedX):Math.max(0,q.right+extent-projectedX);
-    avoidance=distance*vertical*horizontal;
-   }
-   if(still)n.copyOffset=avoidance;
-   else if(!frozen){const dt=this.frameStep||1/60,rate=!n.decor&&this.hover===n.i?n.motionRate:1,delta=(avoidance-(n.copyOffset||0))*(1-Math.exp(-dt/.55));n.copyOffset=(n.copyOffset||0)+Math.max(-95*dt,Math.min(95*dt,delta))*rate;}
-   x+=(n.copyOffset||0)/liveProjection;
+   const x=n.x+this.pan/n.projection+n.pose.x;const y=this.height/2+(screenY-this.height/2)/liveProjection+n.pose.y;
    e.style.transform=`translate3d(${(x-n.w/2).toFixed(2)}px,${(y-n.h/2).toFixed(2)}px,${n.pose.z.toFixed(2)}px) rotateZ(${n.pose.angle.toFixed(2)}deg) rotateY(${n.pose.yaw.toFixed(2)}deg) rotateX(${n.pose.pitch.toFixed(2)}deg)`;
    const sx=n.screenX+this.pan,extent=Math.hypot(n.w,n.h)*liveProjection/2;
    if(!n.decor){const tabIndex=n.admitted&&(this.motion.matches||this.entranceTime>=1.65)&&sx+extent>0&&sx-extent<this.width&&screenY+extent>0&&screenY-extent<this.height?0:-1;if(e.tabIndex!==tabIndex)e.tabIndex=tabIndex;}
   });
  }
- destroy(){this.assetCleanup?.();cancelAnimationFrame(this.frame);this.resize.disconnect();this.observer.disconnect();this.bleedObserver.disconnect();this.modal.disconnect();this.cleanups.forEach(off=>off());delete this.root.poetryGarden;}
+ destroy(){this.cancelReaderInk();this.assetCleanup?.();cancelAnimationFrame(this.frame);this.resize.disconnect();this.observer.disconnect();this.bleedObserver.disconnect();this.modal.disconnect();this.cleanups.forEach(off=>off());delete this.root.poetryGarden;}
 }
 
 

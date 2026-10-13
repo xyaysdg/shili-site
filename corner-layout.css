@@ -7,6 +7,8 @@ body .site-corners #theme-toggle{display:inline-flex;align-items:center;gap:5px;
 body .site-corners #navigation{position:absolute;display:flex;flex-direction:row;justify-content:space-between;align-items:flex-start;left:68.2%;right:28px;top:clamp(12px,1.75vh,22px);width:auto;max-height:none;overflow:visible;gap:0;padding:0;background:none;border:0;box-shadow:none;color:inherit;isolation:isolate;pointer-events:auto}
 body .site-corners #navigation::before{content:'';position:absolute;inset:-34px -30px;z-index:-1;background:var(--directory-paper);filter:blur(20px);opacity:0;transition:opacity .4s;pointer-events:none}
 body:not(.intro-active) .site-corners #navigation:is(:hover,:has(a:focus-visible))::before{opacity:.94}
+/* Hide immediately during travel; fade back only after destination geometry is painted. */
+body.directory-travel .site-corners #navigation::before{opacity:0!important;transition:none!important}
 body .site-corners #navigation .nav-link{display:flex;flex-direction:column;align-items:center;writing-mode:horizontal-tb;padding:10px 7px;margin:-10px 0 0;gap:0;flex:1;align-self:stretch;min-width:0;min-height:64px;max-height:none;font-size:clamp(9px,.52vw,12px);letter-spacing:2px;line-height:1.6;transform:rotate(1.25deg);transform-origin:50% 0;opacity:.58;color:inherit;transition:opacity .35s,transform .45s cubic-bezier(.2,.7,.2,1)}
 body .site-corners #navigation .nav-link.active{font-size:clamp(11px,.61vw,14px);opacity:1;color:inherit}
 body .site-corners #navigation .nav-label{writing-mode:vertical-rl;text-orientation:upright}

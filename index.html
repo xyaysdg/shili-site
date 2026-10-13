@@ -51,7 +51,14 @@
   <div class="record-player" data-record-player data-playing="false">
     <button type="button" class="record-toggle" aria-label="播放音乐：Red Rock Riviera — Sea Power" aria-pressed="false" title="播放 · Red Rock Riviera — Sea Power">
   <span class="record-ripples" aria-hidden="true"><i></i><i></i><i></i></span>
-  <img class="record-disc" src="assets/shili-record-v52.svg" width="48" height="48" alt="" draggable="false">
+  <span class="record-face" aria-hidden="true">
+    <img class="record-disc record-art" src="assets/shili-record-sun-v82.png" width="48" height="48" alt="" draggable="false">
+    <svg class="record-shine" viewBox="0 0 100 100" focusable="false" aria-hidden="true">
+      <defs><linearGradient id="record-shine-v81" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".9"/><stop offset=".42" stop-color="#dce3ea" stop-opacity=".2"/><stop offset=".57" stop-color="#fff" stop-opacity=".02"/><stop offset="1" stop-color="#fff" stop-opacity=".75"/></linearGradient><clipPath id="record-edge-v81"><circle cx="50" cy="50" r="48"/></clipPath></defs>
+      <g clip-path="url(#record-edge-v81)"><path d="M-2 4L32 -2 50 50 104 92 67 104 50 50Z" fill="url(#record-shine-v81)"/><path d="M0 12L8 2 50 50 99 83 94 94 50 50Z" fill="#fff" opacity=".2"/></g>
+      <circle cx="50" cy="50" r="47.5" fill="none" stroke="#c9d0d4" stroke-width=".3" opacity=".6"/>
+    </svg>
+  </span>
     </button>
     <audio src="assets/red-rock-riviera-sea-power.mp3" preload="none" loop></audio>
     <span class="record-status" data-record-status role="status" aria-live="polite" hidden></span>

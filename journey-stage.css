@@ -55,3 +55,18 @@
 @media(max-width:850px){#section-journey{padding-bottom:120px}#section-journey .journey-copy .prose{font-size:14px}#section-journey>.medal-controls{left:20px;right:auto;bottom:22px}#section-journey .medal-exhibit{margin-top:25px}}
 /* The medal, cone and copy share document movement during section transitions. */
 #section-journey .medal-exhibit{position:relative;top:auto}
+
+/* Desktop: reserve the controls inside one viewport, rather than extending the section. */
+@media(min-width:851px){
+ body.long-mode #section-journey{--journey-room:calc(100svh - clamp(90px,12svh,130px) - 96px);height:100svh;min-height:0;padding-top:clamp(90px,12svh,130px);padding-bottom:96px}
+ body.long-mode #section-journey .section-content{height:100%;min-height:0}
+ body.long-mode #section-journey .journey-layout{height:100%;min-height:0;grid-template-rows:minmax(0,1fr);align-items:center}
+ body.long-mode #section-journey .medal-exhibit{height:100%;min-height:0;margin-top:0;align-self:stretch;--medal-size:min(510px,29vw,calc(var(--journey-room) / 1.12))}
+ body.long-mode #section-journey .medal-stage{height:100%;min-height:0}
+ body.long-mode #section-journey .journey-copy{height:max-content;min-height:0;padding-bottom:0;align-self:center;scale:var(--journey-copy-fit,1);transform-origin:center}
+ body.long-mode #section-journey .page-heading{padding-bottom:16px;margin-bottom:12px}
+ body.long-mode #section-journey .journey-milestone-title{margin-bottom:16px}
+ body.long-mode #section-journey .journey-story{margin-bottom:0}
+ body.long-mode #section-journey .journey-copy .prose p{margin-bottom:1em}
+ body.long-mode #section-journey>.medal-controls{bottom:62px}
+}
