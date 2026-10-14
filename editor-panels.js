@@ -1,7 +1,7 @@
 /* Section-aware editing tools. IDs, routes and actions stay independent of labels. */
 (function(){
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const defaults={home:'#20170f',art:'#102b3a',photography:'#fcfaf6',poetry:'#f5f4f2',writing:'#fffefa',journey:'#030405',pantheon:'#090f21',contact:'#020304'};
+ const defaults={home:'#20170f',art:'#102b3a',photography:'#fcfaf6',poetry:'#fdfdfc',writing:'#fffefa',journey:'#030405',pantheon:'#090f21',contact:'#020304'};
  const titles={home:'让我想想说什么比较好',art:'说来“画”长',photography:'“摄”身处地',poetry:'“诗”志不渝',writing:'“篇篇”起舞',journey:'一步。一个。脚印。',pantheon:'万艺殿',contact:'超微型栗子对撞机'};
  const control=(section,key,selector,label,when)=>({section,key,selector,label,when});
  const originalCategories=['全部',...new Set(window.SITE_DATA.articles.map(a=>a.category))];

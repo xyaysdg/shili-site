@@ -55,11 +55,12 @@ class MagneticPageController extends LongPageController {
   });
  }
  bands(){return this.sections.map(el=>{const id=el.dataset.section,r=el.getBoundingClientRect(),top=r.top+scrollY;const min=Math.max(0,top-(id==='about'?innerHeight*.22:0));return {el,id,min,max:Math.max(min,top+r.height-innerHeight)};});}
- excluded(el){return document.querySelector('dialog[open]')||document.body.classList.contains('menu-open')||el?.closest('#site-editor-ui,input,textarea,select,[contenteditable],.poetry-pages,.article-toc,.library-index,.medal-orbit,.chestnut-core-handle');}
+ scrollable(el){for(let node=el;node&&node!==document.body;node=node.parentElement){const s=getComputedStyle(node);if(/auto|scroll/.test(s.overflowY)&&node.scrollHeight>node.clientHeight+2)return true;}return false;}
+ excluded(el){return document.querySelector('dialog[open]')||document.body.classList.contains('menu-open')||el?.closest('#site-editor-ui,input,textarea,select,[contenteditable],.poetry-pages,.poetry-reader,.article-toc,.library-index,.medal-orbit,.chestnut-core-handle')||this.scrollable(el);}
  cancel(force=false,preserveDeparture=false){if(this.transitioning&&!force)return;if(this.pendingScene){this.sceneEvent('cancel',this.pendingScene);this.pendingScene=null;}this.departureToken=(this.departureToken||0)+1;const museum=this.departureMuseum||document.querySelector('[data-museum-wall]')?.museumWall;if(!preserveDeparture&&museum?.stage.dataset.departure){museum.clearDeparture();museum.finishEntrance();}this.departureMuseum=null;super.cancel();this.transitioning=false;if(!this.destroyed)this.request();}
  resetPressure(){this.pressure=0;this.direction=0;this.sections.forEach(s=>s.style.removeProperty('--magnet-pull'));}
  scheduleRelease(){clearTimeout(this.pressureTimer);this.pressureTimer=setTimeout(()=>this.resetPressure(),260);}
- wheel(e){if(e.ctrlKey||e.metaKey||this.excluded(e.target)||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;for(let el=e.target;el&&el!==document.body;el=el.parentElement){const s=getComputedStyle(el);if(/auto|scroll/.test(s.overflowY)&&el.scrollHeight>el.clientHeight+2)return;}e.preventDefault();this.input(e.deltaY*(e.deltaMode===1?18:e.deltaMode===2?innerHeight:1));}
+ wheel(e){if(e.ctrlKey||e.metaKey||this.excluded(e.target)||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;e.preventDefault();this.input(e.deltaY*(e.deltaMode===1?18:e.deltaMode===2?innerHeight:1));}
  input(delta,touch=false){
   const now=performance.now();if(this.transitioning||now<this.cooldown||!delta)return;const bands=this.bands(),position=this.scrollFrame?this.target:scrollY;let index=0,distance=Infinity;
   bands.forEach((b,i)=>{const d=Math.max(b.min-position,position-b.max,0);if(d<distance){distance=d;index=i;}});

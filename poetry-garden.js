@@ -58,7 +58,7 @@ class PoetryGarden{
   if(!this.pages.length)return;i=Math.max(0,Math.min(this.pages.length-1,i));
   const switching=!this.reader.hidden&&this.index!==i;this.cancelReaderInk();this.index=i;this.hover=null;
   const token=this.readerInkToken,p=this.pages[i],title=this.reader.querySelector('h2'),lines=this.reader.querySelector('.poetry-reader-lines'),texts=[title,lines];
-  const render=()=>{title.textContent=p.title;lines.innerHTML=(p.kind==='image'?`<img class="poetry-upload-image" src="${E(p.src)}" alt="${E(p.title)}">`:'')+poetryLinesMarkup(p.body);this.reader.querySelector('.poetry-reader-author').hidden=p.kind==='image';this.reader.querySelector('.poetry-count').textContent=String(p.sourceIndex+1).padStart(2,'0')+' / '+POETRY_LEAVES.length;this.reader.querySelector('.poetry-reader-scroll').scrollTop=0;this.reader.hidden=false;this.leaves.forEach((e,j)=>e.setAttribute('aria-expanded',String(i===j)));};
+  const render=()=>{title.textContent=p.title;lines.innerHTML=(p.kind==='image'?`<img class="poetry-upload-image" src="${E(p.src)}" alt="${E(p.title)}">`:'')+poetryLinesMarkup(p.body);this.reader.querySelector('.poetry-reader-author').hidden=p.kind==='image';this.reader.querySelector('.poetry-count').textContent=String(p.sourceIndex+1).padStart(2,'0')+' / '+POETRY_LEAVES.length;this.reader.querySelector('.poetry-reader-scroll').scrollTop=0;this.reader.hidden=false;this.space.inert=innerWidth<=760;this.leaves.forEach((e,j)=>e.setAttribute('aria-expanded',String(i===j)));};
   if(switching&&!this.motion.matches&&texts.every(e=>typeof e.animate==='function')){
    // Only the ink changes; keep the paper panel and controls still and usable.
    const outgoing=this.readerInk=texts.map(e=>e.animate([{opacity:1,filter:'blur(0px)'},{opacity:0,filter:'blur(3px)'}],{duration:120,easing:'ease-out',fill:'forwards'}));
@@ -75,7 +75,7 @@ class PoetryGarden{
  }
 
  nextPoem(step){const source=this.pages[this.index]?.sourceIndex;for(let k=1;k<=this.pages.length;k++){const i=(this.index+step*k+this.pages.length)%this.pages.length;if(this.pages[i].sourceIndex!==source){this.open(i,false);return;}}}
- closeReader(restoreLeaf=false){this.cancelReaderInk();this.reader.hidden=true;this.hover=null;this.focus=null;this.leaves.forEach(e=>e.setAttribute('aria-expanded','false'));const leaf=this.leaves[this.index];(restoreLeaf&&leaf&&getComputedStyle(leaf).visibility!=='hidden'?leaf:this.space).focus({preventScroll:true});this.wake();}
+ closeReader(restoreLeaf=false){this.cancelReaderInk();this.reader.hidden=true;this.space.inert=false;this.hover=null;this.focus=null;this.leaves.forEach(e=>e.setAttribute('aria-expanded','false'));const leaf=this.leaves[this.index];(restoreLeaf&&leaf&&getComputedStyle(leaf).visibility!=='hidden'?leaf:this.space).focus({preventScroll:true});this.wake();}
  clamp(x){return Math.max(Math.min(0,this.width-this.worldWidth),Math.min(0,x));}
  layout(){
   const previous=this.nodes;
@@ -127,11 +127,11 @@ class PoetryGarden{
   this.draw();this.sync();
  }
  active(){return !document.body.classList.contains('site-editor-active')&&this.visible&&!this.blurred&&!document.hidden&&!document.body.classList.contains('modal-open');}
- sync(){if(this.motion.matches&&this.readerInk?.length)this.open(this.index,false);if(document.body.classList.contains('site-editor-active')){this.entered=true;this.entranceTime=60;this.updateEntrance(0);this.draw();}if(this.motion.matches&&this.entered)this.updateEntrance(0);if(!this.active()){cancelAnimationFrame(this.frame);this.frame=0;this.last=0;return;}if(this.motion.matches){cancelAnimationFrame(this.frame);this.frame=0;this.pan=this.panTarget;this.draw();}else this.wake();}
+ sync(){this.space.inert=!this.reader.hidden&&innerWidth<=760;if(this.motion.matches&&this.readerInk?.length)this.open(this.index,false);if(document.body.classList.contains('site-editor-active')){this.entered=true;this.entranceTime=60;this.updateEntrance(0);this.draw();}if(this.motion.matches&&this.entered)this.updateEntrance(0);if(!this.active()){cancelAnimationFrame(this.frame);this.frame=0;this.last=0;return;}if(this.motion.matches){cancelAnimationFrame(this.frame);this.frame=0;this.pan=this.panTarget;this.draw();}else this.wake();}
  wake(){if(!this.active())return;if(this.motion.matches){this.pan=this.panTarget;this.draw();return;}if(this.frame)return;this.last=0;const tick=t=>{this.frame=0;if(!this.active())return;const dt=this.last?Math.min(40,t-this.last):16;this.last=t;this.frameStep=dt/1000;this.elapsed+=dt/1000;this.updateEntrance(dt/1000);this.advanceFall(dt/1000);this.smoothing=1-Math.exp(-dt/170);const follow=1-Math.exp(-dt/210);this.mx+=(this.pointer.x-this.mx)*follow;this.my+=(this.pointer.y-this.my)*follow;this.pan+=(this.panTarget-this.pan)*(1-Math.exp(-dt/115));this.draw();if(this.paused&&this.entranceTime>5.5&&Math.abs(this.panTarget-this.pan)<.1&&Math.abs(this.pointer.x-this.mx)<.001&&Math.abs(this.pointer.y-this.my)<.001){this.last=0;return;}this.frame=requestAnimationFrame(tick);};this.frame=requestAnimationFrame(tick);}
  resetEntrance(){
   this.cancelReaderInk();
-  this.entered=false;this.entranceTime=0;this.reader.hidden=true;this.root.dataset.entrance='waiting';this.hover=null;this.focus=null;
+  this.entered=false;this.entranceTime=0;this.reader.hidden=true;this.space.inert=false;this.root.dataset.entrance='waiting';this.hover=null;this.focus=null;
   (this.flowNodes||[]).forEach((n,k)=>{n.travel=this.paused?n.margin+n.screenY:0;n.entryAge=-n.entryDelay;n.entryDone=!!this.paused;n.motionRate=1;n.age=0;n.pose=null;n.admitted=Math.random()*100<n.chance;if(!n.decor)this.leaves[n.i].setAttribute('aria-expanded','false');});
   this.draw();
  }
@@ -177,7 +177,7 @@ class PoetryGarden{
    const x=n.x+this.pan/n.projection+n.pose.x;const y=this.height/2+(screenY-this.height/2)/liveProjection+n.pose.y;
    e.style.transform=`translate3d(${(x-n.w/2).toFixed(2)}px,${(y-n.h/2).toFixed(2)}px,${n.pose.z.toFixed(2)}px) rotateZ(${n.pose.angle.toFixed(2)}deg) rotateY(${n.pose.yaw.toFixed(2)}deg) rotateX(${n.pose.pitch.toFixed(2)}deg)`;
    const sx=n.screenX+this.pan,extent=Math.hypot(n.w,n.h)*liveProjection/2;
-   if(!n.decor){const tabIndex=n.admitted&&(this.motion.matches||this.entranceTime>=1.65)&&sx+extent>0&&sx-extent<this.width&&screenY+extent>0&&screenY-extent<this.height?0:-1;if(e.tabIndex!==tabIndex)e.tabIndex=tabIndex;}
+   if(!n.decor){const viewWidth=this.reader&&!this.reader.hidden?this.width:this.root?.clientWidth||this.width,tabIndex=n.admitted&&(this.motion.matches||this.entranceTime>=1.65)&&sx+extent>0&&sx-extent<viewWidth&&screenY+extent>0&&screenY-extent<this.height?0:-1;if(e.tabIndex!==tabIndex)e.tabIndex=tabIndex;}
   });
  }
  destroy(){this.cancelReaderInk();this.assetCleanup?.();cancelAnimationFrame(this.frame);this.resize.disconnect();this.observer.disconnect();this.bleedObserver.disconnect();this.modal.disconnect();this.cleanups.forEach(off=>off());delete this.root.poetryGarden;}

@@ -12,6 +12,7 @@
  }
  const cleanStyle=o=>Object.fromEntries(Object.entries(o||{}).filter(([k,v])=>styleKeys.includes(k)&&typeof v==='string'&&v.length<120&&!/[<>;{}]|url\(|expression/i.test(v)));
  function normalize(input){
+  window.ShiliDraftSchema.validate(input);
   if(!input||typeof input!=='object'||![1,2].includes(input.version))throw Error('文件不是受支持的编辑备份（版本 1 或 2）。');
   if(!input.text||!input.additions||!input.hidden)throw Error('备份缺少必要数据，未导入。');
   const s=empty();
@@ -34,22 +35,32 @@
  class Store{
   constructor(){this.state=empty();this.history=[];this.future=[];this.queue=Promise.resolve();this.dirty=false;this.scope=location.pathname;this.base=JSON.stringify(this.state);this.ready=this.init();}
   async init(){
-   try{this.db=await new Promise((resolve,reject)=>{const r=indexedDB.open('shili-editor-v2',1);r.onupgradeneeded=()=>r.result.createObjectStore('drafts');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);r.onblocked=()=>reject(Error('请关闭旧版编辑标签页后重试。'));});const record=await new Promise((resolve,reject)=>{const r=this.db.transaction('drafts').objectStore('drafts').get(this.scope);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});if(record){this.state=normalize(record.state);this.history=(record.history||[]).slice(-20);this.revision=record.revision||0;this.savedAt=record.savedAt||0;}else{let legacy;try{legacy=JSON.parse(localStorage.getItem('shili-local-editor-v1')||'null');}catch{}this.state=normalize(window.SHILI_PUBLISHED_EDITS||legacy||empty());}this.base=JSON.stringify(this.state);}
-   catch(e){this.error='浏览器草稿库不可用：'+e.message;try{this.state=normalize(window.SHILI_PUBLISHED_EDITS||JSON.parse(localStorage.getItem('shili-local-editor-v1')||'null')||empty());}catch{}this.base=JSON.stringify(this.state);}
+   let loaded;
+   try{this.db=await new Promise((resolve,reject)=>{const r=indexedDB.open('shili-editor-v2',1);r.onupgradeneeded=()=>r.result.createObjectStore('drafts');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);r.onblocked=()=>reject(Error('请关闭旧版编辑标签页后重试。'));});loaded=await new Promise((resolve,reject)=>{const r=this.db.transaction('drafts').objectStore('drafts').get(this.scope);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});if(loaded){this.revision=loaded.revision||0;this.savedAt=loaded.savedAt||0;this.state=normalize(loaded.state);this.history=Array.isArray(loaded.history)?loaded.history.slice(-20):[];await this.loadRecoveryBackup(loaded.recoveryKey);}else{let legacy;try{legacy=JSON.parse(localStorage.getItem('shili-local-editor-v1')||'null');}catch(e){this.recoveryRecord={legacyRaw:localStorage.getItem('shili-local-editor-v1')};throw e;}loaded=window.SHILI_PUBLISHED_EDITS||legacy;this.state=normalize(loaded||empty());}this.base=JSON.stringify(this.state);}
+   catch(e){this.error='编辑草稿暂时无法读取：'+e.message;if(loaded||this.recoveryRecord)this.recoveryRecord??=loaded.state?loaded:{state:loaded};this.history=[];try{this.state=normalize(window.SHILI_PUBLISHED_EDITS||empty());}catch{this.state=empty();}this.base=JSON.stringify(this.state);}
    this.savedRevision=this.revision||0;this.savedBase=JSON.stringify(this.state);return this;
+  }
+  async loadRecoveryBackup(key){if(typeof key!=='string'||!key.startsWith(this.scope+'|recovery:'))return;try{this.recoveredRecord=await new Promise((resolve,reject)=>{const r=this.db.transaction('drafts').objectStore('drafts').get(key);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});this.recoveryKey=key;}catch{}}
+  async recoverOriginal(){
+   if(!this.recoveryRecord)return;if(!this.db)throw Error('草稿库不可用，请先导出原始草稿。');
+   await this.queue;const key=this.scope+'|recovery:'+crypto.randomUUID(),original=this.recoveryRecord,next={state:empty(),history:[],revision:this.savedRevision+1,savedAt:Date.now(),recoveryKey:key};
+   await new Promise((resolve,reject)=>{const tx=this.db.transaction('drafts','readwrite'),store=tx.objectStore('drafts'),r=store.get(this.scope);let conflict;
+    r.onsuccess=()=>{if((r.result?.revision||0)!==this.savedRevision){conflict=Error('另一标签页已修改草稿，请先导出后刷新。');tx.abort();return;}store.put(original,key);store.put(next,this.scope);};tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(conflict||tx.error||Error('恢复未完成，原草稿未替换'));});
+   this.state=next.state;this.history=[];this.future=[];this.revision=this.savedRevision=next.revision;this.savedAt=next.savedAt;this.base=this.savedBase=JSON.stringify(this.state);this.recoveredRecord=this.recoveryRecord;this.recoveryKey=key;this.recoveryRecord=null;this.error='';this.dirty=false;
   }
   checkpoint(label='修改内容'){
    const json=JSON.stringify(this.state);if(json===this.base){this.dirty=json!==this.savedBase;if(!this.dirty)this.onstatus?.(this.error?'error':'saved',this.error);return this.queue;}
    this.history.push({id:crypto.randomUUID(),time:Date.now(),label,state:JSON.parse(this.base)});this.history=this.history.slice(-20);this.future=[];this.base=json;return this.persist();
   }
   persist(){
+   if(this.recoveryRecord){this.error='原草稿尚未恢复，请先导出原始草稿并选择恢复编辑。';this.onstatus?.('error',this.error);return this.queue;}
    const record={state:clone(this.state),// History states are immutable snapshots; undo/restore already clone into live state.
     // Capture the list now; IndexedDB performs the deep structured clone when putting it.
-    history:this.history.slice(),revision:(this.revision||0)+1};this.revision=record.revision;this.dirty=true;this.onstatus?.('saving');
+    history:this.history.slice(),...(this.recoveryKey?{recoveryKey:this.recoveryKey}:{}),revision:(this.revision||0)+1};this.revision=record.revision;this.dirty=true;this.onstatus?.('saving');
    this.queue=this.queue.catch(()=>{}).then(async()=>{if(!this.db)throw Error(this.error||'草稿库不可用');await new Promise((resolve,reject)=>{const tx=this.db.transaction('drafts','readwrite'),store=tx.objectStore('drafts'),check=store.get(this.scope);let conflict;check.onsuccess=()=>{if((check.result?.revision||0)!==this.savedRevision){conflict=Error('另一标签页已保存新版本。请先导出本页备份，再刷新后导入合并');tx.abort();return;}record.savedAt=Date.now();store.put(record,this.scope);};tx.oncomplete=()=>{this.savedRevision=record.revision;this.savedBase=JSON.stringify(record.state);this.savedAt=record.savedAt;resolve();};tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(conflict||tx.error||Error('保存被中断'));});if(record.revision===this.revision){this.dirty=JSON.stringify(this.state)!==this.savedBase;this.error='';this.onstatus?.(this.dirty?'saving':'saved');}}).catch(e=>{this.error=e.message||'存储空间不足';this.onstatus?.('error',this.error);});return this.queue;
   }
-  undo(){const x=this.history.pop();if(!x)return false;this.future.push({id:crypto.randomUUID(),time:Date.now(),label:'重做',state:clone(this.state)});this.state=clone(x.state);this.base=JSON.stringify(this.state);this.persist();return true;}
-  redo(){const x=this.future.pop();if(!x)return false;this.history.push({id:crypto.randomUUID(),time:Date.now(),label:'撤销重做',state:clone(this.state)});this.state=clone(x.state);this.base=JSON.stringify(this.state);this.persist();return true;}
+  undo(){const x=this.history.at(-1);if(!x)return false;let restored;try{restored=normalize(x.state);}catch(e){this.onstatus?.('error','历史记录无法恢复：'+e.message);return false;}this.history.pop();this.future.push({id:crypto.randomUUID(),time:Date.now(),label:'重做',state:clone(this.state)});this.state=restored;this.base=JSON.stringify(this.state);this.persist();return true;}
+  redo(){const x=this.future.at(-1);if(!x)return false;let restored;try{restored=normalize(x.state);}catch(e){this.onstatus?.('error','历史记录无法恢复：'+e.message);return false;}this.future.pop();this.history.push({id:crypto.randomUUID(),time:Date.now(),label:'撤销重做',state:clone(this.state)});this.state=restored;this.base=JSON.stringify(this.state);this.persist();return true;}
  }
  window.ShiliEditorData={Store,empty,normalize,clone,cleanHTML,cleanStyle,safeURL,styleKeys,validateCardSettings};
 })();
