@@ -119,7 +119,7 @@
  #section-writing .shelf-results{inset:220px 0 0}
  .library-plane{height:146%;top:-25%;right:-220px;transform:rotateY(-50deg)}
  .library-viewport{perspective:900px;perspective-origin:20% 50%}
- .library-article-slot{--preview-scale:2}
+ .library-article-slot{--preview-scale:1.15}
  #section-writing .library-article-slot .book-object{transition-duration:650ms}
  #section-writing .library-article-slot .book-spine{padding:9px 4px 6px}
  #section-writing .library-article-slot .book-spine-title{font-size:10px;max-height:calc(100% - 20px)}
@@ -132,7 +132,7 @@
 .library-article-slot .book-motion{position:absolute;inset:0;display:block;transform-style:preserve-3d;transform:translate3d(0,0,0)}
 #section-writing .library-article-slot .book-object,
 #section-writing .library-article-slot .shelf-book.is-previewed .book-object{transform:none!important;transition:none;will-change:auto}
-#section-writing .library-article-slot .shelf-book.is-previewed .book-motion{transform:translateX(calc(-.55 * var(--cover-width) + var(--preview-shift,0px))) translateZ(max(calc(var(--book-depth) + 40px),calc(var(--book-depth) * var(--preview-scale) + 40px))) translateY(calc(-10px + var(--preview-lift,0px))) rotateZ(-2deg) rotateY(-32deg) scale(var(--preview-scale))}
+#section-writing .library-article-slot .shelf-book.is-previewed .book-motion{transform:translateX(calc(-.10 * var(--cover-width) + var(--preview-shift,0px))) translateZ(var(--preview-depth,calc(var(--book-depth) * var(--preview-scale) + 16px))) translateY(calc(-4px + var(--preview-lift,0px))) rotateZ(-1deg) rotateY(-10deg) scale(var(--preview-scale))}
 .library-plank{height:var(--shelf-depth,180px)}
 @media(max-width:360px){.library-plane{right:-240px}}
 @media(prefers-reduced-motion:reduce){#section-writing .library-article-slot .book-object{transition:none;will-change:auto}}
@@ -187,3 +187,9 @@
    Both recycling edges are fully invisible before their coordinates wrap. */
 .library-dummy{will-change:auto;--dummy-world:calc(var(--dummy-x,0) + var(--filler-phase,0) + var(--dummy-wrap,0));--dummy-in:clamp(0,calc((var(--dummy-world) - 100) / 1100),1);--dummy-out:clamp(0,calc((2920 - var(--dummy-world)) / 240),1);--dummy-alpha:calc(var(--dummy-in) * var(--dummy-in) * (3 - 2 * var(--dummy-in)) * var(--dummy-out) * var(--dummy-out) * (3 - 2 * var(--dummy-out)))}
 .library-dummy>i{opacity:var(--dummy-alpha,1)}
+/* V93: five reusable outline silhouettes. Keep the existing three depth faces
+   for correct shelf/article occlusion, without page grain or shading. */
+.library-dummy .dummy-spine,.library-dummy .dummy-cover,.library-dummy .dummy-top{background:#fffefa!important;box-shadow:none!important;border:1px solid #d4b488}
+.library-dummy .dummy-spine{border-radius:var(--dummy-radius,2px) 1px 0 0}
+/* V94: retain the original upper/lower double-line spine ornaments. */
+.library-dummy .dummy-spine::before,.library-dummy .dummy-spine::after{content:''}
