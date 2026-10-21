@@ -9,13 +9,13 @@ body.long-mode #section-poetry.long-section{padding:0!important;background:#fdfd
 .poetry-intro h1{font-size:26px;letter-spacing:4px;margin:12px 0 18px}
 .poetry-intro p{font-size:12px;line-height:2;color:#817b70}
 /* Keep the original perspective width; the section clips at the viewport edge. */
-.poetry-space{position:absolute;inset:0 23% 0 0;touch-action:pan-y;outline-offset:-8px;cursor:grab;user-select:none;-webkit-user-select:none;overflow:visible;clip-path:inset(-650px -100vw -650px 0);perspective:1000px;perspective-origin:50% 50%}
+.poetry-space{position:absolute;inset:0;touch-action:pan-y;outline-offset:-8px;cursor:grab;user-select:none;-webkit-user-select:none;overflow:visible;clip-path:inset(-650px -100vw -650px 0);perspective:1000px;perspective-origin:50% 50%}
 .poetry-space.is-dragging{cursor:grabbing}
 .poetry-thread{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.48}
 .poetry-thread path{fill:none;stroke:#998979;stroke-width:1.4;stroke-dasharray:1 10;stroke-linecap:round}
 .poetry-leaf{position:absolute;left:0;top:0;padding:0;border:0;background:none;cursor:pointer;transform-origin:center;will-change:transform;text-align:left;color:#3a3631;font-family:var(--serif);filter:blur(var(--paper-blur));opacity:var(--paper-alpha)}
 .poetry-leaf-paper{position:absolute;inset:0;display:block;padding:calc(25px * var(--page-unit));background:var(--poem-paper-color,#f6f1e7);box-shadow:7px 15px 30px #5544310d,0 1px 2px #6d5a3812;isolation:isolate}
-.poetry-leaf-paper::after{content:"";position:absolute;inset:0;z-index:-2;background-image:var(--poem-paper-image,var(--poetry-default-image,none));background-position:center bottom;background-size:100% 100%;opacity:var(--poem-paper-opacity,1);pointer-events:none}
+.poetry-leaf-paper::after{content:"";position:absolute;inset:0;z-index:-2;background-image:var(--poem-paper-image,none);background-position:center bottom;background-size:100% 100%;opacity:var(--poem-paper-opacity,1);pointer-events:none}
 .poetry-leaf-paper::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(#faf6ee22 30%,#faf6ee77 70%,transparent)}
 .poetry-leaf:nth-of-type(3n) .poetry-leaf-paper::after{background-size:125% 115%;background-position:left bottom}
 .poetry-leaf-number{display:block;font:calc(12px * var(--page-unit))/1.4 Georgia,serif;letter-spacing:1px;margin-bottom:calc(17px * var(--page-unit))}
@@ -107,4 +107,8 @@ body.long-mode #section-poetry.long-section{--bridge-top:var(--poetry-paper,#fdf
 .poetry-leaf:not(.poetry-ghost){transition:filter .95s ease,opacity .95s ease}
 .poetry-ghost .poetry-leaf-paper{overflow:hidden}
 .poetry-ghost .poetry-leaf-lines{font-size:calc(12px * var(--page-unit));line-height:1.9}
+.poetry-original-art{position:absolute;left:10%;bottom:8%;width:80%;height:26%;overflow:hidden;pointer-events:none;opacity:.85}
+.poetry-reader-landscape{background:none;mask-image:none;opacity:1;position:relative}
+.poetry-reader-landscape:empty{display:none}
+.poetry-reader-landscape .poetry-original-art{inset:12px 10% 0;width:80%;height:calc(100% - 12px)}
 @media(prefers-reduced-motion:reduce){.poetry-leaf:not(.poetry-ghost){transition:none}}

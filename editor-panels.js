@@ -8,11 +8,11 @@
  window.shiliArticleCategories=()=>['全部',...new Set(window.SITE_DATA.articles.map(a=>a.category).filter(c=>c&&c!=='全部'))];
  const controls=[
   ...Object.keys(titles).map(id=>control(id,'nav:'+id,`#navigation a[href="#/${id}"] .nav-label`,titles[id])),
-  ...[['art','完整作品墙 ↗','.museum-tools a'],['photography','查看完整照片墙 ↗','.photo-wall-link'],['poetry','查看完整诗稿墙 ↗','.poetry-wall-link'],['pantheon','完整作品墙 ↗','.flow-wall-link']].map(([id,label,selector])=>control(id,'wall:'+id,`#section-${id} ${selector}`,label)),
+  ...[['art','查看完整画作墙 ↗','.museum-tools a'],['photography','查看完整照片墙 ↗','.photo-wall-link'],['poetry','查看完整诗稿墙 ↗','.poetry-wall-link'],['pantheon','查看完整游戏墙 ↗','.flow-wall-link']].map(([id,label,selector])=>control(id,'wall:'+id,`#section-${id} ${selector}`,label)),
   control('poetry','poetry:original','.poetry-original','查看原稿 ↗'),
   control('poetry','poetry:previous','[data-poem-prev]','‹'),control('poetry','poetry:next','[data-poem-next]','›'),control('poetry','poetry:close','[data-poem-close]','×'),
   control('writing','writing:index','.library-index-toggle','查看全部文章'),
-  control('journey','journey:image','[data-journey-image]','查看图片'),control('journey','journey:flip','.medal-flip','查看背面 ↻',e=>e.dataset.face!=='back'),control('journey','journey:front','.medal-flip','查看正面 ↻',e=>e.dataset.face==='back'),control('journey','journey:reset','.medal-reset','复位 ↺'),
+  control('journey','journey:image','[data-journey-image]','查看完整勋章墙 ↗'),control('journey','journey:flip','.medal-flip','查看背面 ↻',e=>e.dataset.face!=='back'),control('journey','journey:front','.medal-flip','查看正面 ↻',e=>e.dataset.face==='back'),control('journey','journey:reset','.medal-reset','复位 ↺'),
   control('contact','contact:exchange','[data-chestnut-message]','与十里交流 ↗'),control('contact','contact:home','[data-chestnut-home]','回到中心'),
   control('contact','contact:friend','[data-chestnut-friend]','另一个顶有趣的灵魂。'),control('contact','contact:draft','#contact-form button[type=submit]','保留留言草稿'),control('contact','contact:send','#contact-form a.primary','启动对撞机 ↗'),
   ...[['poetry','.poetry-fall-toggle','暂停飘落','继续飘落'],['pantheon','#section-pantheon .flow-toggle','暂停漂浮 Ⅱ','继续漂浮 ▷'],['journey','.medal-pause','暂停转动 Ⅱ','继续转动 ▷'],['contact','[data-chestnut-pause]','暂停流动','继续流动']].flatMap(([id,selector,a,b])=>[control(id,id+':pause',selector,a,e=>e.getAttribute('aria-pressed')!=='true'),control(id,id+':resume',selector,b,e=>e.getAttribute('aria-pressed')==='true')])

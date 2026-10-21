@@ -1,5 +1,5 @@
 /* Four depth planes of original photographs, clipped to a finite recycled viewport. */
-function hangingPhotographyMarkup(){return `<div class="photo-hanging" data-photo-hanging><div class="photo-depths" tabindex="0" role="region" aria-label="悬挂摄影，按住左键左右拖动，或用左右方向键探索"></div><div class="photo-copy">${pageHeading('photography',E(intro.photography))}</div><a class="photo-wall-link" href="#/wall/photography">查看完整照片墙 ↗</a></div>`;}
+function hangingPhotographyMarkup(){return `<div class="photo-hanging" data-photo-hanging><div class="photo-depths" tabindex="0" role="region" aria-label="悬挂摄影，按住左键左右拖动，或用左右方向键探索"></div><div class="photo-copy">${pageHeading('photography',E(intro.photography))}</div><a class="photo-wall-link section-wall-entry" href="#/wall/photography">查看完整照片墙 ↗</a></div>`;}
 class HangingPhotography {
  constructor(root,items,onOpen){
   this.root=root;this.viewport=root.querySelector('.photo-depths');this.items=items;this.onOpen=onOpen;this.offset=0;this.target=0;this.velocity=0;this.lift=0;this.liftTarget=0;this.listeners=[];this.frame=0;this.visible=false;this.motion=matchMedia('(prefers-reduced-motion: reduce)');root.photography=this;

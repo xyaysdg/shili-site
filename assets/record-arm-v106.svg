@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 200" fill="none">
+<defs><linearGradient id="gold"><stop stop-color="#704814"/><stop offset=".25" stop-color="#e5b954"/><stop offset=".45" stop-color="#fff1ad"/><stop offset=".65" stop-color="#bb852b"/><stop offset=".85" stop-color="#ffe597"/><stop offset="1" stop-color="#765017"/></linearGradient><linearGradient id="black" x2="1" y2="1"><stop stop-color="#46413b"/><stop offset=".5" stop-color="#191715"/><stop offset="1" stop-color="#39332c"/></linearGradient></defs>
+<rect x="9" y="14" width="34" height="26" rx="5" fill="url(#gold)" stroke="#392b13"/>
+<rect x="16" y="0" width="19" height="37" rx="3" fill="url(#black)" stroke="#100e0a"/>
+<path d="M26 27 L31 61 C33 77 49 93 50 108 C51 120 39 145 34 159" stroke="#35240e" stroke-width="11"/>
+<path d="M26 27 L31 61 C33 77 49 93 50 108 C51 120 39 145 34 159" stroke="url(#gold)" stroke-width="9"/>
+<circle cx="26" cy="26" r="8" fill="url(#gold)" stroke="#f7d67b"/>
+<g transform="rotate(20 33 160)"><rect x="24" y="152" width="22" height="41" rx="4" fill="url(#black)" stroke="#0b0a08"/><path d="M28 159V187 M33 159V187 M38 159V187" stroke="#655e53" stroke-width="1.5"/><path d="M46 172h7v6h-7" fill="#211d17" stroke="#514735"/><path d="M31 193v6" stroke="#cea240" stroke-width="1.5"/></g></svg>

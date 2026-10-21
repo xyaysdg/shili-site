@@ -1,0 +1,8 @@
+.solar-test{position:fixed;left:74px;bottom:62px;z-index:1001;font:12px/1.5 var(--serif);padding:7px 11px;border:1px solid #89857966;border-radius:3px;color:#eee;background:#151515b8;cursor:pointer}
+.solar-test:focus-visible{outline:2px solid #d9bb70;outline-offset:3px}
+.solar-notice{position:fixed;left:74px;bottom:108px;z-index:1001;max-width:min(320px,75vw);color:#fff;background:#222;font-size:12px}
+.solar-notice:empty{display:none}
+dialog.solar-veil{position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:#fff;opacity:0;overflow:hidden}
+dialog.solar-veil::backdrop{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none}
+dialog.solar-veil{background:transparent;box-shadow:none;transform:none;backdrop-filter:blur(0px);-webkit-backdrop-filter:blur(0px)}
+@media(max-width:700px){.solar-test,.solar-notice{left:70px}}

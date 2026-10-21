@@ -56,6 +56,20 @@
 /* The medal, cone and copy share document movement during section transitions. */
 #section-journey .medal-exhibit{position:relative;top:auto}
 
+/* One placement and type scale for all full-wall entries, matching the art scene. */
+:is(#section-art,#section-photography,#section-poetry,#section-pantheon,#section-journey) .section-wall-entry{
+ position:absolute;left:74px;right:auto;bottom:14px;z-index:9;display:flex;align-items:center;
+ justify-content:flex-start;min-height:42px;margin:0;padding:0;border:0;
+ font:13px/1.5 var(--serif);letter-spacing:1px;pointer-events:auto
+}
+:is(#section-art,#section-photography,#section-poetry,#section-pantheon,#section-journey) a.section-wall-entry,
+#section-art .section-wall-entry a{text-decoration:underline;text-underline-offset:5px;text-decoration-color:currentColor}
+#section-journey .medal-wall-link{color:#bac0cc}
+@media(max-width:700px){
+ :is(#section-art,#section-photography,#section-poetry,#section-pantheon,#section-journey) .section-wall-entry{left:70px;font-size:12px}
+}
+@media(max-width:850px){#section-journey>.medal-controls{bottom:64px}}
+
 /* Desktop: reserve the controls inside one viewport, rather than extending the section. */
 @media(min-width:851px){
  body.long-mode #section-journey{--journey-room:calc(100svh - clamp(90px,12svh,130px) - 96px);height:100svh;min-height:0;padding-top:clamp(90px,12svh,130px);padding-bottom:96px}
@@ -63,9 +77,7 @@
  body.long-mode #section-journey .journey-layout{height:100%;min-height:0;grid-template-rows:minmax(0,1fr);align-items:center}
  body.long-mode #section-journey .medal-exhibit{height:100%;min-height:0;margin-top:0;align-self:stretch;--medal-size:min(510px,29vw,calc(var(--journey-room) / 1.12))}
  body.long-mode #section-journey .medal-stage{height:100%;min-height:0}
- body.long-mode #section-journey .journey-copy{height:max-content;min-height:0;padding-bottom:0;align-self:center;scale:1;transform-origin:center}
- body.long-mode #section-journey .journey-copy[data-journey-overflow]{height:calc(100% - 36px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding-inline:6px}
- body.long-mode #section-journey .journey-copy[data-journey-overflow]:focus-visible{outline:1px solid #e6d4ac66;outline-offset:4px}
+ body.long-mode #section-journey .journey-copy{height:max-content;min-height:0;padding-bottom:0;align-self:center;scale:var(--journey-copy-fit,1);transform-origin:center}
  body.long-mode #section-journey .page-heading{padding-bottom:16px;margin-bottom:12px}
  body.long-mode #section-journey .journey-milestone-title{margin-bottom:16px}
  body.long-mode #section-journey .journey-story{margin-bottom:0}

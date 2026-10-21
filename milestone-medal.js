@@ -46,14 +46,14 @@ function milestoneMedalMarkup(){
  return `<section class="medal-exhibit" data-medal-asset="blender-v37" aria-labelledby="medal-title"><header class="medal-exhibit-heading"><span class="eyebrow">2025 / RUNNING MILESTONE</span><h2 id="medal-title">2025个人跑步生涯1000公里目标达成！</h2></header>
  <div class="medal-stage"><div class="medal-shadow" aria-hidden="true"></div><div class="medal-orbit" tabindex="0" role="group" aria-roledescription="可旋转的三维徽章" aria-label="1000公里纪念徽章。首次记录2021年2月2日，达成日期2025年12月18日。">
  <div class="medal-rotor" aria-hidden="true"><div class="medal-edge"></div><div class="medal-face medal-front">${face(false)}<img class="medal-reference-front" src="assets/medal-blender-v37-front.webp" loading="lazy" alt=""><span class="medal-glint"></span></div><div class="medal-face medal-back">${face(true)}<img class="medal-reference-back" src="assets/medal-blender-v37-back.webp" loading="lazy" alt=""><span class="medal-glint"></span></div></div></div></div>
- <div class="medal-controls"><div><button class="medal-image" data-journey-image aria-haspopup="dialog">查看图片</button><button class="medal-pause" aria-pressed="false">暂停转动 Ⅱ</button><button class="medal-flip">查看背面 ↻</button><button class="medal-reset">复位 ↺</button></div></div>
- <span class="visually-hidden medal-status" role="status" aria-live="polite"></span></section>`;
+ <div class="medal-controls"><div><button class="medal-pause" aria-pressed="false">暂停转动 Ⅱ</button><button class="medal-flip">查看背面 ↻</button><button class="medal-reset">复位 ↺</button></div></div>
+ <a class="medal-wall-link section-wall-entry" data-journey-image href="#/wall/journey">查看完整勋章墙 ↗</a><span class="visually-hidden medal-status" role="status" aria-live="polite"></span></section>`;
 }
 
 class MilestoneMedal {
  constructor(root){
   this.root=root;this.stage=root.querySelector('.medal-stage');this.orbit=root.querySelector('.medal-orbit');this.rotor=root.querySelector('.medal-rotor');this.pause=root.querySelector('.medal-pause');this.flip=root.querySelector('.medal-flip');this.reset=root.querySelector('.medal-reset');this.status=root.querySelector('.medal-status');
-  this.yaw=0;this.pitch=0;this.targetYaw=0;this.targetPitch=0;this.baseYaw=0;this.time=0;this.frame=0;this.listeners=[];this.visible=false;this.reduced=matchMedia('(prefers-reduced-motion: reduce)');this.paused=true;
+  this.yaw=0;this.pitch=0;this.targetYaw=0;this.targetPitch=0;this.baseYaw=0;this.time=0;this.frame=0;this.listeners=[];this.visible=false;this.reduced=matchMedia('(prefers-reduced-motion: reduce)');this.paused=this.reduced.matches;
   const edge=root.querySelector('.medal-edge');
   const outline=root.querySelector('.medal-outline'),length=outline.getTotalLength();
   for(let i=0;i<96;i++){
