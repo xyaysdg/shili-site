@@ -53,7 +53,8 @@ function milestoneMedalMarkup(){
 class MilestoneMedal {
  constructor(root){
   this.root=root;this.stage=root.querySelector('.medal-stage');this.orbit=root.querySelector('.medal-orbit');this.rotor=root.querySelector('.medal-rotor');this.pause=root.querySelector('.medal-pause');this.flip=root.querySelector('.medal-flip');this.reset=root.querySelector('.medal-reset');this.status=root.querySelector('.medal-status');
-  this.yaw=0;this.pitch=0;this.targetYaw=0;this.targetPitch=0;this.baseYaw=0;this.time=0;this.frame=0;this.listeners=[];this.visible=false;this.reduced=matchMedia('(prefers-reduced-motion: reduce)');this.paused=this.reduced.matches;
+  this.angleOutput=root.querySelector('[data-medal-angles]');
+  this.yaw=2.2;this.pitch=-3.07;this.targetYaw=2.2;this.targetPitch=-3.07;this.baseYaw=2.2;this.basePitch=-3.07;this.startDelay=2;this.time=0;this.frame=0;this.listeners=[];this.visible=false;this.reduced=matchMedia('(prefers-reduced-motion: reduce)');this.paused=this.reduced.matches;
   const edge=root.querySelector('.medal-edge');
   const outline=root.querySelector('.medal-outline'),length=outline.getTotalLength();
   for(let i=0;i<96;i++){
@@ -85,18 +86,20 @@ class MilestoneMedal {
   this.intersection=new IntersectionObserver(es=>{this.visible=es[0].isIntersecting;this.wake();});this.intersection.observe(root);
   this.mutation=new MutationObserver(()=>{if(document.body.classList.contains('modal-open'))this.cancelDrag();this.wake();});this.mutation.observe(document.body,{attributes:true,attributeFilter:['class']});
   this.paint();this.sync();
-  this.modelPreload=new IntersectionObserver(entries=>{if(!entries.some(e=>e.isIntersecting))return;this.modelPreload.disconnect();import('./medal-blender-model.js').then(m=>this.destroyed?null:m.createMedalModel(root)).then(model=>{if(this.destroyed){model?.dispose();return;}this.meshModel=model;this.paint();}).catch(()=>{if(!this.destroyed){root.dataset.medalRenderer='fallback';this.status.textContent='当前设备未能启用三维渲染，显示兼容版徽章。';}});},{rootMargin:'700px'});this.modelPreload.observe(root);
+  this.modelPreload=new IntersectionObserver(entries=>{if(!entries.some(e=>e.isIntersecting))return;this.modelPreload.disconnect();import('./medal-blender-model.js').then(m=>this.destroyed?null:m.createMedalModel(root,{pitch:this.pitch,yaw:this.yaw})).then(model=>{if(this.destroyed){model?.dispose();return;}this.meshModel=model;this.previous=0;this.paint();}).catch(()=>{if(!this.destroyed){root.dataset.medalRenderer='fallback';this.status.textContent='当前设备未能启用三维渲染，显示兼容版徽章。';}});},{rootMargin:'700px'});this.modelPreload.observe(root);
  }
  listen(el,event,fn){el.addEventListener(event,fn);this.listeners.push(()=>el.removeEventListener(event,fn));}
- resetPosition(){this.paused=true;this.targetYaw=this.nearestFace(0,this.yaw);this.targetPitch=0;this.sync();this.wake();}
+ resetPosition(){this.paused=true;this.targetYaw=this.nearestFace(2.2,this.yaw);this.targetPitch=-3.07;this.sync();this.wake();}
  nearestFace(offset,reference){return Math.round((reference-offset)/360)*360+offset;}
- toggleMotion(){if(this.reduced.matches)return;if(this.paused){this.paused=false;this.baseYaw=this.nearestFace(Math.cos(this.yaw*Math.PI/180)>=0?0:180,this.yaw);this.time=0;}else{this.paused=true;this.targetYaw=this.yaw;this.targetPitch=this.pitch;}this.sync();this.wake();}
+ toggleMotion(){if(this.reduced.matches)return;if(this.paused){this.paused=false;this.baseYaw=this.yaw;this.basePitch=this.pitch;this.startDelay=0;this.time=0;}else{this.paused=true;this.targetYaw=this.yaw;this.targetPitch=this.pitch;}this.sync();this.wake();}
  cancelDrag(){if(!this.drag)return;const id=this.drag.id;this.drag=null;this.root.classList.remove('is-dragging');if(this.orbit.hasPointerCapture(id))this.orbit.releasePointerCapture(id);this.targetYaw=this.yaw;this.targetPitch=this.pitch;}
  sync(){this.pause.disabled=this.reduced.matches;this.pause.textContent=this.reduced.matches?'已减少动态':this.paused?'继续转动 ▷':'暂停转动 Ⅱ';this.pause.setAttribute('aria-pressed',String(this.paused));this.flip.dataset.face=Math.cos(this.targetYaw*Math.PI/180)>=0?'front':'back';this.flip.textContent=this.flip.dataset.face==='front'?'查看背面 ↻':'查看正面 ↻';}
  wake(){if(this.destroyed)return;if(!this.visible||document.hidden||document.body.classList.contains('modal-open')){cancelAnimationFrame(this.frame);this.frame=0;return;}if(!this.frame){this.previous=0;this.frame=requestAnimationFrame(t=>this.tick(t));}}
+ // Integral of a 1.5-second smoothstep speed ramp, then 3 degrees/second.
+ turnOffset(time,delay){const t=Math.max(0,time-delay),ramp=1.5,u=Math.min(1,t/ramp);return 3*(t<ramp?ramp*(u*u*u-.5*u*u*u*u):t-ramp/2);}
  tick(t){
   this.frame=0;if(this.destroyed||!this.visible||document.hidden||document.body.classList.contains('modal-open'))return;const dt=this.previous?Math.min((t-this.previous)/1000,.05):0;this.previous=t;
-  if(!this.paused&&!this.drag&&!this.reduced.matches){this.time+=dt;this.targetYaw=this.baseYaw+Math.sin(this.time*.28)*12;this.targetPitch=Math.sin(this.time*.35)*3;}
+  if(!this.paused&&!this.drag&&!this.reduced.matches&&(this.meshModel||this.root.dataset.medalRenderer==='fallback')){this.time+=dt;this.targetYaw=this.baseYaw-this.turnOffset(this.time,this.startDelay);this.targetPitch=this.basePitch;}
   const ease=this.reduced.matches?1:1-Math.exp(-dt/(this.drag ? .085 : .2));this.yaw+=(this.targetYaw-this.yaw)*ease;this.pitch+=(this.targetPitch-this.pitch)*ease;
   this.paint();
   if(!this.paused&&!this.reduced.matches||Math.abs(this.targetYaw-this.yaw)>.015||Math.abs(this.targetPitch-this.pitch)>.015)this.frame=requestAnimationFrame(n=>this.tick(n));

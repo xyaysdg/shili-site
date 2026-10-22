@@ -6,3 +6,4 @@ dialog.solar-veil{position:fixed;inset:0;width:100vw;height:100dvh;max-width:non
 dialog.solar-veil::backdrop{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none}
 dialog.solar-veil{background:transparent;box-shadow:none;transform:none;backdrop-filter:blur(0px);-webkit-backdrop-filter:blur(0px)}
 @media(max-width:700px){.solar-test,.solar-notice{left:70px}}
+.solar-eyelid{position:absolute;left:0;width:100%;height:50%;background:#000;pointer-events:none}.solar-eyelid-top{top:0}.solar-eyelid-bottom{bottom:0}

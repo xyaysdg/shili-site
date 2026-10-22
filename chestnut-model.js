@@ -12,6 +12,7 @@ export async function loadChestnutModel(host){
  const rim=new T.DirectionalLight(0xffe6b0,3.3);rim.position.set(-2,3,-2);scene.add(rim);
  const bounce=new T.DirectionalLight(0xb58c55,.4);bounce.position.set(2,-2,1);scene.add(bounce);
  gltf.scene.traverse(o=>{if(o.isMesh){o.material.roughness=T.MathUtils.clamp(o.material.roughness,.4,.8);o.material.metalness=Math.min(.18,o.material.metalness);}});
+ const diagnostic=(key,value)=>{if(host.dataset[key]!==value)host.dataset[key]=value;};
  let renderer,target,previousSize=0,angle=.3,disposed=false,lastPose='';
  return {
   size:1,opacity:0,rise:0,revision:0,
@@ -34,9 +35,9 @@ export async function loadChestnutModel(host){
     try{renderer.setClearAlpha(0);renderer.setRenderTarget(target);renderer.render(scene,camera);lastPose=pose;this.revision++;}
     finally{renderer.setRenderTarget(previous);renderer.setClearAlpha(alpha);}
    }
-   host.dataset.modelRise=this.rise.toFixed(2);host.dataset.modelOpacity=arrive.toFixed(3);
-   host.dataset.modelPulse=wave.toFixed(4);host.dataset.modelPulsePeak=Math.max(+(host.dataset.modelPulsePeak||0),wave).toFixed(4);
-   host.dataset.modelLight=lx.toFixed(3)+','+ly.toFixed(3);host.dataset.modelRotation=angle.toFixed(4);
+   diagnostic('modelRise',this.rise.toFixed(2));diagnostic('modelOpacity',arrive.toFixed(3));
+   diagnostic('modelPulse',wave.toFixed(4));diagnostic('modelPulsePeak',Math.max(+(host.dataset.modelPulsePeak||0),wave).toFixed(4));
+   diagnostic('modelLight',lx.toFixed(3)+','+ly.toFixed(3));diagnostic('modelRotation',angle.toFixed(4));
   },
   destroy(){if(disposed)return;disposed=true;const resources=new Set();gltf.scene.traverse(o=>{if(o.geometry)resources.add(o.geometry);if(o.material)for(const m of(Array.isArray(o.material)?o.material:[o.material])){resources.add(m);for(const t of Object.values(m))if(t?.isTexture)resources.add(t);}});resources.forEach(o=>o.dispose());target?.dispose();renderer=null;}
  };

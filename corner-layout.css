@@ -70,9 +70,9 @@ body:not(.long-mode) .main-content{padding-top:210px}
 @media(prefers-reduced-motion:reduce){body .site-corners #navigation .nav-link,body .site-corners #navigation::before{transition:none}#section-journey .journey-copy{animation:none;translate:0 -9px}}
 @media(hover:none){body:not(.intro-active) .site-corners #navigation:hover:not(:has(a:focus-visible))::before{opacity:0}}
 @media print{.site-corners,.journey-floor{display:none}#section-journey .journey-copy{animation:none;translate:none}}
-/* The navy gallery keeps cream text and the existing cream hover panel. */
-body:has(#navigation a.active[href="#/art"]) .site-corners{color:#ece5d7;--directory-paper:#fffefa}
-body:has(#navigation a.active[href="#/art"]) .site-corners #navigation:is(:hover,:has(a:focus-visible)){color:#373c3c}
+/* Match the gallery wall blue while keeping cream navigation text legible. */
+body:has(#navigation a.active[href="#/art"]) .site-corners{color:#ece5d7;--directory-paper:#102b3a}
+body:has(#navigation a.active[href="#/art"]) .site-corners #navigation:is(:hover,:has(a:focus-visible)){color:#ece5d7}
 /* Full-wall entries sit alongside the signature, leaving motion controls on the right. */
 .museum-stage>.museum-tools{left:74px;right:auto;bottom:14px;justify-content:flex-start;font-size:13px}
 #section-pantheon .flow-wall>.flow-wall-link{position:absolute;left:74px;bottom:14px;z-index:9;display:inline-flex;align-items:center;min-height:40px;font:13px/1.5 var(--serif);letter-spacing:1px;color:#edf0f5}
