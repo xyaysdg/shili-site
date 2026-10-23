@@ -91,3 +91,11 @@ body:has(#navigation a.active[href="#/art"]) .site-corners #navigation:is(:hover
  body:has(#main.reading-main) .site-corners :is(.corner-brand,.corner-tools){position:fixed}
 }
 
+
+/* V115: cross-section navigation uses two composited color planes. */
+.section-crossfade{position:fixed;inset:0;z-index:24;opacity:0;pointer-events:auto;contain:strict;will-change:opacity}
+.section-crossfade>div{position:absolute;inset:0;opacity:0;will-change:opacity}
+body.cross-travel :is(.solar-test,.solar-notice,.corner-tools,.corner-brand){opacity:0!important;pointer-events:none!important;transition:opacity .3s}
+body.cross-travel #navigation{color:#a7a39b;transition:color .4s}
+
+:is(.solar-test,.solar-notice,.corner-tools,.corner-brand){transition:opacity .3s}

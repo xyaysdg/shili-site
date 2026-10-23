@@ -72,3 +72,6 @@ body:has(#navigation a[href='#/contact'].active) .corner-brand,body:has(#navigat
 #main.long-page{overflow:clip}
 @media(max-width:700px){.chestnut-friend-link{left:50%;top:41%}.chestnut-gravity[data-status=fallback] .chestnut-friend-link{left:50%;top:calc(41% + 145px)}}
 @media(prefers-reduced-motion:reduce){.chestnut-friend-link{transition:none}}
+
+/* Keep recovery available on touch screens as well. */
+.chestnut-gravity[data-status=fallback] [data-chestnut-home]{display:inline-block}

@@ -80,6 +80,3 @@
 [data-medal-asset="blender-v13"] .medal-back>svg,[data-medal-asset="blender-v13"] .medal-edge,[data-medal-asset="blender-v13"] .medal-glint{display:none}
 .medal-reference-back{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
 
-/* V110: live model-space Euler angles for pose matching. */
-.medal-angle-panel{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);z-index:6;display:grid;gap:3px;padding:8px 12px;border:1px solid #ffffff26;border-radius:6px;background:#090c12d9;color:#edf0f5;text-align:center;pointer-events:none;white-space:nowrap;font:11px/1.5 var(--sans)}
-.medal-angle-panel output{font:12px/1.5 monospace;font-variant-numeric:tabular-nums}.medal-angle-panel small{font-size:10px;opacity:.65}

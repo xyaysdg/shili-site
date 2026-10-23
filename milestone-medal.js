@@ -53,7 +53,7 @@ function milestoneMedalMarkup(){
 class MilestoneMedal {
  constructor(root){
   this.root=root;this.stage=root.querySelector('.medal-stage');this.orbit=root.querySelector('.medal-orbit');this.rotor=root.querySelector('.medal-rotor');this.pause=root.querySelector('.medal-pause');this.flip=root.querySelector('.medal-flip');this.reset=root.querySelector('.medal-reset');this.status=root.querySelector('.medal-status');
-  this.angleOutput=root.querySelector('[data-medal-angles]');
+  
   this.yaw=2.2;this.pitch=-3.07;this.targetYaw=2.2;this.targetPitch=-3.07;this.baseYaw=2.2;this.basePitch=-3.07;this.startDelay=2;this.time=0;this.frame=0;this.listeners=[];this.visible=false;this.reduced=matchMedia('(prefers-reduced-motion: reduce)');this.paused=this.reduced.matches;
   const edge=root.querySelector('.medal-edge');
   const outline=root.querySelector('.medal-outline'),length=outline.getTotalLength();
@@ -98,8 +98,8 @@ class MilestoneMedal {
  // Integral of a 1.5-second smoothstep speed ramp, then 3 degrees/second.
  turnOffset(time,delay){const t=Math.max(0,time-delay),ramp=1.5,u=Math.min(1,t/ramp);return 3*(t<ramp?ramp*(u*u*u-.5*u*u*u*u):t-ramp/2);}
  tick(t){
-  this.frame=0;if(this.destroyed||!this.visible||document.hidden||document.body.classList.contains('modal-open'))return;const dt=this.previous?Math.min((t-this.previous)/1000,.05):0;this.previous=t;
-  if(!this.paused&&!this.drag&&!this.reduced.matches&&(this.meshModel||this.root.dataset.medalRenderer==='fallback')){this.time+=dt;this.targetYaw=this.baseYaw-this.turnOffset(this.time,this.startDelay);this.targetPitch=this.basePitch;}
+  this.frame=0;if(this.destroyed||!this.visible||document.hidden||document.body.classList.contains('modal-open'))return;const elapsed=this.previous?Math.max(0,(t-this.previous)/1000):0,dt=Math.min(elapsed,.05);this.previous=t;
+  if(!this.paused&&!this.drag&&!this.reduced.matches&&(this.meshModel||this.root.dataset.medalRenderer==='fallback')){this.time+=elapsed;this.targetYaw=this.baseYaw-this.turnOffset(this.time,this.startDelay);this.targetPitch=this.basePitch;}
   const ease=this.reduced.matches?1:1-Math.exp(-dt/(this.drag ? .085 : .2));this.yaw+=(this.targetYaw-this.yaw)*ease;this.pitch+=(this.targetPitch-this.pitch)*ease;
   this.paint();
   if(!this.paused&&!this.reduced.matches||Math.abs(this.targetYaw-this.yaw)>.015||Math.abs(this.targetPitch-this.pitch)>.015)this.frame=requestAnimationFrame(n=>this.tick(n));

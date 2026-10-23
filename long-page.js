@@ -38,8 +38,9 @@ class LongPageController {
   const introBottom=document.querySelector('.intro-sequence').getBoundingClientRect().bottom;
   for(const {el,r} of copies){const distance=Math.abs(r.top+r.height/2-center),focus=Math.max(0,1-distance/(innerHeight*.48)),opacity=focus>.86?1:Math.max(.025,Math.pow(focus,2.6));el.style.opacity=this.reduced.matches?1:opacity.toFixed(3);el.style.filter=this.reduced.matches?'none':`blur(${((1-focus)*.55).toFixed(2)}px)`;}
   let active=this.sections[0];for(const {el,r} of sections){if(r.top<=innerHeight*.40)active=el;}
-  document.body.classList.toggle('intro-active',introBottom>innerHeight*.4);
-  document.body.classList.toggle('sky-active',active.dataset.section==='pantheon');document.body.classList.toggle('journey-active',active.dataset.section==='journey');
+  const themeId=this.navigating?this.current:active.dataset.section;
+  document.body.classList.toggle('intro-active',this.navigating?themeId==='home':introBottom>innerHeight*.4);
+  document.body.classList.toggle('sky-active',themeId==='pantheon');document.body.classList.toggle('journey-active',themeId==='journey');
   if(!this.navigating&&active.dataset.section!==this.current)this.activate(active.dataset.section,true);
   for(const {el:section,r} of sections){if(section.classList.contains('intro-scene')||r.bottom<0||r.top>innerHeight)continue;const progress=Math.max(0,Math.min(1,(innerHeight-r.top)/(innerHeight*.68)));section.style.setProperty('--section-arrival',this.reduced.matches?1:progress);}
  }
