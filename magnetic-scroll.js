@@ -50,7 +50,7 @@ class MagneticPageController extends LongPageController {
   });
   document.querySelectorAll('.section-bridge[data-from]').forEach(el=>{
    const from=document.querySelector('#section-'+el.dataset.from),to=document.querySelector('#section-'+el.dataset.to),a=getComputedStyle(from),b=getComputedStyle(to);
-   el.style.setProperty('--bridge-from',el.dataset.from==='home'&&!from.dataset.editorBackground?'#20170f':a.getPropertyValue('--bridge-bottom').trim()||a.backgroundColor);
+   el.style.setProperty('--bridge-from',a.getPropertyValue('--bridge-bottom').trim()||a.backgroundColor);
    el.style.setProperty('--bridge-to',b.getPropertyValue('--bridge-top').trim()||b.backgroundColor);
   });
  }
@@ -80,7 +80,7 @@ class MagneticPageController extends LongPageController {
  crossJump(y,id){
   if(this.crossFade){this.queuedCross={y,id};return;}
   const source=this.current;this.cancel(true);this.resetPressure();
-  const color=(key,edge)=>{const el=this.sections.find(s=>s.dataset.section===key),cs=getComputedStyle(el);return cs.getPropertyValue('--bridge-'+edge).trim()||(key==='home'?'#20170f':cs.backgroundColor==='rgba(0, 0, 0, 0)'?getComputedStyle(document.body).backgroundColor:cs.backgroundColor);};
+  const color=(key,edge)=>{const el=this.sections.find(s=>s.dataset.section===key),cs=getComputedStyle(el);return cs.getPropertyValue('--bridge-'+edge).trim()||(key==='home'?(cs.getPropertyValue('--home-edge').trim()||'#20170f'):cs.backgroundColor==='rgba(0, 0, 0, 0)'?getComputedStyle(document.body).backgroundColor:cs.backgroundColor);};
   const cover=document.createElement('div'),end=document.createElement('div');cover.className='section-crossfade';cover.setAttribute('aria-hidden','true');cover.style.background=color(source,'bottom');end.style.background=color(id,'top');cover.append(end);document.body.append(cover);this.crossFade=cover;
   this.crossInert=[...this.sections,...document.querySelectorAll('.solar-test,.solar-notice,.corner-tools,.corner-brand')].map(el=>[el,el.inert]);this.crossInert.forEach(([el])=>el.inert=true);
   document.body.classList.add('cross-travel');this.navigating=this.transitioning=true;this.sceneEvent('prepare',id);this.target=y;

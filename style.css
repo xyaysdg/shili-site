@@ -74,3 +74,14 @@
 @media(max-width:600px){.masonry,.poetry-gallery{column-count:var(--columns,2)}.art-gallery{grid-template-columns:repeat(var(--columns,2),minmax(0,1fr))}}
 @media(min-width:801px){.icon-button.menu-toggle{display:none}}
 @media print{.sidebar,.topbar,.footer,.reading-top,.article-neighbors,dialog,.skip-link{display:none!important}.site-shell{margin:0}.main-content{padding:0}.article-body{font-size:12pt;color:#000}.article-heading>h1{font-size:24pt}body{background:white;color:#000}.article-body img{max-height:600px;break-inside:avoid}.article-body a{color:#000}p{orphans:3;widows:3}}
+
+/* V124: visible game URL only in the game section / game wall. */
+.footer .footer-game-link{display:none;color:#a9d8ff;overflow-wrap:anywhere}
+body.pantheon-page .footer-original,body.long-mode.sky-active .footer-original{display:none}
+body.pantheon-page .footer-game-link,body.long-mode.sky-active .footer-game-link{display:inline-block}
+@supports (background-clip:text){
+.footer .footer-game-link{background:linear-gradient(110deg,#ff8b94,#ffb677,#ffe58a,#9bea9a,#83e6ee,#92baff,#cf9bff,#ff8b94);background-size:250% 100%;background-clip:text;-webkit-background-clip:text;color:transparent;animation:game-link-flow 9s ease-in-out infinite}
+}
+@keyframes game-link-flow{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@media(prefers-reduced-motion:reduce){.footer .footer-game-link{animation:none}}
+@media(forced-colors:active){.footer .footer-game-link{background:none;color:LinkText}}

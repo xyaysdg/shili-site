@@ -64,11 +64,13 @@ class PoetryGarden{
   on(window,'blur',()=>{this.blurred=true;this.drag=null;this.space.classList.remove('is-dragging');this.pointer={x:0,y:0};this.sync();});on(window,'focus',()=>{this.blurred=false;this.sync();});
   on(document,'visibilitychange',()=>this.sync());on(this.motion,'change',()=>{this.mx=this.my=0;this.sync();});
   this.resize=new ResizeObserver(()=>this.layout());this.resize.observe(this.space);
-  this.observer=new IntersectionObserver(es=>{const e=es[0];this.viewportVisible=e.isIntersecting;if(!this.viewportVisible){this.hover=null;this.focus=null;}this.visible=this.viewportVisible||this.bleedVisible;if(!this.visible)this.resetEntrance();if(e.isIntersecting&&!this.entered&&e.intersectionRatio>=.4){this.entered=true;this.entranceTime=0;}this.sync();},{threshold:[0,.05,.4]});this.observer.observe(root);
+  this.observer=new IntersectionObserver(es=>{const e=es[0];this.viewportVisible=e.isIntersecting;if(!this.viewportVisible){this.hover=null;this.focus=null;}this.visible=this.viewportVisible||this.bleedVisible;if(!this.visible)this.resetEntrance();this.sync();},{threshold:[0,.05,.4]});this.observer.observe(root);
   this.bleedObserver=new IntersectionObserver(es=>{this.bleedVisible=es[0].isIntersecting;this.visible=this.bleedVisible||this.viewportVisible;if(!this.visible)this.resetEntrance();this.sync();},{rootMargin:'650px 0px'});this.bleedObserver.observe(root);
   this.modal=new MutationObserver(()=>this.sync());this.modal.observe(document.body,{attributes:true,attributeFilter:['class']});
   [...this.leaves,...this.ghosts].forEach(el=>applyPoetryPaper(el,POETRY_LEAVES[+(el.dataset.poem??el.dataset.source)]));
-  this.layout();this.resetEntrance();
+  on(window,'shili:section-active',()=>this.sync());
+  on(window,'pageshow',()=>{this.blurred=false;this.sync();});
+  this.layout();this.resetEntrance();this.sync();
  }
  cancelReaderInk(){this.readerInkToken=(this.readerInkToken||0)+1;this.readerInk?.forEach(a=>a.cancel());this.readerInk=[];}
  open(i,focus=true){
@@ -140,20 +142,27 @@ class PoetryGarden{
   });
   this.draw();this.sync();
  }
- active(){return !document.body.classList.contains('site-editor-active')&&this.visible&&!this.blurred&&!document.hidden&&!document.body.classList.contains('modal-open');}
- sync(){this.space.inert=!this.reader.hidden&&innerWidth<=760;if(this.motion.matches&&this.readerInk?.length)this.open(this.index,false);if(document.body.classList.contains('site-editor-active')){this.entered=true;this.entranceTime=60;this.updateEntrance(0);this.draw();}if(this.motion.matches&&this.entered)this.updateEntrance(0);if(!this.active()){cancelAnimationFrame(this.frame);this.frame=0;this.last=0;return;}if(this.motion.matches){cancelAnimationFrame(this.frame);this.frame=0;this.pan=this.panTarget;this.draw();}else this.wake();}
+ active(){return !document.body.classList.contains('site-editor-active')&&this.visible&&!document.hidden&&!document.body.classList.contains('modal-open');}
+ ensureEntrance(){
+  if(this.entered)return;
+  const r=this.root.getBoundingClientRect(),overlap=Math.max(0,Math.min(r.bottom,innerHeight)-Math.max(r.top,0));
+  if(overlap>=Math.min(r.height,innerHeight)*.35&&overlap>0){this.entered=true;this.entranceTime=0;this.visible=true;}
+ }
+ sync(){this.ensureEntrance();this.space.inert=!this.reader.hidden&&innerWidth<=760;if(this.motion.matches&&this.readerInk?.length)this.open(this.index,false);if(document.body.classList.contains('site-editor-active')){this.entered=true;this.entranceTime=60;this.updateEntrance(0);this.draw();}if(this.motion.matches&&this.entered)this.updateEntrance(0);if(!this.active()){cancelAnimationFrame(this.frame);this.frame=0;this.last=0;return;}if(this.motion.matches){cancelAnimationFrame(this.frame);this.frame=0;this.pan=this.panTarget;this.draw();}else this.wake();}
  wake(){if(!this.active())return;if(this.motion.matches){this.pan=this.panTarget;this.draw();return;}if(this.frame)return;this.last=0;const tick=t=>{this.frame=0;if(!this.active())return;const dt=this.last?Math.min(40,t-this.last):16;this.last=t;this.frameStep=dt/1000;this.elapsed+=dt/1000;this.updateEntrance(dt/1000);this.advanceFall(dt/1000);this.smoothing=1-Math.exp(-dt/170);const follow=1-Math.exp(-dt/210);this.mx+=(this.pointer.x-this.mx)*follow;this.my+=(this.pointer.y-this.my)*follow;this.pan+=(this.panTarget-this.pan)*(1-Math.exp(-dt/115));this.draw();if(this.paused&&this.entranceTime>5.5&&Math.abs(this.panTarget-this.pan)<.1&&Math.abs(this.pointer.x-this.mx)<.001&&Math.abs(this.pointer.y-this.my)<.001){this.last=0;return;}this.frame=requestAnimationFrame(tick);};this.frame=requestAnimationFrame(tick);}
  resetEntrance(){
   this.cancelReaderInk();
-  this.entered=false;this.entranceTime=0;this.reader.hidden=true;this.space.inert=false;this.root.dataset.entrance='waiting';this.hover=null;this.focus=null;
+  this.entered=false;this.entranceTime=0;this.reader.hidden=true;this.space.inert=false;this.root.dataset.entrance='waiting';this.lastGlow=0;this.root.style.setProperty('--poetry-glow',0);this.hover=null;this.focus=null;
+  if(this.densityGroups){this.densityGroups=null;this.configureFlow();}
   (this.flowNodes||[]).forEach((n,k)=>{n.travel=this.densityGroups?n.margin+n.screenY:(this.paused?n.margin+n.screenY:0);n.entryAge=this.densityGroups?1:-n.entryDelay;n.entryDone=this.densityGroups?true:!!this.paused;n.motionRate=1;n.age=0;n.pose=null;n.admitted=this.densityGroups?!!n.scheduled:Math.random()*100<n.chance;if(!n.decor)this.leaves[n.i].setAttribute('aria-expanded','false');});
   this.draw();
  }
  updateEntrance(dt){
   if(!this.entered)return;
   this.entranceTime=this.motion.matches?20:this.entranceTime+dt;
-  const t=this.entranceTime,stage=t<.35?'waiting':t<1.65?'text':t<4.8?'pages':'ready';
+  const t=this.entranceTime,stage=t<.35?'waiting':t<4.8?'pages':'ready';
   if(this.root.dataset.entrance!==stage)this.root.dataset.entrance=stage;
+  const glow=Math.max(0,Math.min(1,(t-2)/1.2));if(glow!==this.lastGlow){this.lastGlow=glow;this.root.style.setProperty('--poetry-glow',glow*glow*(3-2*glow));}
  }
  configureFlow(){
   const small=innerWidth<=760,previousGroups=this.densityGroups;
@@ -183,12 +192,14 @@ class PoetryGarden{
   selected.flowTop=-this.height*.5;selected.flowSpan=this.height*2;selected.cycle=selected.flowSpan;selected.fallSpeed=group.decor?22:24;
   const lanes=this.width<850?2:3;
   const random=((Math.sin((selected.i+1)*127.1+(slot.index+1)*311.7+(selected.laps||0)*73.3)*43758.5453)%1+1)%1;selected.laps=(selected.laps||0)+1;
-  selected.entryStart=group.decor?slot.index*.65+random*.4:2.8+slot.index*1.15+random*.6;selected.entryLength=(group.decor?8:7.5)+random*3;
+  selected.entryStart=group.decor?(slot.index===0?0:slot.index*.65+random*.4):2.8+slot.index*1.15+random*.6;selected.entryLength=(group.decor?8:7.5)+random*3;
   selected.anchor=group.decor?.12+((slot.index*.61803398875)%1)*.76:Math.max(.10,Math.min(.90,.18+(slot.index%lanes)*.64/(lanes-1)+(random-.5)*.24));
   selected.screenY=selected.flowTop+slot.phase*selected.flowSpan+selected.flowSpan*.10/Math.max(1,Math.min(group.limit,group.nodes.filter(n=>n.chance>0).length))*Math.sin(group.clock*(group.decor?.7:.35)+slot.index*2.4);selected.travel=selected.margin+selected.screenY;
+  // Limit the catch-up speed of lower slots instead of giving every distance the same duration.
+  selected.entryLength=Math.max(selected.entryLength,1.5*(Math.max(0,selected.screenY)+selected.margin+40)/(group.decor?65:85));
  }
  advanceFall(dt){
-  if(!this.densityGroups||this.motion.matches||this.paused||!this.entered||this.entranceTime<1.65)return;
+  if(!this.densityGroups||this.motion.matches||this.paused||!this.entered||this.entranceTime<.35)return;
   for(const group of this.densityGroups){
    // Keep spacing intact when a reader holds a foreground sheet.
    const hold=!!this.drag;
@@ -228,7 +239,7 @@ class PoetryGarden{
     if(!n.pose||still)n.pose=target;else for(const key of Object.keys(target))n.pose[key]+=(target[key]-n.pose[key])*(this.smoothing||.1)*(!n.decor&&this.hover===n.i?n.motionRate:1);
    }
    const liveProjection=1000/(1000-n.pose.z),screenY=still?n.screenY:n.travel-n.margin;
-   const entryProgress=still?1:Math.max(0,Math.min(1,(this.entranceTime-1.65-(n.entryStart||0))/(n.entryLength||8))),entryShift=(1-entryProgress*entryProgress*(3-2*entryProgress))*(Math.max(0,screenY)+n.margin+40);
+   const entryProgress=still?1:Math.max(0,Math.min(1,(this.entranceTime-.35-(n.entryStart||0))/(n.entryLength||8))),entryShift=(1-entryProgress*entryProgress*(3-2*entryProgress))*(Math.max(0,screenY)+n.margin+40);
    const anchored=!!this.densityGroups;
    const pad=Math.min(this.drawWidth*.32,n.w*liveProjection*.65+18),baseX=anchored?Math.max(pad,Math.min(this.drawWidth-pad,n.anchor*this.drawWidth+this.pan+(n.avoidX||0)+(still?0:Math.sin(n.age*.3+n.phase)*12))):null;
    const x=anchored?this.width/2+(baseX-this.width/2)/liveProjection:n.x+this.pan/n.projection+n.pose.x;const y=this.height/2+(screenY-entryShift-this.height/2)/liveProjection+n.pose.y;
@@ -239,13 +250,13 @@ class PoetryGarden{
    const rx=denom>0?radius*(1000+Math.abs(cx-this.width/2))/denom+64:Infinity;
    const ry=denom>0?radius*(1000+Math.abs(cy-this.height/2))/denom+64:Infinity;
    const outside=cx+rx<0||cx-rx>(this.root?.clientWidth||this.width)||cy+ry<-(this.bleed??650)||cy-ry>this.height+(this.bleed??650);
-   const visible=n.admitted&&this.entered&&this.entranceTime>=1.65&&(still||n.entryAge>=0)&&!outside;
+   const visible=n.admitted&&this.entered&&this.entranceTime>=.35&&(still||n.entryAge>=0)&&!outside;
    const visibility=visible?'visible':'hidden';if(n.drawVisibility!==visibility){e.style.visibility=visibility;n.drawVisibility=visibility;}
    if(!visible){if(!n.decor&&e.tabIndex!==-1)e.tabIndex=-1;return;}
    e.style.transform=`translate3d(${(x-n.w/2).toFixed(2)}px,${(y-n.h/2).toFixed(2)}px,${n.pose.z.toFixed(2)}px) rotateZ(${n.pose.angle.toFixed(2)}deg) rotateY(${n.pose.yaw.toFixed(2)}deg) rotateX(${n.pose.pitch.toFixed(2)}deg)`;
    const fade=still?1:Math.min(1,entryProgress*2);if(n.drawFade!==fade){e.style.opacity='calc(var(--paper-alpha) * '+fade+')';n.drawFade=fade;}
    const sx=anchored?baseX:n.screenX+this.pan,extent=radius*liveProjection;
-   if(!n.decor){const viewWidth=this.reader&&!this.reader.hidden?this.width:this.root?.clientWidth||this.width,tabIndex=n.admitted&&(this.motion.matches||this.entranceTime>=1.65)&&sx+extent>0&&sx-extent<viewWidth&&screenY+extent>0&&screenY-extent<this.height?0:-1;if(e.tabIndex!==tabIndex)e.tabIndex=tabIndex;}
+   if(!n.decor){const viewWidth=this.reader&&!this.reader.hidden?this.width:this.root?.clientWidth||this.width,tabIndex=n.admitted&&(this.motion.matches||this.entranceTime>=.35)&&sx+extent>0&&sx-extent<viewWidth&&screenY+extent>0&&screenY-extent<this.height?0:-1;if(e.tabIndex!==tabIndex)e.tabIndex=tabIndex;}
   });
  }
  destroy(){this.cancelReaderInk();this.assetCleanup?.();cancelAnimationFrame(this.frame);this.resize.disconnect();this.observer.disconnect();this.bleedObserver.disconnect();this.modal.disconnect();this.cleanups.forEach(off=>off());delete this.root.poetryGarden;}

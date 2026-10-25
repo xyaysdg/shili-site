@@ -22,7 +22,7 @@ class InfiniteLibrary {
    this.element=element;this.interaction=interaction;this.root=interaction.root;this.pool=JSON.parse(element.dataset.articles).map(slug=>D.articles.find(a=>a.slug===slug));this.offset=this.target=this.velocity=0;this.listeners=[];this.slots=[...element.querySelectorAll('.library-article-slot')];this.bookFlights=new Map();this.fillerTracks=[...element.querySelectorAll('.library-filler-track')];this.fillers=this.fillerTracks.map(e=>[...e.children]);this.hiddenFillers=this.fillers.map(()=>new Set());this.fillerWrapCount=0;this.sizeFrame=0;this.needsSizing=false;element.library=this;
    this.initFillers();
   const listen=(el,type,fn,options)=>{el.addEventListener(type,fn,options);this.listeners.push(()=>el.removeEventListener(type,fn,options));};
-  listen(element,'pointerdown',e=>{if(e.button!==0||!e.isPrimary)return;this.drag={id:e.pointerId,x:e.clientX,y:e.clientY,lastX:e.clientX,lastTime:performance.now(),start:this.target,moved:false};this.velocity=0;});
+  listen(element,'pointerdown',e=>{if(e.button!==0||!e.isPrimary)return;this.drag={id:e.pointerId,x:e.clientX,y:e.clientY,lastX:e.clientX,lastTime:performance.now(),start:this.offset,moved:false};this.velocity=0;});
   listen(element,'pointermove',e=>{const d=this.drag;if(!d||d.id!==e.pointerId)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;if(!d.moved&&Math.abs(dy)>Math.abs(dx)+8){this.drag=null;return;}if(!d.moved&&Math.abs(dx)>7){d.moved=true;element.setPointerCapture(e.pointerId);element.classList.add('is-dragging');interaction.hide();}if(!d.moved)return;e.preventDefault();const now=performance.now(),dt=Math.max(8,now-d.lastTime);this.velocity=.6*this.velocity+.4*(e.clientX-d.lastX)*2.4/dt;this.target=d.start+dx*2.4;d.lastX=e.clientX;d.lastTime=now;this.root.libraryDragUntil=now+400;this.wake();});
   const release=e=>{if(!this.drag||e.pointerId!==this.drag.id)return;const moved=this.drag.moved;this.drag=null;element.classList.remove('is-dragging');if(element.hasPointerCapture(e.pointerId))element.releasePointerCapture(e.pointerId);if(moved){this.root.libraryDragUntil=performance.now()+400;this.wake();}};
   listen(element,'pointerup',release);listen(element,'pointercancel',e=>{this.velocity=0;release(e);});listen(element,'lostpointercapture',e=>{if(e.target===element)release(e);});
@@ -41,12 +41,13 @@ class InfiniteLibrary {
   const pauseLetters=()=>this.letters.forEach(e=>e.style.animationPlayState=!this.visible||document.hidden?'paused':'running');listen(document,'visibilitychange',pauseLetters);
    this.observer=new IntersectionObserver(es=>{this.visible=es[0].isIntersecting;pauseLetters();if(!this.visible){this.velocity=0;this.target=this.offset;if(this.drag&&element.hasPointerCapture(this.drag.id))element.releasePointerCapture(this.drag.id);this.drag=null;element.classList.remove('is-dragging');interaction.hide();cancelAnimationFrame(this.frame);this.frame=0;this.finishMotion();}},{threshold:0});this.observer.observe(element);this.visible=true;this.resize=new ResizeObserver(()=>{this.needsSizing=true;this.queueSizeBooks();});this.resize.observe(element);this.paint();this.sizeBooks();
   this.entrance=new SectionEntrance(this.section,'library');
+  if(['127.0.0.1','localhost',''].includes(location.hostname))this.createBookTuner();
  }
   replaceArticles(articles){
    // Let the original lifecycle handle unfinished entrances and empty results.
    if(this.destroyed||!articles.length||this.section.dataset.sceneEntrance!=='ready')return false;
    this.interaction.hide();
-   this.bookFlights.forEach(animation=>animation.cancel());this.bookFlights.clear();
+   this.bookFlights.forEach(animation=>animation.cancel());this.bookFlights.clear();this.bookPaths=new WeakMap();
    cancelAnimationFrame(this.frame);this.frame=0;
    cancelAnimationFrame(this.sizeFrame);this.sizeFrame=0;
    const drag=this.drag;this.drag=null;
@@ -93,7 +94,7 @@ class InfiniteLibrary {
    const period=3828,phase=((this.offset%period)+period)%period,{min,max}=this.fillerRange,first=Math.ceil((min+852-phase)/58),last=Math.floor((max+852-phase)/58),recycle=first!==this.fillerFirst||last!==this.fillerLast,mod=(n,p)=>((n%p)+p)%p;
    if(phase!==this.fillerPhase){
     this.fillerPhase=phase;
-    this.fillerTracks.forEach(track=>{track.style.transform=`translate3d(${phase}px,0,0)`;track.style.setProperty('--filler-phase',String(phase));});
+    this.fillerTracks.forEach(track=>{track.style.transform=`translate3d(${phase}px,0,0)`;});
    }
    this.fillers.forEach((books,row)=>{
     if(recycle){
@@ -101,7 +102,7 @@ class InfiniteLibrary {
      const element=books[mod(index,books.length)];
      if(element.libraryFillerIndex!==index){
       element.libraryFillerIndex=index;const sourceIndex=mod(index,66),seed=Math.sin(sourceIndex*127.1+row*311.7)*43758.5453,kind=Math.floor((seed-Math.floor(seed))*5),shape=libraryFillerStyles[kind];
-      element.style.left=index*58+'px';element.style.setProperty('--dummy-x',String(index*58-852));
+      element.style.left=index*58+'px';
       if(element.dataset.lineStyle!==String(kind)){element.dataset.lineStyle=String(kind);element.style.setProperty('--dummy-h',shape.h+'%');element.style.setProperty('--dummy-w',shape.w+'px');element.style.setProperty('--dummy-radius',shape.r+'px');element.dataset.width=String(shape.w);}
      }
     }
@@ -117,19 +118,16 @@ class InfiniteLibrary {
   }
   paint(){
   const period=4050,mod=(n,p)=>((n%p)+p)%p,positions=Array.from({length:6},()=>[]);
-  const smooth=n=>{const t=Math.max(0,Math.min(1,n));return t*t*(3-2*t);};
-  // Both ends are fully transparent before a world object is recycled.
-  const fade=(x,end)=>smooth((x-100)/1100)*smooth((end-x)/240);let changed=false;
+  // Left recycling is hidden by the foreground; right recycling stays beyond the viewport.
+  let changed=false;
   this.slots.forEach((slot,i)=>{
    if(!this.pool.length){slot.innerHTML='';return;}
    const row=Math.floor(i/3),base=this.rowPositions[row][i%3],cycle=Math.floor((base+this.offset+650)/period),cell=i%3-cycle*3;
    const seed=Math.sin(cell*127.1+row*311.7+this.layoutSeed)*43758.5453,jitter=((seed-Math.floor(seed))-.5)*160;
    const x=base+this.offset-cycle*period+jitter,index=mod(cell*4+row,this.pool.length),a=this.pool[index];
    if(slot.dataset.slug!==a.slug){const focused=slot.contains(document.activeElement);slot.dataset.slug=a.slug;slot.innerHTML=libraryBookMarkup(a,D.articles.indexOf(a));slot.libraryPaint=null;changed=true;if(focused)this.element.focus({preventScroll:true});}
-   const state=slot.libraryPaint||(slot.libraryPaint={}),transform=`translate3d(${x}px,0,1px)`,fog=Math.max(0,Math.min(70,(1200-x)*.055))+'%',alpha=fade(x,2920),opacity=alpha.toFixed(5);
+   const state=slot.libraryPaint||(slot.libraryPaint={}),transform=`translate3d(${x}px,0,1px)`,alpha=x>=100&&x<=2920?1:0;
    if(state.transform!==transform){slot.style.transform=transform;state.transform=transform;}
-   if(state.fog!==fog){slot.style.setProperty('--distance-fog',fog);state.fog=fog;}
-   if(state.opacity!==opacity){slot.style.setProperty('--distance-alpha',opacity);state.opacity=opacity;}
    const book=state.book?.parentElement===slot?state.book:(state.book=slot.querySelector('.shelf-book'));
    if(book.hasAttribute('data-distance-hidden')!==(alpha===0))book.toggleAttribute('data-distance-hidden',alpha===0);
    const tabIndex=alpha>.15?0:-1;if(book.tabIndex!==tabIndex)book.tabIndex=tabIndex;positions[row+1].push(x);
@@ -139,11 +137,12 @@ class InfiniteLibrary {
  }
  updateFocusTargets(){
   // Recycled volumes beyond the screen must not become invisible Tab stops.
-  const v=this.element.getBoundingClientRect(),items=this.slots.map(slot=>({book:slot.querySelector('.shelf-book'),rect:slot.getBoundingClientRect(),alpha:+slot.style.getPropertyValue('--distance-alpha')}));
+  const v=this.element.getBoundingClientRect(),items=this.slots.map(slot=>({book:slot.querySelector('.shelf-book'),rect:slot.getBoundingClientRect(),alpha:slot.querySelector('.shelf-book')?.hasAttribute('data-distance-hidden')?0:1}));
   items.forEach(({book,rect:r,alpha})=>{if(book)book.tabIndex=alpha>.15&&r.right>Math.max(0,v.left)&&r.left<Math.min(innerWidth,v.right)&&r.bottom>Math.max(74,v.top)&&r.top<Math.min(innerHeight-60,v.bottom)?0:-1;});
  }
  hold(){this.velocity=0;this.target=this.offset;}
  fitPreview(book){
+  if(this.bookFlights.has(book.querySelector('.book-motion')))return;
   const object=book.querySelector('.book-motion'),cover=book.querySelector('.book-cover');let shift=0;object.style.transition='none';book.style.setProperty('--preview-shift','0px');book.style.setProperty('--preview-lift','0px');
   // Measure the final projected cuboid, not just the old spine hit area.
   for(let i=0;i<3;i++){const r=cover.getBoundingClientRect(),delta=r.left<16?16-r.left:r.right>innerWidth-16?innerWidth-16-r.right:0;if(Math.abs(delta)<1)break;book.style.setProperty('--preview-shift',(shift+20)+'px');const slope=(cover.getBoundingClientRect().left-r.left)/20;shift+=delta/Math.max(.15,slope);book.style.setProperty('--preview-shift',shift+'px');}
@@ -152,15 +151,21 @@ class InfiniteLibrary {
   for(let i=0;i<3;i++){const r=cover.getBoundingClientRect(),delta=r.top<top?top-r.top:r.bottom>bottom?bottom-r.bottom:0;if(Math.abs(delta)<.5)break;book.style.setProperty('--preview-lift',(lift+20)+'px');const slope=(cover.getBoundingClientRect().top-r.top)/20;lift+=delta/Math.max(.15,slope);book.style.setProperty('--preview-lift',lift+'px');}
   object.style.removeProperty('transition');
  }
- pose(book){const motion=book?.querySelector('.book-motion');if(!motion)return 'none';const pose=getComputedStyle(motion).transform;const flight=this.bookFlights.get(motion);if(flight){flight.cancel();this.bookFlights.delete(motion);}return pose;}
+ pose(book){const motion=book?.querySelector('.book-motion');if(!motion)return 'none';const pose=getComputedStyle(motion).transform;return pose;}
  animateBook(book,opening,from){
-  const motion=book?.querySelector('.book-motion');if(!motion)return;from??=this.pose(book);const to=getComputedStyle(motion).transform;if(this.interaction.motion.matches)return;
-  const style=getComputedStyle(book),depth=parseFloat(style.getPropertyValue('--book-depth')),scale=parseFloat(style.getPropertyValue('--preview-scale'))||1,clearance=parseFloat(style.getPropertyValue('--preview-depth'))||libraryBookPreviewDepth(depth,book.clientHeight,scale),clear='translate3d(0,0,'+clearance+'px)';
-  // The entire cuboid clears the shelf before changing height, angle or scale.
-  // Ease each stage separately so the change of direction at clearance is gentle too.
-  const easing='cubic-bezier(.42,0,.58,1)',frames=[{transform:from,offset:0,easing},{transform:clear,offset:opening?.44:.56,easing},{transform:to,offset:1}];
-  const animation=motion.animate(frames,{duration:1300,easing:'linear',fill:'both'});this.bookFlights.set(motion,animation);
-  animation.onfinish=()=>{if(this.bookFlights.get(motion)===animation){animation.cancel();this.bookFlights.delete(motion);}};
+  const motion=book?.querySelector('.book-motion');if(!motion)return;
+  const settings=this.bookTuning||{duration:1500,split:.60,a:[.128,.017,.288,1],b:[.277,.054,.664,1]},curve=v=>'cubic-bezier('+v.join(',')+')';
+  this.bookPaths??=new WeakMap();let animation=this.bookPaths.get(motion);
+  if(this.interaction.motion.matches){animation?.cancel();this.bookFlights.delete(motion);this.bookPaths.delete(motion);return;}
+  if(!animation){
+   if(!opening)return;
+   from??=this.pose(book);const to=getComputedStyle(motion).transform,style=getComputedStyle(book),depth=parseFloat(style.getPropertyValue('--book-depth')),scale=parseFloat(style.getPropertyValue('--preview-scale'))||1,clearance=parseFloat(style.getPropertyValue('--preview-depth'))||libraryBookPreviewDepth(depth,book.clientHeight,scale);
+   // Nonzero but gentle speed at clearance; returning retraces this same safe path.
+   animation=motion.animate([{transform:from,offset:0,easing:curve(settings.a)},{transform:'translate3d(0,0,'+clearance+'px)',offset:settings.split,easing:curve(settings.b)},{transform:to,offset:1}],{duration:settings.duration,easing:'linear',fill:'both'});
+   this.bookPaths.set(motion,animation);
+  }
+  this.bookFlights.set(motion,animation);animation.updatePlaybackRate(opening?1:-1);animation.play();
+  animation.onfinish=()=>{if(this.bookFlights.get(motion)!==animation)return;this.bookFlights.delete(motion);if(animation.playbackRate<0){animation.cancel();this.bookPaths.delete(motion);}else if(this.interaction.book===book)this.interaction.updateTilt?.();};
  }
   queueSizeBooks(){if(this.sizeFrame||this.destroyed)return;this.sizeFrame=requestAnimationFrame(()=>{this.sizeFrame=0;if(this.frame||this.drag)return;this.sizeBooks();});}
   finishMotion(){if(this.needsSizing)this.sizeBooks();else this.updateFocusTargets();}
@@ -181,6 +186,22 @@ class InfiniteLibrary {
    if(overflow){let low=9,high=titleSize;while(high-low>.5){const middle=Math.floor((low+high)*2)/4;slot.style.setProperty('--cover-title-size',middle+'px');if(face.scrollHeight<=face.clientHeight+1)low=middle;else high=middle;}slot.style.setProperty('--cover-title-size',low+'px');}
    });this.element.style.setProperty('--shelf-depth',shelfDepth+'px');if(fillerLayoutChanged)this.paint();this.updateFocusTargets();}
 
-  wake(){if(document.body.classList.contains('site-editor-active')||this.frame||this.destroyed)return;let previous;const step=t=>{if(document.body.classList.contains('site-editor-active')){this.frame=0;this.velocity=0;this.target=this.offset;return;}const dt=previous?Math.min(40,t-previous):16;previous=t;if(!this.drag){this.target+=this.velocity*dt;this.velocity*=Math.exp(-dt/220);}this.offset+=(this.target-this.offset)*(this.interaction.motion.matches?1:1-Math.exp(-dt/100));this.paint();if(Math.abs(this.target-this.offset)>.1||Math.abs(this.velocity)>.005)this.frame=requestAnimationFrame(step);else{this.frame=0;this.offset=this.target;this.paint();this.finishMotion();}};this.frame=requestAnimationFrame(step);}
-  destroy(){this.bookFlights.forEach(a=>a.cancel());this.bookFlights.clear();this.destroyed=true;cancelAnimationFrame(this.frame);cancelAnimationFrame(this.sizeFrame);this.entrance.destroy();this.letterLayer.remove();this.observer.disconnect();this.resize.disconnect();this.listeners.forEach(off=>off());}
+  wake(){if(document.body.classList.contains('site-editor-active')||this.frame||this.destroyed)return;let previous;const step=t=>{if(document.body.classList.contains('site-editor-active')){this.frame=0;this.velocity=0;this.target=this.offset;return;}const dt=previous?Math.min(40,t-previous):16;previous=t;if(!this.drag){this.target+=this.velocity*dt;this.velocity*=Math.exp(-dt/220);}this.offset+=(this.target-this.offset)*(this.interaction.motion.matches?1:1-Math.exp(-dt/(this.drag?35:100)));this.paint();if(Math.abs(this.target-this.offset)>.1||Math.abs(this.velocity)>.005)this.frame=requestAnimationFrame(step);else{this.frame=0;this.offset=this.target;this.paint();this.finishMotion();}};this.frame=requestAnimationFrame(step);}
+ createBookTuner(){
+  const defaults=()=>({duration:1500,split:.60,a:[.128,.017,.288,1],b:[.277,.054,.664,1]});this.bookTuning=defaults();try{const saved=JSON.parse(localStorage.getItem('shili-book-motion-settings'));if(saved&&Number.isFinite(saved.duration)&&saved.duration>=200&&saved.duration<=6000&&Number.isFinite(saved.split)&&saved.split>=.15&&saved.split<=.85&&['a','b'].every(k=>Array.isArray(saved[k])&&saved[k].length===4&&saved[k].every(v=>Number.isFinite(v)&&v>=0&&v<=1)))this.bookTuning=saved;if(this.bookTuning.b.join(',')==='0.265,0.309,0.664,1')this.bookTuning.b=[.277,.054,.664,1];}catch{}
+  const panel=document.createElement('details');panel.className='book-tuner';panel.open=true;panel.innerHTML='<summary>书籍动画 · 曲线编辑</summary><div class="book-tuner-body"><p>修改后点击重播。参数自动记在本浏览器，仅编辑模式显示。</p><label>总时长（毫秒）<input data-key="duration" type="number" min="200" max="6000" step="50" value="1500"></label><label>抽出阶段占比（%）<input data-key="split" type="number" min="15" max="85" step="1" value="60"></label>'+['a','b'].map((key,i)=>'<fieldset><legend>'+ (i?'第二段：轻转停稳':'第一段：向外抽出')+'</legend><svg data-editor="'+key+'" viewBox="0 0 120 90" aria-label="时间与位移曲线"><path d="M10 5V80H115" fill="none" stroke="#b4a88f"/><path data-curve="'+key+'" fill="none" stroke="#93713d" stroke-width="2"/><path data-handles="'+key+'" fill="none" stroke="#ba9459" stroke-dasharray="2 2"/><rect x="7" y="77" width="6" height="6" fill="#76552b"/><rect x="107" y="7" width="6" height="6" fill="#76552b"/><circle data-handle="0" r="4" tabindex="0" role="button" aria-label="起点控制柄，方向键微调"/><circle data-handle="2" r="4" tabindex="0" role="button" aria-label="终点控制柄，方向键微调"/></svg><div class="book-tuner-points">'+['X1','Y1','X2','Y2'].map((name,j)=>'<label>'+name+'<input type="number" min="0" max="1" step=".001" data-point="'+key+j+'" value="'+this.bookTuning[key][j]+'"></label>').join('')+'</div></fieldset>').join('')+'<div class="book-tuner-actions"><button type="button" data-play>重播抽出</button><button type="button" data-return>回架</button><button type="button" data-reset>恢复默认</button></div><textarea readonly aria-label="当前动画参数" rows="4"></textarea><small>横轴时间，纵轴位移。方形是固定起止锚点，圆形是可拖动控制柄。参数框可复制发给我。</small><p data-status role="status"></p></div>';
+  this.section.append(panel);this.tuner=panel;
+  const update=()=>{panel.querySelector('[data-key="duration"]').value=this.bookTuning.duration;panel.querySelector('[data-key="split"]').value=Math.round(this.bookTuning.split*100);try{localStorage.setItem('shili-book-motion-settings',JSON.stringify(this.bookTuning));}catch{}for(const key of ['a','b']){const v=this.bookTuning[key];panel.querySelector('[data-curve="'+key+'"]').setAttribute('d','M10 80 C'+(10+100*v[0])+' '+(80-70*v[1])+','+(10+100*v[2])+' '+(80-70*v[3])+',110 10');}for(const key of ['a','b']){const v=this.bookTuning[key],svg=panel.querySelector('[data-editor="'+key+'"]');svg.querySelector('[data-handles]').setAttribute('d','M10 80 L'+(10+100*v[0])+' '+(80-70*v[1])+' M110 10 L'+(10+100*v[2])+' '+(80-70*v[3]));for(const n of [0,2]){const h=svg.querySelector('[data-handle="'+n+'"]');h.setAttribute('cx',10+100*v[n]);h.setAttribute('cy',80-70*v[n+1]);}v.forEach((value,i)=>panel.querySelector('[data-point="'+key+i+'"]').value=Number(value.toFixed(3)));}panel.querySelector('textarea').value=JSON.stringify(this.bookTuning,null,2);};
+  panel.addEventListener('input',e=>{const input=e.target;if(input.tagName!=='INPUT'||!input.validity.valid||input.value==='')return;const value=Number(input.value);if(!Number.isFinite(value))return;if(input.dataset.key)this.bookTuning[input.dataset.key]=input.dataset.key==='split'?value/100:value;else if(input.dataset.point){const [key,i]=input.dataset.point;this.bookTuning[key][i]=value;}update();});
+  for(const svg of panel.querySelectorAll('[data-editor]')){
+   let drag=null;const change=(n,x,y)=>{const v=this.bookTuning[svg.dataset.editor];v[n]=Math.round(Math.max(0,Math.min(1,x))*1000)/1000;v[n+1]=Math.round(Math.max(0,Math.min(1,y))*1000)/1000;update();};
+   svg.addEventListener('pointerdown',e=>{const handle=e.target.closest('[data-handle]');if(!handle||e.button!==0)return;e.preventDefault();e.stopPropagation();drag={id:e.pointerId,n:Number(handle.dataset.handle)};svg.setPointerCapture(e.pointerId);handle.focus();});
+   svg.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;e.preventDefault();const r=svg.getBoundingClientRect();change(drag.n,((e.clientX-r.left)/r.width*120-10)/100,(80-(e.clientY-r.top)/r.height*90)/70);});
+   const release=e=>{if(!drag||drag.id!==e.pointerId)return;drag=null;if(svg.hasPointerCapture(e.pointerId))svg.releasePointerCapture(e.pointerId);};svg.addEventListener('pointerup',release);svg.addEventListener('pointercancel',release);svg.addEventListener('lostpointercapture',()=>{drag=null;});
+   svg.addEventListener('keydown',e=>{const h=e.target.closest('[data-handle]');if(!h||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();e.stopPropagation();const n=Number(h.dataset.handle),v=this.bookTuning[svg.dataset.editor],step=e.shiftKey?.1:.01;change(n,v[n]+(e.key==='ArrowRight'?step:e.key==='ArrowLeft'?-step:0),v[n+1]+(e.key==='ArrowUp'?step:e.key==='ArrowDown'?-step:0));});
+  }
+  panel.querySelector('[data-play]').addEventListener('click',()=>{if(this.interaction.motion.matches){panel.querySelector('[data-status]').textContent='系统已启用减少动态效果，请关闭后再预览动画。';return;}let book=this.interaction.book;if(!book?.isConnected){const candidates=this.slots.map(s=>s.querySelector('.shelf-book')).filter(b=>{const r=b.getBoundingClientRect();return !b.hasAttribute('data-distance-hidden')&&r.right>innerWidth*.4&&r.left<innerWidth-30&&r.top>90&&r.bottom<innerHeight-80;});book=candidates[0];}if(!book){panel.querySelector('[data-status]').textContent='请先拖动书架，让一本彩色书进入画面。';return;}this.interaction.hide();const motion=book.querySelector('.book-motion');this.bookPaths?.get(motion)?.cancel();this.bookFlights.delete(motion);this.bookPaths?.delete(motion);this.interaction.preview(book);panel.querySelector('[data-status]').textContent=book.getAttribute('aria-label')+' · '+this.bookTuning.duration+'毫秒';});
+  panel.querySelector('[data-return]').addEventListener('click',()=>this.interaction.hide());panel.querySelector('[data-reset]').addEventListener('click',()=>{this.bookTuning=defaults();panel.querySelector('[data-key="duration"]').value=1500;panel.querySelector('[data-key="split"]').value=60;for(const key of ['a','b'])this.bookTuning[key].forEach((v,i)=>panel.querySelector('[data-point="'+key+i+'"]').value=v);update();});update();
+ }
+  destroy(){this.tuner?.remove();this.bookFlights.forEach(a=>a.cancel());this.bookFlights.clear();this.destroyed=true;cancelAnimationFrame(this.frame);cancelAnimationFrame(this.sizeFrame);this.entrance.destroy();this.letterLayer.remove();this.observer.disconnect();this.resize.disconnect();this.listeners.forEach(off=>off());}
 }

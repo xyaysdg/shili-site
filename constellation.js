@@ -94,7 +94,7 @@ class ConstellationWall {
   const ease=(a,b)=>{const p=Math.max(0,Math.min(1,(t-a)/(b-a)));return p*p*(3-2*p);};
   const linkProgress=ease(5.9,7.8),finish=ease(7.9,9.4);
   if(!this.entrancePainted||t<9.4){
-  this.section?.style.setProperty('--pantheon-glow',ease(.5,1.7));
+  this.section?.style.setProperty('--pantheon-glow',ease(2,3.2));
   this.section?.style.setProperty('--pantheon-title',ease(.15,1.35));
   this.wall.dataset.entrance=t>=9.4?'ready':t<1.4?'title':t<5.9?'pictures':t<7.9?'lines':'stars';
   this.sky.style.opacity=finish;this.wall.style.setProperty("--pantheon-stars",finish);

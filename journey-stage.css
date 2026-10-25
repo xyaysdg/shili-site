@@ -84,3 +84,11 @@
  body.long-mode #section-journey .journey-copy .prose p{margin-bottom:1em}
  body.long-mode #section-journey>.medal-controls{bottom:62px}
 }
+
+/* V125: quiet luminous lettering and a layered spotlight. */
+#section-journey .journey-copy .journey-text-face{ text-shadow:0 0 7px #e5eeff22,0 0 19px #dbe5ff12,0 2px 3px #0008 }
+body #section-journey .page-title-row h1{font-size:clamp(26px,2.1vw,34px);line-height:1.25;white-space:nowrap}
+#section-journey .medal-stage::after{content:'';position:absolute;inset:-8% 4% 6%;z-index:2;pointer-events:none;background:radial-gradient(ellipse 42% 85% at 50% 0%,#f4f7ff0e 0%,#eaf1ff08 36%,#eaf1ff03 58%,transparent 78%);mask-image:linear-gradient(transparent,#000 18%,#0009 60%,transparent)}
+.journey-beam::before{content:'';position:absolute;left:42%;top:0;width:16%;height:12%;background:radial-gradient(ellipse,#f4f8ff55, #e7f0ff14 35%,transparent 70%);pointer-events:none}
+@media(max-width:600px){body #section-journey .page-title-row h1{font-size:26px;white-space:normal;text-wrap:balance;overflow-wrap:anywhere}}
+@media print{#section-journey .journey-copy .journey-text-face{text-shadow:none}#section-journey .medal-stage::after{display:none}}

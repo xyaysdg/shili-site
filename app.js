@@ -132,6 +132,9 @@ function render() {
  closeMenu();bindPage();if(!detail){updateArticles();longPage=new MagneticPageController();wallCleanup.push(()=>longPage?.destroy());}
 }
 function bindPage() {
+ const nightPortrait=document.querySelector('.intro-portrait-night');
+ if(nightPortrait){const ready=()=>{if(nightPortrait.naturalWidth)nightPortrait.classList.add('is-ready');};if(nightPortrait.complete)ready();else nightPortrait.addEventListener('load',ready,{once:true});}
+
  $$('.editor-wall-card').forEach(button=>button.addEventListener('click',()=>{const editor=window.shiliSiteEditor;if(editor.active&&!editor.previewing)return;const record=editor.catalog().find(r=>r.id===button.dataset.workId);if(!record||!record.visible)return;if(record.kind==='article')location.hash='#/article/'+record.item.slug;else {const item=record.item;openGallery([{...item,src:item.src||editor.poemImage(item.title,item.body),caption:record.title}],0,button);}}));
  const chestnutRoot=$('[data-chestnut-gravity]');if(chestnutRoot){const chestnut=new ChestnutGravity(chestnutRoot);wallCleanup.push(()=>chestnut.destroy());}
  const poetryRoot=document.querySelector('[data-poetry-garden]');if(poetryRoot){const garden=new PoetryGarden(poetryRoot);wallCleanup.push(()=>garden.destroy());}
@@ -172,7 +175,25 @@ document.addEventListener('keydown',e=>{if(e.key==='/'&&!['INPUT','TEXTAREA'].in
 function closeMenu(){$('body').classList.remove('menu-open');}
 $('#mobile-shade').addEventListener('click',closeMenu);
 function setTheme(dark){document.documentElement.dataset.theme=dark?'dark':'light';$('#theme-toggle span').textContent=dark?'日间模式':'夜读模式';$('#theme-toggle').setAttribute('aria-label',dark?'切换浅色模式':'切换深色模式');try{localStorage.setItem('shili-theme',dark?'dark':'light');}catch{}}
-try{setTheme(localStorage.getItem('shili-theme')==='dark');}catch{}$('#theme-toggle').addEventListener('click',()=>setTheme(document.documentElement.dataset.theme!=='dark'));
+let libraryThemeTransition=null,requestedTheme=null;
+function changeTheme(dark){
+ requestedTheme=dark;
+ if(libraryThemeTransition){libraryThemeTransition.skipTransition();return;}
+ const library=document.querySelector('#section-writing'),rect=library?.getBoundingClientRect();
+ const visible=rect&&Math.min(rect.bottom,innerHeight)-Math.max(rect.top,0)>innerHeight*.4;
+ if(!visible||!document.startViewTransition||matchMedia('(prefers-reduced-motion: reduce)').matches){setTheme(dark);return;}
+ document.documentElement.classList.add('library-theme-changing');
+ try{
+  const transition=document.startViewTransition(()=>setTheme(dark));libraryThemeTransition=transition;
+  transition.ready.catch(()=>{});
+  transition.finished.catch(()=>{}).finally(()=>{
+   if(libraryThemeTransition!==transition)return;
+   libraryThemeTransition=null;document.documentElement.classList.remove('library-theme-changing');
+   if(requestedTheme!==(document.documentElement.dataset.theme==='dark'))changeTheme(requestedTheme);
+  });
+ }catch{document.documentElement.classList.remove('library-theme-changing');setTheme(dark);}
+}
+try{setTheme(localStorage.getItem('shili-theme')==='dark');}catch{}$('#theme-toggle').addEventListener('click',()=>changeTheme(!(requestedTheme??(document.documentElement.dataset.theme==='dark'))));
 function finishPage(){
  const grid=$('#gallery-grid');
  if(grid){const initial=innerWidth<=600?2:3;grid.style.setProperty('--columns',initial);$$('[data-density]').forEach(b=>{const on=Number(b.dataset.density)===initial;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});}
@@ -195,6 +216,12 @@ function routeChanged(initial=false){
  else scrollTo(0,initial?0:savedScroll.get(route)||0);
  $('#main').focus({preventScroll:true});
 }
+// Reset scene instances under the persistent solar dialog, without navigating the document.
+window.shiliResetScenes=()=>{
+ savedScroll.clear();history.replaceState(null,'','#/home');
+ $('#search-dialog').close();render();finishPage();
+ longPage?.scrollToSection('home',false);scrollTo({top:0,left:0,behavior:'instant'});
+};
 window.shiliEditorBridge={
  colors:()=>longPage?.bridges(),
  refresh:()=>{const y=scrollY;sortedArticles.splice(0,sortedArticles.length,...(window.shiliSiteEditor.state.order.writing?D.articles:[...D.articles].sort((a,b)=>b.date.localeCompare(a.date))));render();finishPage();scrollTo(0,y);},

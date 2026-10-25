@@ -112,3 +112,16 @@ body.long-mode #section-poetry.long-section{--bridge-top:var(--poetry-paper,#fdf
 .poetry-reader-landscape:empty{display:none}
 .poetry-reader-landscape .poetry-original-art{inset:12px 10% 0;width:80%;height:calc(100% - 12px)}
 @media(prefers-reduced-motion:reduce){.poetry-leaf:not(.poetry-ghost){transition:none}}
+
+/* V127: crossfade gradient layers rather than switching background images. */
+html[data-theme] .poetry-garden{background:linear-gradient(#fdfdfc,transparent 18%,transparent 82%,#fdfdfc),radial-gradient(ellipse at 48% 46%,#fff 22%,#fdfdfc 100%);transition:color .5s ease}
+.poetry-garden::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:#24272a;opacity:0;transition:opacity .5s ease}
+html[data-theme="dark"] .poetry-garden::before{opacity:1}
+body.long-mode #section-poetry.long-section{transition:background-color .5s ease,color .5s ease}
+.poetry-intro p,.poetry-intro>span,.poetry-fall-toggle,.poetry-about{transition:color .5s ease}
+@media(prefers-reduced-motion:reduce){.poetry-garden::before,html[data-theme] .poetry-garden,body.long-mode #section-poetry.long-section,.poetry-intro p,.poetry-intro>span,.poetry-fall-toggle,.poetry-about{transition:none}}
+
+/* Night glow enters after the solid edge has arrived; outer edges stay transparent. */
+.poetry-garden::after{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 45% 40%,#383b3d 0%,transparent 72%);mask-image:linear-gradient(transparent,#000 18%,#000 82%,transparent);opacity:0;transition:opacity .5s ease}
+html[data-theme="dark"] .poetry-garden::after{opacity:var(--poetry-glow,0)}
+@media(prefers-reduced-motion:reduce){.poetry-garden::after{transition:none}html[data-theme="dark"] .poetry-garden::after{opacity:1}}

@@ -185,11 +185,54 @@
 /* V48: masks on the shared 3D parent flatten all covers and break occlusion.
    Keep the six moving tracks; fade only each book's flat faces in world space.
    Both recycling edges are fully invisible before their coordinates wrap. */
-.library-dummy{will-change:auto;--dummy-world:calc(var(--dummy-x,0) + var(--filler-phase,0) + var(--dummy-wrap,0));--dummy-in:clamp(0,calc((var(--dummy-world) - 100) / 1100),1);--dummy-out:clamp(0,calc((2920 - var(--dummy-world)) / 240),1);--dummy-alpha:calc(var(--dummy-in) * var(--dummy-in) * (3 - 2 * var(--dummy-in)) * var(--dummy-out) * var(--dummy-out) * (3 - 2 * var(--dummy-out)))}
-.library-dummy>i{opacity:var(--dummy-alpha,1)}
+.library-dummy{will-change:auto}
+.library-dummy>i{opacity:1}
 /* V93: five reusable outline silhouettes. Keep the existing three depth faces
    for correct shelf/article occlusion, without page grain or shading. */
 .library-dummy .dummy-spine,.library-dummy .dummy-cover,.library-dummy .dummy-top{background:#fffefa!important;box-shadow:none!important;border:1px solid #d4b488}
 .library-dummy .dummy-spine{border-radius:var(--dummy-radius,2px) 1px 0 0}
 /* V94: retain the original upper/lower double-line spine ornaments. */
 .library-dummy .dummy-spine::before,.library-dummy .dummy-spine::after{content:''}
+
+/* V117: a single foreground fade, outside the preserved 3D scene. */
+#section-writing .section-content::after{display:block;content:'';position:absolute;inset:0;pointer-events:none;z-index:4;background:linear-gradient(90deg,#fffefa 32%,#fffefaf7 38%,#fffefaad 46%,#fffefa33 58%,transparent 68%)}
+#section-writing .library-article-slot{--distance-fog:0%}
+#section-writing .library-article-slot .book-object>span,.library-dummy>i{opacity:1}
+.library-plank,.library-plank-edge{mask-image:none}
+@media(max-width:600px){#section-writing .section-content::after{background:linear-gradient(90deg,#fffefa 0%,#fffefae6 8%,#fffefa66 22%,transparent 40%)}}
+
+#section-writing .shelf-book[data-distance-hidden]:not(.is-previewed){visibility:hidden}
+
+/* Local-only temporary motion controls. */
+.book-tuner{position:absolute;left:16px;top:100px;z-index:22;width:290px;max-height:calc(100dvh - 200px);overflow:auto;padding:12px;background:#fffdf6f5;border:1px solid #b6a27c;border-radius:10px;box-shadow:0 6px 24px #372a1920;color:#57462e;font:12px/1.5 sans-serif;touch-action:pan-y}
+.book-tuner summary{cursor:pointer;font-weight:600}.book-tuner p{margin:8px 0}.book-tuner label{display:flex;justify-content:space-between;align-items:center;gap:5px;margin:6px 0}.book-tuner input{width:80px;background:white;color:#473925;border:1px solid #cbbd9f;padding:4px}.book-tuner fieldset{margin:10px 0;padding:6px;border:1px solid #d5c7ac}.book-tuner svg{width:100%;height:70px}.book-tuner-points{display:grid;grid-template-columns:1fr 1fr;gap:4px}.book-tuner-points input{width:58px}.book-tuner-actions{display:flex;gap:5px;flex-wrap:wrap}.book-tuner button{padding:6px;border:1px solid #cbbd9f;border-radius:4px;background:#eee5d3;color:#473925;cursor:pointer}.book-tuner textarea{width:100%;box-sizing:border-box;margin:8px 0;font:11px monospace;color:#473925;background:#fff;border:1px solid #cbbd9f}.book-tuner small{font-size:11px}
+@media(max-width:600px){.book-tuner{top:70px;left:10px;width:260px;max-height:55dvh}}
+
+.book-tuner svg{height:auto;aspect-ratio:120/90;display:block;background:repeating-linear-gradient(0deg,transparent 0 19px,#bfa98122 19px 20px),repeating-linear-gradient(90deg,transparent 0 19px,#bfa98122 19px 20px);touch-action:none;user-select:none}.book-tuner svg circle{fill:#fff6dd;stroke:#8d662e;stroke-width:1.5;cursor:grab}.book-tuner svg circle:active{cursor:grabbing}.book-tuner svg circle:focus{fill:#ffd68b;outline:none}
+
+/* V120: editor-only controls; slower, smaller pointer tilt. */
+
+#section-writing .library-article-slot .shelf-book .book-object,#section-writing .library-article-slot .shelf-book.is-previewed .book-object{transition:transform 650ms cubic-bezier(.2,.65,.25,1)}
+@media(prefers-reduced-motion:reduce){#section-writing .library-article-slot .shelf-book .book-object{transition:none}}
+
+/* V127: editor-only controls; black and gold night library. */
+body:not(.site-editor-active) .book-tuner{display:none}
+html[data-theme="dark"] #section-writing{background:#080808;color:#ebc66c;filter:none;--bridge-top:#080808;--bridge-bottom:#080808}
+html[data-theme="dark"] #section-writing .section-content::after{background:linear-gradient(90deg,#080808 32%,#080808f7 38%,#080808ad 46%,#08080833 58%,transparent 68%)}
+html[data-theme="dark"] #section-writing .library-dummy i{background:#080808!important;border-color:#eac568;box-shadow:none!important}
+html[data-theme="dark"] #section-writing .dummy-spine::before,html[data-theme="dark"] #section-writing .dummy-spine::after{border-color:#eac568b3}
+html[data-theme="dark"] #section-writing .library-plank,html[data-theme="dark"] #section-writing .library-plank-edge{background:#0d0c09;border-color:#eac568;box-shadow:none}
+html[data-theme="dark"] #section-writing :is(.page-title-row h1,.page-heading>p,.writing-tools,.library-controls,.library-letters,.shelf-results-heading){color:#edcd7d}
+html[data-theme="dark"] #section-writing :is(.library-index,.library-controls button){background:#13110b;color:#f0d28a;border-color:#c9a354}
+html[data-theme="dark"] #section-writing .library-index a{color:#f0d28a}
+html[data-theme="dark"] #section-writing .inline-search input{color:#f0d28a}
+@media(max-width:600px){html[data-theme="dark"] #section-writing .section-content::after{background:linear-gradient(90deg,#080808 0%,#080808e6 8%,#08080866 22%,transparent 40%)}}
+
+/* V129: blend two captured library surfaces instead of repainting every book. */
+html.library-theme-changing{view-transition-name:none}
+html.library-theme-changing #section-writing{view-transition-name:library-theme}
+::view-transition-group(library-theme){animation-duration:.5s;animation-timing-function:linear}
+::view-transition-old(library-theme){animation:none;opacity:1;mix-blend-mode:normal}
+::view-transition-new(library-theme){animation:library-theme-reveal .5s linear both;mix-blend-mode:normal}
+@keyframes library-theme-reveal{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){::view-transition-group(library-theme),::view-transition-new(library-theme){animation:none}}

@@ -48,7 +48,7 @@
 .section-bridge{height:clamp(4000px,700svh,8000px);position:relative;pointer-events:none;background:linear-gradient(180deg,var(--bridge-from),color-mix(in srgb,var(--bridge-from) 60%,var(--bridge-to)) 40%,var(--bridge-to));overflow:hidden}
 .section-bridge[data-from="art"][data-to="photography"]{height:clamp(3000px,430svh,5600px);min-height:0}
 
-.intro-sequence::after{content:'';position:absolute;bottom:0;left:0;right:0;height:18svh;background:linear-gradient(transparent,#20170f);pointer-events:none}
+.intro-sequence::after{content:'';position:absolute;bottom:0;left:0;right:0;height:18svh;background:linear-gradient(transparent,var(--home-edge,#20170f));pointer-events:none}
 .long-section .section-content{translate:0 calc(-1 * var(--magnet-pull,0px));transition:translate .2s ease-out,opacity .4s ease-out,transform .5s ease-out}
 .intro-scene{translate:0 calc(-1 * var(--magnet-pull,0px));transition:translate .2s ease-out}
 @media(max-width:700px){.museum-stage{min-height:520px}.museum-tools{left:12px;right:12px;font-size:9px;gap:10px}.museum-mouse-help{display:none}.museum-touch-help{display:inline}.museum-wall-label{padding:10px 8px}.section-bridge{height:550svh;min-height:3500px}}
