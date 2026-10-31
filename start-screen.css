@@ -5,7 +5,7 @@
 .start-copy{position:fixed;left:52%;top:42%;width:44%;text-align:center;z-index:2}
 .start-enter{display:block;width:100%;padding:0;border:0;background:none;color:#ede8dc;font:400 clamp(18px,2.05vw,42px)/1.4 ui-monospace,Consolas,monospace;white-space:nowrap;animation:start-breathe 3.8s ease-in-out infinite;cursor:pointer}
 .start-enter:disabled{opacity:1;cursor:default;animation:none}.start-enter span{display:inline-block}.start-enter:focus-visible{outline:1px dashed #e5dcc680;outline-offset:12px}
-@keyframes start-breathe{0%,100%{text-shadow:0 0 5px #e9dcba22;opacity:.78}50%{text-shadow:0 0 12px #e9dcba77;opacity:1}}
+@keyframes start-breathe{0%,100%{text-shadow:0 0 8px #ffffff66,0 0 18px #e9dcba33;opacity:.88}50%{text-shadow:0 0 14px #ffffffcc,0 0 30px #e9dcba88;opacity:1}}
 .site-start .record-player{z-index:4}.site-start .record-ripples{display:none!important}.site-start .record-toggle:focus-visible{outline:none}.site-start .record-toggle:focus-visible .record-face{filter:brightness(1.15)}
 .site-start .record-arm{transition:transform 1.4s cubic-bezier(.4,0,.2,1)}.site-start .record-player[data-lowering=true] .record-arm{transform:rotate(30deg)}
 .site-start .record-status{display:none}.start-music-note{margin-top:28px;font-size:12px;color:#b8ad98}
@@ -76,3 +76,8 @@
 @keyframes start-invite-dismiss{to{opacity:0;transform:translate(-50%,-50%) scale(1.12,1.4)}}
 
 body:not(.site-editor-active) .start-aura-panel{display:none!important}
+
+/* V154: a second invitation ring follows halfway through the first cycle. */
+.start-enter.needs-click::before{content:"";position:absolute;left:50%;top:50%;width:calc(100% + 40px);height:calc(100% + 26px);margin:0;border:1px solid #ffffffb0;border-radius:50%;box-shadow:0 0 12px #ffffff55;pointer-events:none;opacity:0;transform:translate(-50%,-50%);animation:start-invite 2.8s ease-out 1.4s infinite}
+.site-start.is-entering .start-enter.needs-click::before{animation-play-state:paused;opacity:0!important;visibility:hidden}
+@media(prefers-reduced-motion:reduce){.start-enter.needs-click::before{display:none}}
