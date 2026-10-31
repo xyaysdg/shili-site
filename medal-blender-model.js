@@ -3,7 +3,8 @@ import {GLTFLoader} from './GLTFLoader.js';
 
 // Load the user's Blender export unchanged, including its mesh lettering and PBR materials.
 export async function createMedalModel(root,initialPose={pitch:-3.07,yaw:2.2}){
- const gltf=await new GLTFLoader().loadAsync(new URL('./assets/medal-blender-v37.glb',import.meta.url).href);
+ const url=new URL('./assets/medal-blender-v37.glb',import.meta.url).href,loader=new GLTFLoader();
+ const gltf=window.shiliSceneResources&&location.protocol!=='file:'?await loader.parseAsync((await window.shiliSceneResources.model(url)).slice(0),new URL('.',url).href):await loader.loadAsync(url);
  const geometry=new Set(),materials=new Set(),textures=new Set(),bitmaps=new Set();
  gltf.scene.traverse(e=>{if(!e.isMesh)return;geometry.add(e.geometry);for(const material of Array.isArray(e.material)?e.material:[e.material]){materials.add(material);for(const value of Object.values(material))if(value?.isTexture){textures.add(value);if(value.source?.data?.close)bitmaps.add(value.source.data);}}});
  const releaseAsset=()=>{geometry.forEach(v=>v.dispose());materials.forEach(v=>v.dispose());textures.forEach(v=>v.dispose());bitmaps.forEach(v=>v.close());};

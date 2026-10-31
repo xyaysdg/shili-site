@@ -20,14 +20,15 @@ class MuseumWall {
    this.listen(button,'focus',()=>{if(!button.matches(':focus-visible'))return;const r=button.getBoundingClientRect(),v=viewport.getBoundingClientRect();if(r.left<v.left||r.right>v.right||r.top<v.top||r.bottom>v.bottom){this.stop();this.tx=this.x=viewport.clientWidth/2-n.w/2-n.bx;this.ty=this.y=viewport.clientHeight/2-n.h/2-n.by;this.paint();viewport.scrollLeft=viewport.scrollTop=0;}});
   });
   const label=document.createElement('div');label.className='museum-wall-label';label.innerHTML='<h1>说来“画”长</h1><p>从小热爱画画，系统学过美术，也凭着热爱创作出了许多的画作，且看我一一“道”来。</p><p class="museum-drag-hint">左键摁住拖动画作</p>';this.layer.append(label);this.nodes.push({button:label,isLabel:true,index:-1});
+  this.stage.querySelectorAll('.museum-drag-hint').forEach(el=>{const text=el.textContent;el.setAttribute('aria-label',text);el.innerHTML=[...text].map((ch,i)=>`<span aria-hidden="true" style="--char:${i}">${ch}</span>`).join('');});
   this.compose();
   this.assetCleanup=prepareSceneAssets(this.stage,()=>{this.assetsReady=true;this.stage.style.setProperty('--museum-visitor-image','url("assets/museum-visitor-v29.png")');this.stage.querySelectorAll('img[data-scene-src]').forEach(img=>{img.src=img.dataset.sceneSrc;delete img.dataset.sceneSrc;});});
   this.listen(viewport,'dragstart',e=>e.preventDefault());
   this.listen(viewport,'pointerdown',e=>{if(e.button!==0||!e.isPrimary)return;this.stop();this.suppressClick=false;this.drag={id:e.pointerId,x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,time:e.timeStamp,touch:e.pointerType==='touch',moved:false};this.drag.capture=e.target.closest('.museum-frame')||viewport;this.drag.capture.setPointerCapture(e.pointerId);});
-  this.listen(viewport,'pointermove',e=>{const d=this.drag;if(!d||e.pointerId!==d.id)return;const dx=e.clientX-d.x,dy=d.touch?0:e.clientY-d.y,dt=Math.max(8,e.timeStamp-d.time);if(Math.hypot(e.clientX-d.startX,e.clientY-d.startY)>6){d.moved=true;viewport.classList.add('is-dragging');}this.tx+=dx*.48;this.ty+=dy*.48;this.vx=Math.max(-1.5,Math.min(1.5,dx/dt))*.28;this.vy=Math.max(-1.5,Math.min(1.5,dy/dt))*.28;d.x=e.clientX;d.y=e.clientY;d.time=e.timeStamp;this.wake();});
+  this.listen(viewport,'pointermove',e=>{const d=this.drag;if(!d||e.pointerId!==d.id)return;const dx=e.clientX-d.x,dy=d.touch?0:e.clientY-d.y,dt=Math.max(8,e.timeStamp-d.time);if(Math.hypot(e.clientX-d.startX,e.clientY-d.startY)>6){d.moved=true;this.startHint();viewport.classList.add('is-dragging');}this.tx+=dx*.48;this.ty+=dy*.48;this.vx=Math.max(-1.5,Math.min(1.5,dx/dt))*.28;this.vy=Math.max(-1.5,Math.min(1.5,dy/dt))*.28;d.x=e.clientX;d.y=e.clientY;d.time=e.timeStamp;this.wake();});
   const release=e=>{const d=this.drag;if(!d||e.pointerId!==d.id)return;this.suppressClick=d.moved||e.type==='pointercancel';if(e.type==='pointercancel'||e.timeStamp-d.time>100)this.vx=this.vy=0;this.drag=null;viewport.classList.remove('is-dragging');if(d.capture.hasPointerCapture(e.pointerId))d.capture.releasePointerCapture(e.pointerId);this.wake();clearTimeout(this.clickTimer);this.clickTimer=setTimeout(()=>this.suppressClick=false,160);};
   this.listen(viewport,'pointerup',release);this.listen(viewport,'pointercancel',release);this.listen(viewport,'lostpointercapture',release);
-  this.listen(viewport,'keydown',e=>{const dir={ArrowLeft:[120,0],ArrowRight:[-120,0],ArrowUp:[0,100],ArrowDown:[0,-100]}[e.key];if(!dir)return;e.preventDefault();e.stopPropagation();this.tx+=dir[0];this.ty+=dir[1];this.vx=this.vy=0;this.wake();});
+  this.listen(viewport,'keydown',e=>{const dir={ArrowLeft:[120,0],ArrowRight:[-120,0],ArrowUp:[0,100],ArrowDown:[0,-100]}[e.key];if(!dir)return;this.startHint();e.preventDefault();e.stopPropagation();this.tx+=dir[0];this.ty+=dir[1];this.vx=this.vy=0;this.wake();});
   this.resize=new ResizeObserver(()=>this.layout());this.resize.observe(viewport);
   this.visibility=new IntersectionObserver(es=>{const e=es[0],visibleHeight=e.intersectionRect.height,available=Math.min(e.boundingClientRect.height,Math.max(1,innerHeight));this.visible=e.isIntersecting;this.stage.style.setProperty('--museum-presence',this.reduced.matches?'1':Math.min(1,visibleHeight/(available*.82)).toFixed(3));if(!this.visible){this.stop();this.waitForEntrance();}else if(!this.navigationPending&&visibleHeight>=available*.82&&this.stage.dataset.entrance==='waiting')this.beginEntrance();},{threshold:Array.from({length:41},(_,i)=>i/40)});this.visibility.observe(viewport);
   this.listen(window,'shili:scene-prepare',e=>{if(e.detail.id==='art'){this.navigationPending=true;this.waitForEntrance();}});
@@ -38,7 +39,18 @@ class MuseumWall {
   this.listen(window,'blur',()=>{if(this.drag){const {id,capture}=this.drag;this.drag=null;if(capture.hasPointerCapture(id))capture.releasePointerCapture(id);}viewport.classList.remove('is-dragging');this.stop();});this.layout();
  }
  listen(el,type,fn){el.addEventListener(type,fn);this.listeners.push(()=>el.removeEventListener(type,fn));}
+ cancelHint(){clearTimeout(this.hintTimer);delete this.stage.dataset.hint;}
+ startHint(){
+  this.cancelHint();
+  const check=()=>{if(this.destroyed)return;
+   const r=this.viewport.getBoundingClientRect(),w=this.viewport.clientWidth,h=this.viewport.clientHeight;
+   const titleVisible=this.visible&&!document.hidden&&!this.drag&&(this.rendered||[]).some(v=>v.n.isLabel&&v.x+v.n.w>0&&v.x<w&&v.y+v.n.h>Math.max(0,-r.top)&&v.y<Math.min(h,innerHeight-r.top));
+   if(titleVisible)this.stage.dataset.hint='visible';else delete this.stage.dataset.hint;
+   this.hintTimer=setTimeout(check,5000);
+  };this.hintTimer=setTimeout(check,5000);
+ }
  waitForEntrance(){
+  this.cancelHint();
   cancelAnimationFrame(this.entranceFrame);this.entranceFrame=0;this.entranceElapsed=0;this.stage.dataset.entrance='waiting';this.viewport.inert=true;this.tools.inert=true;
   for(const key of ['floor','person','label','art','reflection','tools'])this.stage.style.setProperty('--entrance-'+key,'0');
   this.clearDeparture();
@@ -46,7 +58,7 @@ class MuseumWall {
   if(this.reduced.matches)this.finishEntrance();
  }
  resetComposition(){const label=this.label,width=this.viewport.clientWidth,height=this.viewport.clientHeight;this.stop();this.x=this.tx=(width<600?width-label.w-20:width*.67-label.w/2)-label.bx;this.y=this.ty=height*.43-label.h/2-label.by;this.anchor={x:label.bx+this.x+label.w/2,y:label.by+this.y+label.h/2};this.paint();}
- beginEntrance(){if(this.destroyed||!this.worldW)return;if(this.reduced.matches){this.finishEntrance();return;}this.resetComposition();this.stage.dataset.entrance='playing';this.entranceElapsed=0;this.entranceLast=0;this.prepareReveal();this.entranceFrame=requestAnimationFrame(t=>this.entranceTick(t));}
+ beginEntrance(){if(this.destroyed||!this.worldW)return;this.startHint();if(this.reduced.matches){this.finishEntrance();return;}this.resetComposition();this.stage.dataset.entrance='playing';this.entranceElapsed=0;this.entranceLast=0;this.prepareReveal();this.entranceFrame=requestAnimationFrame(t=>this.entranceTick(t));}
  prepareReveal(){
   // Reveal complete framed works, ordered by distance from the wall inscription.
   const visible=(this.rendered||[]).filter(v=>!v.n.isLabel&&v.y+v.n.h>0&&v.y<this.viewport.clientHeight);
@@ -227,5 +239,5 @@ class MuseumWall {
  wake(){if(!this.frame){this.last=0;this.frame=requestAnimationFrame(t=>this.tick(t));}}
  tick(t){this.frame=0;if(document.body.classList.contains('site-editor-active')){this.vx=this.vy=0;this.tx=this.x;this.ty=this.y;return;}if(this.destroyed)return;const dt=this.last?Math.min(t-this.last,40):16;this.last=t;if(!this.drag){if(this.reduced.matches)this.vx=this.vy=0;this.tx+=this.vx*dt;this.ty+=this.vy*dt;const decay=Math.exp(-dt/300);this.vx*=decay;this.vy*=decay;}const ease=this.reduced.matches?1:1-Math.exp(-dt/165);this.x+=(this.tx-this.x)*ease;this.y+=(this.ty-this.y)*ease;this.paint();if(Math.hypot(this.tx-this.x,this.ty-this.y)>.15||Math.hypot(this.vx,this.vy)>.002)this.frame=requestAnimationFrame(n=>this.tick(n));}
  stop(){cancelAnimationFrame(this.frame);this.frame=0;this.vx=this.vy=0;this.tx=this.x;this.ty=this.y;}
- destroy(){this.destroyed=true;this.assetCleanup?.();this.stop();this.clearDeparture();cancelAnimationFrame(this.entranceFrame);delete this.viewport.museumWall;clearTimeout(this.clickTimer);this.resize.disconnect();this.visibility.disconnect();this.listeners.forEach(off=>off());}
+ destroy(){this.cancelHint();this.destroyed=true;this.assetCleanup?.();this.stop();this.clearDeparture();cancelAnimationFrame(this.entranceFrame);delete this.viewport.museumWall;clearTimeout(this.clickTimer);this.resize.disconnect();this.visibility.disconnect();this.listeners.forEach(off=>off());}
 }

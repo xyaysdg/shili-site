@@ -26,7 +26,19 @@
 @media print{.record-player{display:none}}
 
 /* V106: the arm pivots about its mounting screw, independently of the disc. */
-.record-arm{position:absolute;left:calc(100% - 4px);top:3px;width:14px;height:45px;transform-origin:44% 13%;transform:rotate(0deg);transition:transform 1s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:3;filter:drop-shadow(0 1px 1px #0007)}
+.record-arm{position:absolute;left:calc(100% - 4px);top:3px;width:14px;height:46.6667px;aspect-ratio:3/10;transform-origin:44% 13%;transform:rotate(0deg);transition:transform 1s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:3;filter:drop-shadow(0 1px 1px #0007)}
 .record-player[data-engaged=true] .record-arm{transform:rotate(30deg)}
-@media(max-width:700px){.record-arm{width:12px;height:38px;top:2px}}
+@media(max-width:700px){.record-arm{width:12px;height:40px;top:2px}}
 @media(prefers-reduced-motion:reduce){.record-arm{transition:none}}
+
+/* Keep the asset at its native aspect ratio; only its rigid pivot rotates. */
+.record-arm-art{display:block;width:100%;height:100%;max-width:none;object-fit:contain;transform:none;transition:none;pointer-events:none}
+#theme-toggle{display:inline-flex;align-items:center;gap:6px}
+.theme-icon{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.45;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+.theme-sun,.theme-moon{transform-origin:center;transition:opacity .5s ease,transform .5s ease}
+.theme-sun{opacity:0;transform:rotate(-70deg) scale(.6)}.theme-moon{opacity:1;transform:rotate(0) scale(1)}
+[data-theme=dark] .theme-sun{opacity:1;transform:rotate(0) scale(1)}[data-theme=dark] .theme-moon{opacity:0;transform:rotate(70deg) scale(.6)}
+.theme-words{display:grid;height:1.5em;overflow:hidden;line-height:1.5;position:relative}.theme-words>span{grid-area:1/1;transition:transform .5s cubic-bezier(.4,0,.2,1),opacity .5s ease}
+.theme-day{transform:translateY(110%);opacity:0}.theme-night{transform:translateY(0);opacity:1}
+[data-theme=dark] .theme-day{transform:translateY(0);opacity:1}[data-theme=dark] .theme-night{transform:translateY(-110%);opacity:0}
+@media(prefers-reduced-motion:reduce){.theme-words>span,.theme-sun,.theme-moon{transition:none}}

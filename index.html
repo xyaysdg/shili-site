@@ -37,6 +37,7 @@
   <script src="article-shelf.js" defer></script>
   <script src="library-corridor.js" defer></script>
   <script src="long-page.js" defer></script>
+  <script src="scene-preload.js" defer></script>
   <script src="magnetic-scroll.js" defer></script>
   <script src="museum-wall.js" defer></script>
   <link rel="stylesheet" href="poetry-garden.css">
@@ -49,6 +50,8 @@
   <script src="record-player.js" defer></script>
   <link rel="stylesheet" href="solar-cycle.css">
   <script src="solar-cycle.js" defer></script>
+  <link rel="stylesheet" href="start-screen.css">
+  <script src="start-screen.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">跳到正文</a>
@@ -65,12 +68,12 @@
     </svg>
   </span>
     </button>
-    <img class="record-arm" src="assets/record-arm-v106.svg" alt="" aria-hidden="true" draggable="false">
-    <audio src="assets/red-rock-riviera-sea-power.mp3" preload="none" loop></audio>
+    <span class="record-arm" aria-hidden="true"><img class="record-arm-art" src="assets/record-arm-v106.svg" alt="" draggable="false"></span>
     <span class="record-status" data-record-status role="status" aria-live="polite" hidden></span>
   </div>
+  <audio data-background-audio src="assets/red-rock-riviera-sea-power.mp3" preload="none" loop></audio>
   <div class="site-shell">
-    <div class="site-corners"><a class="corner-brand" href="#/home" aria-label="十里先生，返回首页">十里<br>先生</a><span id="breadcrumb" hidden></span><nav id="navigation" aria-label="主导航"></nav><div class="corner-tools"><button id="theme-toggle" class="text-tool" aria-label="切换深色模式">◐ <span>夜读模式</span></button></div></div>
+    <div class="site-corners"><a class="corner-brand" href="#/home" aria-label="十里先生，返回首页">十里<br>先生</a><span id="breadcrumb" hidden></span><nav id="navigation" aria-label="主导航"></nav><div class="corner-tools"><button id="theme-toggle" class="text-tool" aria-label="切换深色模式"><svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true"><g class="theme-sun"><circle cx="12" cy="12" r="4"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4.2 4.2l2.1 2.1m11.4 11.4 2.1 2.1M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></g><path class="theme-moon" d="M20.8 14A9 9 0 0 1 10 3.2 9 9 0 1 0 20.8 14Z"/></svg><span class="theme-words" aria-hidden="true"><span class="theme-day">日间模式</span><span class="theme-night">夜读模式</span></span></button></div></div>
     <main id="main" tabindex="-1"></main>
     <footer class="footer"><a href="#/home">十里 <span>SHILI</span></a><p class="footer-easter"><span class="footer-original">嘿嘿，有人知道我为什么名为十里吗</span><a class="footer-game-link" href="https://xyaysdg.github.io/bottle-flip-game/" target="_blank" rel="noopener noreferrer" title="扔瓶子小游戏（新窗口打开）">https://xyaysdg.github.io/bottle-flip-game/ ↗</a></p><a href="#/contact">超微型栗子对撞机 ↗</a></footer>
   </div>

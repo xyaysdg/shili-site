@@ -195,11 +195,14 @@
 .library-dummy .dummy-spine::before,.library-dummy .dummy-spine::after{content:''}
 
 /* V117: a single foreground fade, outside the preserved 3D scene. */
-#section-writing .section-content::after{display:block;content:'';position:absolute;inset:0;pointer-events:none;z-index:4;background:linear-gradient(90deg,#fffefa 32%,#fffefaf7 38%,#fffefaad 46%,#fffefa33 58%,transparent 68%)}
+/* V152: shared opaque stop for rendering and resize-only recycling bounds. */
+#section-writing .section-content{--library-opaque-stop:32%}
+@media(max-width:600px){#section-writing .section-content{--library-opaque-stop:0%}}
+#section-writing .section-content::after{display:block;content:'';position:absolute;inset:0;pointer-events:none;z-index:4;background:linear-gradient(90deg,#fffefa var(--library-opaque-stop),#fffefaf7 38%,#fffefaad 46%,#fffefa33 58%,transparent 68%)}
 #section-writing .library-article-slot{--distance-fog:0%}
 #section-writing .library-article-slot .book-object>span,.library-dummy>i{opacity:1}
 .library-plank,.library-plank-edge{mask-image:none}
-@media(max-width:600px){#section-writing .section-content::after{background:linear-gradient(90deg,#fffefa 0%,#fffefae6 8%,#fffefa66 22%,transparent 40%)}}
+@media(max-width:600px){#section-writing .section-content::after{background:linear-gradient(90deg,#fffefa var(--library-opaque-stop),#fffefae6 8%,#fffefa66 22%,transparent 40%)}}
 
 #section-writing .shelf-book[data-distance-hidden]:not(.is-previewed){visibility:hidden}
 
@@ -218,7 +221,7 @@
 /* V127: editor-only controls; black and gold night library. */
 body:not(.site-editor-active) .book-tuner{display:none}
 html[data-theme="dark"] #section-writing{background:#080808;color:#ebc66c;filter:none;--bridge-top:#080808;--bridge-bottom:#080808}
-html[data-theme="dark"] #section-writing .section-content::after{background:linear-gradient(90deg,#080808 32%,#080808f7 38%,#080808ad 46%,#08080833 58%,transparent 68%)}
+html[data-theme="dark"] #section-writing .section-content::after{background:linear-gradient(90deg,#080808 var(--library-opaque-stop),#080808f7 38%,#080808ad 46%,#08080833 58%,transparent 68%)}
 html[data-theme="dark"] #section-writing .library-dummy i{background:#080808!important;border-color:#eac568;box-shadow:none!important}
 html[data-theme="dark"] #section-writing .dummy-spine::before,html[data-theme="dark"] #section-writing .dummy-spine::after{border-color:#eac568b3}
 html[data-theme="dark"] #section-writing .library-plank,html[data-theme="dark"] #section-writing .library-plank-edge{background:#0d0c09;border-color:#eac568;box-shadow:none}
@@ -226,7 +229,7 @@ html[data-theme="dark"] #section-writing :is(.page-title-row h1,.page-heading>p,
 html[data-theme="dark"] #section-writing :is(.library-index,.library-controls button){background:#13110b;color:#f0d28a;border-color:#c9a354}
 html[data-theme="dark"] #section-writing .library-index a{color:#f0d28a}
 html[data-theme="dark"] #section-writing .inline-search input{color:#f0d28a}
-@media(max-width:600px){html[data-theme="dark"] #section-writing .section-content::after{background:linear-gradient(90deg,#080808 0%,#080808e6 8%,#08080866 22%,transparent 40%)}}
+@media(max-width:600px){html[data-theme="dark"] #section-writing .section-content::after{background:linear-gradient(90deg,#080808 var(--library-opaque-stop),#080808e6 8%,#08080866 22%,transparent 40%)}}
 
 /* V129: blend two captured library surfaces instead of repainting every book. */
 html.library-theme-changing{view-transition-name:none}

@@ -1076,6 +1076,24 @@
           "description": "",
           "width": 2688,
           "height": 1216
+        },
+        {
+          "src": "assets/pantheon-user-v153-1.jpg",
+          "original": "assets/pantheon-user-v153-1.jpg",
+          "thumb": "assets/pantheon-user-v153-1.thumb.jpg",
+          "caption": "",
+          "description": "",
+          "width": 10000,
+          "height": 5000
+        },
+        {
+          "src": "assets/pantheon-user-v153-2.jpg",
+          "original": "assets/pantheon-user-v153-2.jpg",
+          "thumb": "assets/pantheon-user-v153-2.thumb.jpg",
+          "caption": "",
+          "description": "",
+          "width": 10000,
+          "height": 5000
         }
       ],
       "originalId": "section-f_1dab3bb5-abdc-436b-8b37-649c93bb655d",

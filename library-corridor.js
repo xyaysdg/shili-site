@@ -68,16 +68,23 @@ class InfiniteLibrary {
    if(plane){
     const view=getComputedStyle(this.element),style=getComputedStyle(plane),matrix=style.transform.match(/^matrix3d\(([^)]+)\)$/)?.[1].split(',').map(Number),p=parseFloat(view.perspective),origin=parseFloat(style.transformOrigin),camera=parseFloat(view.perspectiveOrigin),rect=this.element.getBoundingClientRect(),width=this.element.clientWidth;
     if(matrix?.length===16&&matrix.every(Number.isFinite)&&p>0&&width>0&&Number.isFinite(origin)&&Number.isFinite(camera)&&!style.transformOrigin.includes('%')&&!view.perspectiveOrigin.includes('%')&&Math.abs(matrix[4])+Math.abs(matrix[6])<1e-8){
+     // V152: recycle behind the opaque foreground, not at a fixed world X.
+     // The same CSS stop drives both themes; include all depth/width corners.
+     const foreground=this.element.closest?.('#section-writing')?.querySelector('.section-content');
+     const foregroundRect=foreground?.getBoundingClientRect();
+     const stop=foreground?parseFloat(getComputedStyle(foreground).getPropertyValue('--library-opaque-stop')):NaN;
+     const opaque=(foregroundRect?.left??rect.left)+(foregroundRect?.width??width)*(Number.isFinite(stop)?stop/100:innerWidth<=600?0:.32);
+     const left=Math.max(0,-rect.left,opaque-rect.left)-48,right=Math.min(width,innerWidth-rect.left)+48;
      const samples=[];let safe=true;
      for(const z of [-160,0]){
       const a=plane.offsetLeft+origin-matrix[0]*origin+matrix[8]*z+matrix[12],b=-matrix[2]*origin+matrix[10]*z+matrix[14];
       for(const x of [100,2969])if(p-b-matrix[2]*x<=1)safe=false;
-      for(const screen of [Math.max(0,-rect.left)-48,Math.min(width,innerWidth-rect.left)+48]){
+      for(const screen of [left,right]){
        const q=(screen-camera)/p,divisor=matrix[0]+q*matrix[2],x=(q*(p-b)-(a-camera))/divisor;
        if(!Number.isFinite(x)||divisor<=1e-6)safe=false;else samples.push(x);
       }
      }
-     if(safe){min=Math.max(100,Math.min(...samples)-49-58);max=Math.min(2920,Math.max(...samples)+58);}
+     if(safe){min=Math.min(...samples)-49-58;max=Math.max(...samples)+58;}
     }
    }
    if(max<=min){min=100;max=2920;}

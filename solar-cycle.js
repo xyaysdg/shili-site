@@ -4,21 +4,30 @@
  const audio=new Audio('assets/solar-destruction.mp3');audio.preload='metadata';audio.volume=.65;
  const button=document.createElement('button');button.type='button';button.className='solar-test';button.textContent='音乐启动';button.title='跳到20分22秒；再次点击跳到22分00秒';
  const notice=document.createElement('span');notice.className='solar-notice';notice.setAttribute('role','status');
- const veil=document.createElement('dialog');veil.className='solar-veil';veil.setAttribute('aria-label','本轮结束，即将返回首页');veil.addEventListener('cancel',e=>e.preventDefault());document.body.append(button,notice,veil);
- let origin=Date.now(),step=0,timer=0,disposed=false,started=false,stopped=false,covered=false,reloading=false,token=0,returning=false,suspended=false,resumeReveal=null;
+ const veil=document.createElement('dialog');veil.className='solar-veil';veil.setAttribute('aria-label','本轮结束，即将返回启动页');veil.addEventListener('cancel',e=>e.preventDefault());document.body.append(button,notice,veil);
+ let origin=Date.now(),step=0,timer=0,disposed=false,started=false,stopped=false,covered=false,reloading=false,token=0,returning=false,suspended=false,resumeReveal=null,musicMuted=false;
+ addEventListener('shili:site-enter',()=>{origin=Date.now();});
  const elapsed=()=>Math.max(0,(Date.now()-origin)/1000);
  audio.addEventListener('loadedmetadata',()=>{if(Number.isFinite(audio.duration)&&audio.duration>0)audio.playbackRate=audio.duration/(STOP-MUSIC);});
- function play(t){started=true;const job=++token;audio.muted=false;try{audio.currentTime=Math.max(0,(t-MUSIC)*audio.playbackRate);}catch{}window.shiliRecordPlayer?.pause();audio.play().then(()=>{if(job!==token)return;if(disposed||suspended||stopped)audio.pause();}).catch(()=>{if(job===token&&!disposed&&!suspended)notice.textContent='浏览器限制了自动播放，本轮音乐未能播放。';});}
+ let audioWaiting=false;
+ function syncRecord(){window.shiliRecordPlayer?.setCycle?.({playing:!musicMuted&&!audio.muted&&!audio.paused&&!audio.ended&&!audio.error&&!audioWaiting&&(audio.readyState===undefined||audio.readyState>=3),toggle:toggleMusic});}
+ const refreshRecord=()=>{if(started&&!stopped&&!disposed&&!returning)syncRecord();};
+ audio.addEventListener('playing',()=>{audioWaiting=false;refreshRecord();});
+ audio.addEventListener('waiting',()=>{audioWaiting=true;refreshRecord();});
+ audio.addEventListener('stalled',()=>{if(audio.readyState<3){audioWaiting=true;refreshRecord();}});
+ for(const event of ['pause','ended','error','volumechange'])audio.addEventListener(event,refreshRecord);
+ function toggleMusic(){if(stopped||elapsed()>=STOP)return;musicMuted=!musicMuted;audio.muted=musicMuted;if(!musicMuted&&audio.paused)play(elapsed());else syncRecord();}
+ function play(t){started=true;const job=++token;audio.muted=musicMuted;try{audio.currentTime=Math.max(0,(t-MUSIC)*audio.playbackRate);}catch{}window.shiliRecordPlayer?.pause();syncRecord();audio.play().then(()=>{if(job!==token)return;if(disposed||suspended||stopped)audio.pause();else syncRecord();}).catch(()=>{if(job===token&&!disposed&&!suspended){musicMuted=true;syncRecord();notice.textContent='点击唱片开启循环音乐，倒计时照常继续。';}});}
  function reset(){
   if(reloading)return;reloading=true;veil.style.backgroundColor='#000';
   // Keep the same top-layer dialog mounted through cleanup and home reconstruction.
   veil.innerHTML='';
   try{window.shiliResetScenes();}catch(error){console.error('Solar scene reset failed',error);}
-  beginReveal();
+  window.shiliOpenStartScreen?.();veil.close();veil.showModal();beginReveal();
  }
  function tick(){
-  if(disposed||suspended||returning||reloading)return;clearTimeout(timer);const t=elapsed();
-  if(t>=STOP&&!stopped){stopped=true;++token;audio.pause();}else if(t>=MUSIC&&t<STOP&&!started)play(t);
+  if(disposed||suspended||returning||reloading)return;clearTimeout(timer);if(document.body.classList.contains('startup-open')){origin=Date.now();timer=setTimeout(tick,250);return;}const t=elapsed();
+  if(t>=STOP&&!stopped){stopped=true;++token;audio.pause();window.shiliRecordPlayer?.setCycle?.(null);}else if(t>=MUSIC&&t<STOP&&!started)play(t);
   if(t>=WHITE&&!document.hidden){
    if(!covered){
     covered=true;button.disabled=true;notice.textContent='';veil.style.opacity='1';
@@ -35,7 +44,7 @@
  function beginReveal(){returning=true;button.disabled=true;
   veil.style.opacity='1';veil.style.backgroundColor='#000';veil.innerHTML='<div class="solar-eyelid solar-eyelid-top"></div><div class="solar-eyelid solar-eyelid-middle"></div><div class="solar-eyelid solar-eyelid-bottom"></div><div class="solar-eye-guard"></div>';veil.showModal();
   let revealing=false,animations=[],revealTimer=0;
-  const finish=()=>{if(disposed||suspended||!returning)return;clearTimeout(revealTimer);veil.close();animations.forEach(a=>a.cancel());veil.innerHTML='';veil.style.cssText='';document.documentElement.classList.remove('solar-returning');origin=Date.now();step=0;started=false;stopped=false;covered=false;reloading=false;audio.currentTime=0;button.textContent='音乐启动';returning=false;resumeReveal=null;button.disabled=false;tick();};
+  const finish=()=>{if(disposed||suspended||!returning)return;clearTimeout(revealTimer);veil.close();animations.forEach(a=>a.cancel());veil.innerHTML='';veil.style.cssText='';document.documentElement.classList.remove('solar-returning');origin=Date.now();step=0;started=false;stopped=false;covered=false;reloading=false;audio.currentTime=0;musicMuted=false;audio.muted=false;window.shiliRecordPlayer?.setCycle?.(null);button.textContent='音乐启动';returning=false;resumeReveal=null;button.disabled=false;tick();};
   const reveal=()=>{if(revealing||disposed||suspended||document.hidden)return;revealing=true;requestAnimationFrame(()=>requestAnimationFrame(()=>{
    if(disposed||suspended||document.hidden){revealing=false;return;}
    scrollTo({top:0,left:0,behavior:'instant'});document.documentElement.classList.remove('solar-returning');const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;const duration=reduced?1500:EYE_MS;
@@ -46,7 +55,7 @@
   if(document.readyState==='complete')reveal();else{addEventListener('load',reveal,{once:true});setTimeout(reveal,5000);}
 
  }
- try{if(sessionStorage.getItem('shili-solar-return')){sessionStorage.removeItem('shili-solar-return');beginReveal();}}catch{document.documentElement.classList.remove('solar-returning');}
+ try{if(sessionStorage.getItem('shili-solar-return')){sessionStorage.removeItem('shili-solar-return');requestAnimationFrame(()=>{window.shiliOpenStartScreen?.();beginReveal();});}}catch{document.documentElement.classList.remove('solar-returning');}
  addEventListener('pagehide',e=>{suspended=true;disposed=!e.persisted;++token;clearTimeout(timer);audio.pause();if(!e.persisted)document.removeEventListener('visibilitychange',visibility);});
  addEventListener('pageshow',e=>{if(!e.persisted||disposed)return;suspended=false;started=false;if(returning)resumeReveal?.();else tick();});tick();
 })();

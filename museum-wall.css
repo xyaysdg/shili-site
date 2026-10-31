@@ -62,8 +62,8 @@
 /* Eased color progression meets both solid sections without a hard change at either end. */
 .section-bridge[data-from="art"][data-to="photography"]{background:linear-gradient(180deg in oklab,var(--bridge-from) 0%,color-mix(in oklab,var(--bridge-from) 97%,var(--bridge-to)) 12%,color-mix(in oklab,var(--bridge-from) 86%,var(--bridge-to)) 25%,color-mix(in oklab,var(--bridge-from) 50%,var(--bridge-to)) 50%,color-mix(in oklab,var(--bridge-from) 14%,var(--bridge-to)) 75%,color-mix(in oklab,var(--bridge-from) 3%,var(--bridge-to)) 88%,var(--bridge-to) 100%)}
 
-#section-art{--bridge-bottom:#102b3a}
-#section-art:has(.museum-stage[data-departure])+.section-bridge{--bridge-from:#102b3a!important}
+#section-art{--bridge-top:#102b3a;--bridge-bottom:#102b3a}
+#section-art:not([data-editor-background]):has(.museum-stage[data-departure])+.section-bridge{--bridge-from:#102b3a}
 .section-bridge{background:linear-gradient(180deg in oklab,var(--bridge-from) 0%,var(--bridge-from) 3%,color-mix(in oklab,var(--bridge-from) 92%,var(--bridge-to)) 22%,color-mix(in oklab,var(--bridge-from) 50%,var(--bridge-to)) 50%,color-mix(in oklab,var(--bridge-from) 8%,var(--bridge-to)) 78%,var(--bridge-to) 97%,var(--bridge-to) 100%)}
 
 /* V43: longer museum dissolve and a solid night-sky handoff before Pantheon stars appear. */
@@ -75,3 +75,15 @@
 .museum-stage::after{left:29%;bottom:42px;width:32px;height:48px;transform:translateX(-50%) scaleY(-.8958333333);transform-origin:50% calc(100% - var(--visitor-sole-inset));background:var(--museum-visitor-image,none) center/contain no-repeat;filter:blur(.45px);mask-image:linear-gradient(transparent,#0009 60%,#000d);opacity:calc(.5 * var(--entrance-person,1))}
 .museum-stage[data-departure]::after{transform:translate(-50%,calc(var(--departure-retreat,0)*160px)) scaleY(-.8958333333)}
 .museum-reflection{filter:blur(.55px);opacity:calc(.65 * var(--entrance-reflection,1));mask-image:linear-gradient(#000e,#0009 45%,transparent)}
+
+/* The reflected wall uses the same paint as the gallery above it. */
+.museum-stage{--museum-wall-color:#102b3a}.museum-backdrop{background:var(--museum-wall-color)}
+.museum-floor{background:linear-gradient(180deg,var(--museum-wall-color),#36505b 64%,#687b83)}
+.museum-drag-hint span{display:inline-block;opacity:0;transition:opacity .5s ease;transition-delay:0s}
+.museum-stage[data-hint=visible] .museum-drag-hint span{opacity:1;transition-delay:calc(var(--char)*70ms)}
+@media(prefers-reduced-motion:reduce){.museum-drag-hint span{transition:none}}
+
+/* V153: quiet recurring invitation, only while the inscription is visible. */
+.museum-stage[data-hint=visible] .museum-drag-hint{animation:museum-hint-breathe 5s ease-in-out infinite}
+@keyframes museum-hint-breathe{0%,100%{text-shadow:0 0 2px #dcefff22}50%{text-shadow:0 0 8px #dcefffaa,0 0 18px #b5dfff55}}
+@media(prefers-reduced-motion:reduce){.museum-stage[data-hint=visible] .museum-drag-hint{animation:none}}

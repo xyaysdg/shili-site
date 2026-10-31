@@ -57,16 +57,16 @@
 #section-journey .medal-exhibit{position:relative;top:auto}
 
 /* One placement and type scale for all full-wall entries, matching the art scene. */
-:is(#section-art,#section-photography,#section-poetry,#section-pantheon,#section-journey) .section-wall-entry{
+:is(#section-art,#section-photography,#section-poetry,#section-writing,#section-pantheon,#section-journey) .section-wall-entry{
  position:absolute;left:74px;right:auto;bottom:14px;z-index:9;display:flex;align-items:center;
  justify-content:flex-start;min-height:42px;margin:0;padding:0;border:0;
  font:13px/1.5 var(--serif);letter-spacing:1px;pointer-events:auto
 }
-:is(#section-art,#section-photography,#section-poetry,#section-pantheon,#section-journey) a.section-wall-entry,
+:is(#section-art,#section-photography,#section-poetry,#section-writing,#section-pantheon,#section-journey) a.section-wall-entry,
 #section-art .section-wall-entry a{text-decoration:underline;text-underline-offset:5px;text-decoration-color:currentColor}
 #section-journey .medal-wall-link{color:#bac0cc}
 @media(max-width:700px){
- :is(#section-art,#section-photography,#section-poetry,#section-pantheon,#section-journey) .section-wall-entry{left:70px;font-size:12px}
+ :is(#section-art,#section-photography,#section-poetry,#section-writing,#section-pantheon,#section-journey) .section-wall-entry{left:70px;font-size:12px}
 }
 @media(max-width:850px){#section-journey>.medal-controls{bottom:64px}}
 
@@ -92,3 +92,34 @@ body #section-journey .page-title-row h1{font-size:clamp(26px,2.1vw,34px);line-h
 .journey-beam::before{content:'';position:absolute;left:42%;top:0;width:16%;height:12%;background:radial-gradient(ellipse,#f4f8ff55, #e7f0ff14 35%,transparent 70%);pointer-events:none}
 @media(max-width:600px){body #section-journey .page-title-row h1{font-size:26px;white-space:normal;text-wrap:balance;overflow-wrap:anywhere}}
 @media print{#section-journey .journey-copy .journey-text-face{text-shadow:none}#section-journey .medal-stage::after{display:none}}
+
+/* Wall links share the art entrance: 2.6 seconds of rest, then a 0.6 second fade. */
+.long-page .section-wall-entry{opacity:0!important;visibility:hidden;pointer-events:none!important;transition:opacity .6s ease,visibility 0s .6s}
+.long-page .section-wall-entry[data-entry-visible=true]{opacity:1!important;visibility:visible;pointer-events:auto!important;transition:opacity .6s ease,visibility 0s}
+body.directory-travel .section-wall-entry,body.startup-open .section-wall-entry{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+#section-writing .section-wall-entry{color:var(--ink);text-decoration:underline;text-underline-offset:5px}
+.writing-full-wall{padding-bottom:80px}.article-wall-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(290px,100%),1fr));gap:28px}.article-wall-list>a{padding:28px;border:1px solid #8884;border-radius:4px}.article-wall-list h2{font-size:22px}.article-wall-list span{font-size:12px;opacity:.65}.article-wall-list p{font-size:14px;line-height:1.9;opacity:.8}
+.intro-about-title h2{font-size:28px!important}
+@media(max-width:700px){.intro-about-title h2{font-size:23px!important}}
+@media(prefers-reduced-motion:reduce){.long-page .section-wall-entry{transition:none}}
+#main.long-page .section-wall-entry:not([data-entry-visible=true]){visibility:hidden!important;pointer-events:none!important}
+#main.long-page .section-wall-entry[data-entry-visible=true]{visibility:visible!important;translate:none!important}
+
+/* V153: text and medal use the same responsive exhibition area. */
+@media(min-width:851px){
+ body.long-mode #section-journey .section-content{max-width:none;width:min(88vw,calc(var(--journey-room) * 2.2));margin-inline:auto}
+ body.long-mode #section-journey .journey-layout{gap:clamp(30px,4vw,120px);grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ body.long-mode #section-journey .journey-copy .prose{font-size:clamp(14px,min(1.15vw,1.85svh),34px);line-height:1.9;max-width:none}
+ body.long-mode #section-journey .page-title-row h1{font-size:clamp(28px,min(2.65vw,4.3svh),76px)}
+ body.long-mode #section-journey .journey-milestone-title{font-size:clamp(18px,min(1.65vw,2.65svh),46px)}
+ body.long-mode #section-journey .eyebrow{font-size:clamp(10px,min(.75vw,1.2svh),20px)}
+}
+@media(min-width:851px){
+ body.long-mode #section-journey .section-content{width:min(92vw,calc(var(--journey-room) * 2.45))}
+ body.long-mode #section-journey .journey-layout{grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);gap:3vw}
+ body.long-mode #section-journey .page-heading{padding:0 0 10px;margin:0 0 10px}
+ body.long-mode #section-journey .page-title-row h1{margin:8px 0 10px}
+ body.long-mode #section-journey .journey-copy .prose{line-height:1.65}
+ body.long-mode #section-journey .journey-copy .prose p{margin-bottom:.65em}
+}
+@media(min-width:851px){body.long-mode #section-journey .journey-copy{max-width:none}}

@@ -46,7 +46,7 @@ function milestoneMedalMarkup(){
  return `<section class="medal-exhibit" data-medal-asset="blender-v37" aria-labelledby="medal-title"><header class="medal-exhibit-heading"><span class="eyebrow">2025 / RUNNING MILESTONE</span><h2 id="medal-title">2025个人跑步生涯1000公里目标达成！</h2></header>
  <div class="medal-stage"><div class="medal-shadow" aria-hidden="true"></div><div class="medal-orbit" tabindex="0" role="group" aria-roledescription="可旋转的三维徽章" aria-label="1000公里纪念徽章。首次记录2021年2月2日，达成日期2025年12月18日。">
  <div class="medal-rotor" aria-hidden="true"><div class="medal-edge"></div><div class="medal-face medal-front">${face(false)}<img class="medal-reference-front" src="assets/medal-blender-v37-front.webp" loading="lazy" alt=""><span class="medal-glint"></span></div><div class="medal-face medal-back">${face(true)}<img class="medal-reference-back" src="assets/medal-blender-v37-back.webp" loading="lazy" alt=""><span class="medal-glint"></span></div></div></div></div>
- <div class="medal-controls"><div><button class="medal-pause" aria-pressed="false">暂停转动 Ⅱ</button><button class="medal-flip">查看背面 ↻</button><button class="medal-reset">复位 ↺</button></div></div>
+
  <a class="medal-wall-link section-wall-entry" data-journey-image href="#/wall/journey">查看完整勋章墙 ↗</a><span class="visually-hidden medal-status" role="status" aria-live="polite"></span></section>`;
 }
 
@@ -86,17 +86,19 @@ class MilestoneMedal {
   this.intersection=new IntersectionObserver(es=>{this.visible=es[0].isIntersecting;this.wake();});this.intersection.observe(root);
   this.mutation=new MutationObserver(()=>{if(document.body.classList.contains('modal-open'))this.cancelDrag();this.wake();});this.mutation.observe(document.body,{attributes:true,attributeFilter:['class']});
   this.paint();this.sync();
-  this.modelPreload=new IntersectionObserver(entries=>{if(!entries.some(e=>e.isIntersecting))return;this.modelPreload.disconnect();import('./medal-blender-model.js').then(m=>this.destroyed?null:m.createMedalModel(root,{pitch:this.pitch,yaw:this.yaw})).then(model=>{if(this.destroyed){model?.dispose();return;}this.meshModel=model;this.previous=0;this.paint();}).catch(()=>{if(!this.destroyed){root.dataset.medalRenderer='fallback';this.status.textContent='当前设备未能启用三维渲染，显示兼容版徽章。';}});},{rootMargin:'700px'});this.modelPreload.observe(root);
+  const loadModel=()=>{if(this.destroyed)return;if(this.modelLoading)return this.modelPromise;this.modelLoading=true;this.modelPreload.disconnect();return this.modelPromise=import('./medal-blender-model.js').then(m=>this.destroyed?null:m.createMedalModel(root,{pitch:this.pitch,yaw:this.yaw})).then(model=>{if(this.destroyed){model?.dispose();return;}this.meshModel=model;this.previous=0;this.paint();}).catch(()=>{if(!this.destroyed){root.dataset.medalRenderer='fallback';this.status.textContent='当前设备未能启用三维渲染，显示兼容版徽章。';}});};this.preload=loadModel;
+  this.modelPreload=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting))loadModel();},{rootMargin:'700px'});this.modelPreload.observe(root);
+  this.listen(window,'shili:scene-prepare',e=>{if(e.detail.id==='journey')loadModel();});
  }
- listen(el,event,fn){el.addEventListener(event,fn);this.listeners.push(()=>el.removeEventListener(event,fn));}
+ listen(el,event,fn){if(!el)return;el.addEventListener(event,fn);this.listeners.push(()=>el.removeEventListener(event,fn));}
  resetPosition(){this.paused=true;this.targetYaw=this.nearestFace(2.2,this.yaw);this.targetPitch=-3.07;this.sync();this.wake();}
  nearestFace(offset,reference){return Math.round((reference-offset)/360)*360+offset;}
  toggleMotion(){if(this.reduced.matches)return;if(this.paused){this.paused=false;this.baseYaw=this.yaw;this.basePitch=this.pitch;this.startDelay=0;this.time=0;}else{this.paused=true;this.targetYaw=this.yaw;this.targetPitch=this.pitch;}this.sync();this.wake();}
  cancelDrag(){if(!this.drag)return;const id=this.drag.id;this.drag=null;this.root.classList.remove('is-dragging');if(this.orbit.hasPointerCapture(id))this.orbit.releasePointerCapture(id);this.targetYaw=this.yaw;this.targetPitch=this.pitch;}
- sync(){this.pause.disabled=this.reduced.matches;this.pause.textContent=this.reduced.matches?'已减少动态':this.paused?'继续转动 ▷':'暂停转动 Ⅱ';this.pause.setAttribute('aria-pressed',String(this.paused));this.flip.dataset.face=Math.cos(this.targetYaw*Math.PI/180)>=0?'front':'back';this.flip.textContent=this.flip.dataset.face==='front'?'查看背面 ↻':'查看正面 ↻';}
+ sync(){if(!this.pause||!this.flip)return;this.pause.disabled=this.reduced.matches;this.pause.textContent=this.reduced.matches?'已减少动态':this.paused?'继续转动 ▷':'暂停转动 Ⅱ';this.pause.setAttribute('aria-pressed',String(this.paused));this.flip.dataset.face=Math.cos(this.targetYaw*Math.PI/180)>=0?'front':'back';this.flip.textContent=this.flip.dataset.face==='front'?'查看背面 ↻':'查看正面 ↻';}
  wake(){if(this.destroyed)return;if(!this.visible||document.hidden||document.body.classList.contains('modal-open')){cancelAnimationFrame(this.frame);this.frame=0;return;}if(!this.frame){this.previous=0;this.frame=requestAnimationFrame(t=>this.tick(t));}}
- // Integral of a 1.5-second smoothstep speed ramp, then 3 degrees/second.
- turnOffset(time,delay){const t=Math.max(0,time-delay),ramp=1.5,u=Math.min(1,t/ramp);return 3*(t<ramp?ramp*(u*u*u-.5*u*u*u*u):t-ramp/2);}
+ // Integral of a 5-second smoothstep speed ramp, then 3 degrees/second.
+ turnOffset(time,delay){const t=Math.max(0,time-delay),ramp=5,u=Math.min(1,t/ramp);return 3*(t<ramp?ramp*(u*u*u-.5*u*u*u*u):t-ramp/2);}
  tick(t){
   this.frame=0;if(this.destroyed||!this.visible||document.hidden||document.body.classList.contains('modal-open'))return;const elapsed=this.previous?Math.max(0,(t-this.previous)/1000):0,dt=Math.min(elapsed,.05);this.previous=t;
   if(!this.paused&&!this.drag&&!this.reduced.matches&&(this.meshModel||this.root.dataset.medalRenderer==='fallback')){this.time+=elapsed;this.targetYaw=this.baseYaw-this.turnOffset(this.time,this.startDelay);this.targetPitch=this.basePitch;}

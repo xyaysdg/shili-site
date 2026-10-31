@@ -28,7 +28,7 @@ class SectionEntrance {
    fade('.page-title-row,.page-heading>.eyebrow',1000,1100);fade('.page-heading>p',1500,1200);
    fade('.library-viewport',2100,1900);
    // Reverse the extraction vector in the book's own 3D coordinates.
-   for(const el of this.section.querySelectorAll('.library-article-slot .book-motion')){const a=el.animate([{transform:'translate3d(0,0,calc(var(--book-depth) + 260px))',offset:0},{transform:'translate3d(0,0,0)',offset:1}],{delay:3100,duration:4400,easing:'cubic-bezier(.35,.05,.3,1)',fill:'both'});a.pause();a.currentTime=0;this.animations.push(a);}
+   for(const el of this.section.querySelectorAll('.library-article-slot .book-motion')){const a=el.animate([{transform:'translate3d(0,0,calc(var(--book-depth) * .5 + 130px))',offset:0},{transform:'translate3d(0,0,0)',offset:1}],{delay:3100,duration:4400,easing:'cubic-bezier(.35,.05,.3,1)',fill:'both'});a.pause();a.currentTime=0;this.animations.push(a);}
    this.add('.library-article-slot .book-object>span',{opacity:0},{opacity:'var(--distance-alpha,1)'},3100,2400);
    fade('.library-letters',5900,1600);fade('.writing-tools,.library-controls,.shelf-results-heading',7500,1000);
   }else if(this.kind==='photography'){
@@ -51,4 +51,16 @@ class SectionEntrance {
  sync(){if(document.body.classList.contains('site-editor-active')){this.finish();return;}if(this.destroyed||this.section.dataset.sceneEntrance!=='playing')return;const paused=!this.visible||document.hidden||document.body.classList.contains('modal-open');this.animations.forEach(a=>{if(a.playState==='finished')return;if(paused)a.pause();else if(a.playState!=='running')a.play();});}
  finish(){if(this.destroyed)return;this.section.dataset.sceneEntrance='ready';if(this.kind==='photography')this.section.photography?.bridgeLayers?.forEach(el=>el.dataset.sceneEntrance='ready');this.animations.forEach(a=>{a.onfinish=null;a.cancel();});this.animations=[];this.controls.forEach(e=>e.inert=false);if(this.kind==='photography')this.section.photography?.syncAtmosphere();}
  destroy(){this.finish();this.destroyed=true;this.observer.disconnect();this.extentObserver.disconnect();this.modal.disconnect();this.listeners.forEach(off=>off());}
+}
+class WallEntryReveal {
+ constructor(){
+  this.links=[...document.querySelectorAll('.long-page .section-wall-entry')];this.timers=new Map();this.pending=false;
+  this.visible=el=>{const r=el.closest('[data-section]').getBoundingClientRect();return Math.min(innerHeight,r.bottom)-Math.max(0,r.top)>=Math.min(innerHeight,r.height)*.8;};
+  this.sync=()=>{for(const el of this.links){const allowed=!document.hidden&&!document.body.classList.contains('startup-open')&&!document.body.classList.contains('directory-travel')&&!this.pending&&this.visible(el);if(!allowed){clearTimeout(this.timers.get(el));this.timers.delete(el);el.dataset.entryVisible='false';el.inert=true;}else if(el.dataset.entryVisible!=='true'&&!this.timers.has(el)){this.timers.set(el,setTimeout(()=>{this.timers.delete(el);if(this.visible(el)&&!this.pending){el.dataset.entryVisible='true';el.inert=false;}},matchMedia('(prefers-reduced-motion: reduce)').matches?0:2600));}}};
+  this.prepare=()=>{this.pending=true;this.sync();};this.arrive=()=>{this.pending=false;this.sync();};
+  this.observer=new IntersectionObserver(this.sync,{threshold:[0,.2,.8,1]});this.links.forEach(el=>{el.inert=true;el.dataset.entryVisible='false';this.observer.observe(el.closest('[data-section]'));});
+  this.bodyObserver=new MutationObserver(this.sync);this.bodyObserver.observe(document.body,{attributes:true,attributeFilter:['class']});
+  this.handlers=[[window,'shili:scene-prepare',this.prepare],[window,'shili:scene-arrive',this.arrive],[window,'shili:scene-cancel',this.arrive],[window,'shili:site-enter',this.sync],[document,'visibilitychange',this.sync]];this.handlers.forEach(([el,type,fn])=>el.addEventListener(type,fn));this.sync();
+ }
+ destroy(){this.timers.forEach(clearTimeout);this.timers.clear();this.observer.disconnect();this.bodyObserver.disconnect();this.handlers.forEach(([el,type,fn])=>el.removeEventListener(type,fn));}
 }

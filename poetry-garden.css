@@ -125,3 +125,23 @@ body.long-mode #section-poetry.long-section{transition:background-color .5s ease
 .poetry-garden::after{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 45% 40%,#383b3d 0%,transparent 72%);mask-image:linear-gradient(transparent,#000 18%,#000 82%,transparent);opacity:0;transition:opacity .5s ease}
 html[data-theme="dark"] .poetry-garden::after{opacity:var(--poetry-glow,0)}
 @media(prefers-reduced-motion:reduce){.poetry-garden::after{transition:none}html[data-theme="dark"] .poetry-garden::after{opacity:1}}
+
+/* Title trails the existing paper arrival by one second. */
+.poetry-garden:not([data-entrance="waiting"]) .poetry-intro{transition-delay:1s}
+@media(prefers-reduced-motion:reduce){.poetry-garden .poetry-intro{transition-delay:0s}}
+
+/* One captured crossfade avoids repainting dozens of blurred cards during theme changes. */
+html.poetry-theme-changing{view-transition-name:none}
+html.poetry-theme-changing #section-poetry{view-transition-name:poetry-theme}
+html.poetry-theme-changing #section-poetry,html.poetry-theme-changing .poetry-garden,
+html.poetry-theme-changing .poetry-garden::before,html.poetry-theme-changing .poetry-garden::after,
+html.poetry-theme-changing .poetry-intro p,html.poetry-theme-changing .poetry-intro>span,
+html.poetry-theme-changing .poetry-fall-toggle,html.poetry-theme-changing .poetry-about{transition:none!important}
+::view-transition-group(poetry-theme){animation-duration:.5s;animation-timing-function:linear}
+::view-transition-old(poetry-theme){animation:none;opacity:1;mix-blend-mode:normal}
+::view-transition-new(poetry-theme){animation:poetry-theme-reveal .5s linear both;mix-blend-mode:normal}
+@keyframes poetry-theme-reveal{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){::view-transition-group(poetry-theme),::view-transition-new(poetry-theme){animation:none}}
+
+/* V151: the heading develops in place. */
+.poetry-garden .poetry-intro{translate:none!important;transform:none!important;transition-property:opacity!important}

@@ -98,6 +98,7 @@ class PoetryGarden{
  clamp(x){return Math.max(Math.min(0,this.width-this.worldWidth),Math.min(0,x));}
  layout(){
   const previous=this.nodes;
+  if(previous&&this.width===this.space.clientWidth&&this.height===this.space.clientHeight)return;
   this.width=this.space.clientWidth;this.height=this.space.clientHeight;
   const small=innerWidth<=760,span=this.width,base=Math.min(278,this.height*.25,this.width*.23),baseOrder=[1,7,14,3,2,5,9,13,4,15,6,0,8,10,11,12],order=[...baseOrder.filter(i=>i<this.pages.length),...this.pages.map((_,i)=>i).filter(i=>!baseOrder.includes(i))];
   // Screen-space composition is converted to one shared 1000px perspective volume.
@@ -169,6 +170,7 @@ class PoetryGarden{
   this.densityGroups=[{nodes:this.nodes,limit:small?5:9,decor:false},{nodes:this.decorNodes,limit:small?17:27,decor:true}];
   for(const group of this.densityGroups){
    const pool=group.nodes.filter(n=>n.chance>0),count=Math.min(group.limit,pool.length);
+   group.margin=Math.max(this.height*.5,...group.nodes.map(n=>n.margin+90));
    group.slots=[];group.rate=1;group.clock=previousGroups?.find(g=>g.decor===group.decor)?.clock||0;
    for(const n of group.nodes){n.scheduled=false;n.admitted=false;n.pose=null;n.avoidX=0;}
    for(let k=0;k<count;k++){
@@ -194,9 +196,15 @@ class PoetryGarden{
   const random=((Math.sin((selected.i+1)*127.1+(slot.index+1)*311.7+(selected.laps||0)*73.3)*43758.5453)%1+1)%1;selected.laps=(selected.laps||0)+1;
   selected.entryStart=group.decor?(slot.index===0?0:slot.index*.65+random*.4):2.8+slot.index*1.15+random*.6;selected.entryLength=(group.decor?8:7.5)+random*3;
   selected.anchor=group.decor?.12+((slot.index*.61803398875)%1)*.76:Math.max(.10,Math.min(.90,.18+(slot.index%lanes)*.64/(lanes-1)+(random-.5)*.24));
-  selected.screenY=selected.flowTop+slot.phase*selected.flowSpan+selected.flowSpan*.10/Math.max(1,Math.min(group.limit,group.nodes.filter(n=>n.chance>0).length))*Math.sin(group.clock*(group.decor?.7:.35)+slot.index*2.4);selected.travel=selected.margin+selected.screenY;
+  selected.screenY=selected.flowTop+slot.phase*selected.flowSpan+selected.flowSpan*.10/Math.max(1,Math.min(group.limit,group.nodes.filter(n=>n.chance>0).length))*Math.sin(group.clock*(group.decor?.7:.35)+slot.index*2.4);selected.screenY=this.flowExitPosition(selected.screenY,group);selected.travel=selected.margin+selected.screenY;
   // Limit the catch-up speed of lower slots instead of giving every distance the same duration.
   selected.entryLength=Math.max(selected.entryLength,1.5*(Math.max(0,selected.screenY)+selected.margin+40)/(group.decor?65:85));
+ }
+ flowExitPosition(y,group){
+  // Keep the same on-screen density; widen only the hidden ends of the loop.
+  const side=y<0?-1:y>this.height?1:0;if(!side)return y;
+  const t=Math.min(1,(side<0?-y:y-this.height)/(this.height*.5)),extra=Math.max(0,group.margin-this.height*.5);
+  return y+side*extra*t*t*(3-2*t);
  }
  advanceFall(dt){
   if(!this.densityGroups||this.motion.matches||this.paused||!this.entered||this.entranceTime<.35)return;
@@ -208,7 +216,7 @@ class PoetryGarden{
    for(const slot of group.slots){
     let n=slot.node;const held=!group.decor&&(this.focus===n.i||this.hover===n.i);n.motionRate+=((held?0:1)-n.motionRate)*(1-Math.exp(-dt/.25));if(held&&n.motionRate<.002)n.motionRate=0;const step=dt*group.rate*n.motionRate;slot.phase+=step*n.fallSpeed/n.flowSpan;
     if(slot.phase>=1){slot.phase-=1;this.assignFlowSlot(group,slot);n=slot.node;}
-    n.age+=step;n.driftTime=(n.driftTime??group.clock)+step;const drift=n.flowSpan*.10/Math.max(1,group.slots.length)*Math.sin(n.driftTime*(group.decor?.7:.35)+slot.index*2.4);n.screenY=n.flowTop+slot.phase*n.flowSpan+drift;n.travel=n.margin+n.screenY;
+    n.age+=step;n.driftTime=(n.driftTime??group.clock)+step;const drift=n.flowSpan*.10/Math.max(1,group.slots.length)*Math.sin(n.driftTime*(group.decor?.7:.35)+slot.index*2.4);n.screenY=this.flowExitPosition(n.flowTop+slot.phase*n.flowSpan+drift,group);n.travel=n.margin+n.screenY;
    }
   }
  }

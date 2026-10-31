@@ -105,3 +105,7 @@ button.photo-print{cursor:grab;pointer-events:auto}
 .photo-bridge-decor[data-scene-entrance="ready"]{opacity:1}
 .photo-hanging>.photo-wall-link{position:absolute;left:74px;bottom:14px;z-index:9;margin:0;min-height:40px;border:0;font-size:13px;line-height:1.5;display:inline-flex;align-items:center}
 @media(max-width:700px){.photo-hanging>.photo-wall-link{left:70px;font-size:12px;bottom:max(14px,calc(900px - 100svh + 14px))}}
+
+/* Use the same opaque night color at both bridge boundaries. */
+:root[data-theme=dark] #section-photography{--bridge-top:#20241f;--bridge-bottom:#20241f}
+:root[data-theme=dark] .photo-hanging{background:#20241f}

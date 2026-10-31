@@ -2,7 +2,8 @@ import * as T from './three.module.min.js';
 import {GLTFLoader} from './GLTFLoader.js';
 // Keep the author's materials and lighting; the gravity renderer owns the GPU.
 export async function loadChestnutModel(host){
- const gltf=await new GLTFLoader().loadAsync('./assets/chestnut-v39.glb');
+ const url=new URL('./assets/chestnut-v39.glb',import.meta.url).href,loader=new GLTFLoader();
+ const gltf=window.shiliSceneResources&&location.protocol!=='file:'?await loader.parseAsync((await window.shiliSceneResources.model(url)).slice(0),new URL('.',url).href):await loader.loadAsync(url);
  const scene=new T.Scene(),camera=new T.PerspectiveCamera(32,1,.1,30),pivot=new T.Group();
  scene.add(pivot);camera.position.set(0,.15,4.4);camera.lookAt(0,0,0);
  const box=new T.Box3().setFromObject(gltf.scene),size=box.getSize(new T.Vector3()),center=box.getCenter(new T.Vector3()),scale=2.05/Math.max(size.x,size.y,size.z);

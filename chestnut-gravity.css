@@ -75,3 +75,8 @@ body:has(#navigation a[href='#/contact'].active) .corner-brand,body:has(#navigat
 
 /* Keep recovery available on touch screens as well. */
 .chestnut-gravity[data-status=fallback] [data-chestnut-home]{display:inline-block}
+
+.chestnut-exchange[data-chestnut-message]{position:relative;isolation:isolate;color:#f4dfb9;text-shadow:0 0 7px #edc27d55}
+.chestnut-exchange[data-chestnut-message]::before{content:'';position:absolute;inset:3px -12px;z-index:-1;pointer-events:none;border-radius:50%;background:radial-gradient(ellipse,#edbd7040,transparent 70%);opacity:.2;animation:chestnut-invite-breathe 4s ease-in-out infinite}
+@keyframes chestnut-invite-breathe{0%,100%{opacity:.2}50%{opacity:.85}}
+@media(prefers-reduced-motion:reduce){.chestnut-exchange[data-chestnut-message]::before{animation:none;opacity:.35}}

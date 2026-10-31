@@ -40,21 +40,22 @@ function galleryPage(id) {
 
 function aboutPage() {return `${pageHeading('about')}<div class="about-grid"><div class="about-photo">${picture(photos[0])}<span class="photo-caption">本人</span></div><div class="about-copy">${D.sections.about.html}</div></div>`; }
 
-function writingPage() {if(!categories().includes(articleCategory))articleCategory='全部';return `${pageHeading('writing',intro.writing)}<div class="writing-tools"><div class="filter-list" aria-label="文章分类">${categories().map(c=>`<button class="filter ${articleCategory===c?'active':''}" data-category="${E(c)}" aria-pressed="${articleCategory===c}">${E(c)}</button>`).join('')}</div><div class="writing-search-row"><label class="inline-search"><span class="visually-hidden">搜索文章</span><input id="article-search" type="search" value="${E(articleQuery)}" placeholder="搜索文章…"></label><button type="button" class="library-index-toggle" aria-expanded="false" aria-controls="library-index">查看全部文章</button></div></div><div id="article-results" class="shelf-results"></div>`; }
+function writingPage(full=false) {if(!full)return `${pageHeading('writing',intro.writing)}<div id="article-results" class="shelf-results"></div><a class="section-wall-entry" href="#/wall/writing">查看完整文章墙 ↗</a>`;if(!categories().includes(articleCategory))articleCategory='全部';return `${pageHeading('writing',intro.writing)}<div class="writing-tools"><div class="filter-list" aria-label="文章分类">${categories().map(c=>`<button class="filter ${articleCategory===c?'active':''}" data-category="${E(c)}" aria-pressed="${articleCategory===c}">${E(c)}</button>`).join('')}</div><div class="writing-search-row"><label class="inline-search"><span class="visually-hidden">搜索文章</span><input id="article-search" type="search" value="${E(articleQuery)}" placeholder="搜索文章…"></label></div></div><div id="article-results" class="shelf-results"></div>`; }
 function updateArticles() {
  const root=$('#article-results');if(!root)return;
- const query=articleQuery.toLowerCase();
- const results=sortedArticles.filter(a=>(articleCategory==='全部'||a.category===articleCategory)&&(!query||(a.title+a.text).toLowerCase().includes(query)));
+ const full=!!root.closest('.writing-full-wall'),query=full?articleQuery.toLowerCase():'';
+ const results=sortedArticles.filter(a=>(!full||articleCategory==='全部'||a.category===articleCategory)&&(!query||(a.title+a.text).toLowerCase().includes(query)));
  // Editor/content refresh creates a new root; this cache lives only with its rendered content.
  const previous=root.articleMatches;
  if(previous&&previous.length===results.length&&results.every((a,i)=>a===previous[i]))return;
  root.articleMatches=results;
+ if(root.closest('.writing-full-wall')){root.innerHTML=`<p class="results-count" role="status">共 ${results.length} 篇文章</p><div class="article-wall-list">${results.map(a=>`<a href="#/article/${E(a.slug)}"><h2>${E(a.title)}</h2><span>${E(a.category||'')} · ${E(a.date||'')}</span><p>${E(a.text.slice(0,110))}…</p></a>`).join('')||'<p>没有找到匹配的文章，请调整筛选条件。</p>'}</div>`;return;}
  const reused=results.length&&root.querySelector('.library-viewport')?.library?.replaceArticles(results);
  if(reused){
-  root.querySelector('.results-count').textContent=`共 ${results.length} 篇文章`;
+  if(root.querySelector('.results-count'))root.querySelector('.results-count').textContent=`共 ${results.length} 篇文章`;
   const index=root.querySelector('.library-index');index.innerHTML=libraryIndexLinks(results);index.hidden=true;
  }else{
- root.innerHTML=`<div class="shelf-results-heading"><p class="results-count" role="status">共 ${results.length} 篇文章</p><span class="shelf-desktop-hint">左右拖动 · 悬停抽书 · 点击阅读</span><span class="shelf-touch-hint">轻触预览 · 再次点击阅读</span></div>`+(results.length?corridorMarkup(sortedArticles,results):'<div class="empty-state">这一页暂时没有找到结果。<br><button class="text-tool" id="clear-article-search">清空筛选</button></div>');
+ root.innerHTML=(sortedArticles.length?corridorMarkup(sortedArticles,sortedArticles):'<div class="empty-state">这一页暂时没有找到结果。<br><button class="text-tool" id="clear-article-search">清空筛选</button></div>');
  }
  const indexToggle=$('.library-index-toggle');if(indexToggle){indexToggle.disabled=!results.length;indexToggle.setAttribute('aria-expanded','false');}
  $('#clear-article-search')?.addEventListener('click',()=>{
@@ -80,7 +81,7 @@ function articlePage(slug) {const a=D.articles.find(a=>a.slug===slug);if(!a)retu
 
 function journeyPage() {const s=D.sections.journey; const paras=s.paragraphs.filter(p=>!['一步。一个。脚印。','还没有什么着墨的成长记录~建设ing...','2025个人跑步生涯1000公里目标达成！','感想'].includes(p));return `<div class="journey-layout"><div class="journey-floor" aria-hidden="true"></div><div class="journey-copy">${pageHeading('journey')}<h2 class="journey-milestone-title">2025个人跑步生涯1000公里目标达成！</h2><div class="journey-story"><div class="prose">${paras.map(p=>`<p>${E(p)}</p>`).join('')}</div></div></div>${milestoneMedalMarkup()}</div>`; }
 function pantheonPage() {return '<header class="pantheon-heading"><h1>万神殿</h1><p>我见证过无数世界</p></header>'+movingWall('pantheon'); }
-function contactPage(){return `<div class="chestnut-gravity" data-chestnut-gravity data-status="loading"><div class="chestnut-fallback" aria-hidden="true"><img src="assets/chestnut-v39-preview.png" alt=""></div><div class="chestnut-canvas"><a class="chestnut-friend-link" data-chestnut-friend href="https://caienqi.mysxl.cn/" tabindex="-1" aria-label="另一个顶有趣的灵魂。前往蔡恩淇的博客">另一个顶有趣的灵魂。</a><button class="chestnut-core-handle" data-chestnut-handle data-gravity-drag-handle aria-label="拖动栗子，方向键移动，Home复位"></button></div><div class="chestnut-copy"><h1>超微型栗子对撞机</h1><p>灵魂是比粒子（质子）更大的栗子，虽说与大型粒子对撞机相比，撞不出黑洞，更撞不出宇宙。但我相信两个灵魂的碰撞，是比宇宙大爆炸更耀眼的东西。</p><button class="chestnut-exchange" data-chestnut-message>与十里交流 ↗</button></div><div class="chestnut-tools"><button data-chestnut-pause aria-pressed="false">暂停流动</button><button data-chestnut-home>回到中心</button><span class="chestnut-help">拖动栗子 · 点击泛起涟漪</span></div><dialog class="chestnut-message" aria-labelledby="chestnut-message-title"><div class="chestnut-message-heading"><h2 id="chestnut-message-title">与十里交流</h2><button data-chestnut-close aria-label="关闭留言">×</button></div><form id="contact-form" class="contact-form"><label for="contact-name">请问如何称呼？</label><input id="contact-name" name="name" maxlength="80" placeholder="你的名字或昵称" required><label for="contact-message">我期待与任何人进行一场深度的交流</label><textarea id="contact-message" name="message" rows="7" placeholder="此刻，你在想些什么？" required maxlength="10000"></textarea><p class="form-note">这里可以保存本机草稿。想把话送达十里，请前往原站的留言区。</p><div class="form-actions"><button class="button outline" type="submit">保留留言草稿</button><a class="button primary" href="https://xyay.mysxl.cn/#_9" target="_blank" rel="noopener noreferrer">启动对撞机 ↗</a></div><p class="draft-status" id="draft-status" role="status"></p></form></dialog></div>`;}
+function contactPage(){return `<div class="chestnut-gravity" data-chestnut-gravity data-status="loading"><div class="chestnut-fallback" aria-hidden="true"><img src="assets/chestnut-v39-preview.png" alt=""></div><div class="chestnut-canvas"><a class="chestnut-friend-link" data-chestnut-friend href="https://caienqi.mysxl.cn/" tabindex="-1" aria-label="另一个顶有趣的灵魂。前往蔡恩淇的博客">另一个顶有趣的灵魂。</a><button class="chestnut-core-handle" data-chestnut-handle data-gravity-drag-handle aria-label="拖动栗子，方向键移动，Home复位"></button></div><div class="chestnut-copy"><h1>超微型栗子对撞机</h1><p>灵魂是比粒子（质子）更大的栗子，虽说与大型粒子对撞机相比，撞不出黑洞，更撞不出宇宙。但我相信两个灵魂的碰撞，是比宇宙大爆炸更耀眼的东西。</p><button class="chestnut-exchange" data-chestnut-message>与十里交流 ↗</button></div><div class="chestnut-tools"><button data-chestnut-retry hidden>重新加载</button></div><dialog class="chestnut-message" aria-labelledby="chestnut-message-title"><div class="chestnut-message-heading"><h2 id="chestnut-message-title">与十里交流</h2><button data-chestnut-close aria-label="关闭留言">×</button></div><form id="contact-form" class="contact-form"><label for="contact-name">请问如何称呼？</label><input id="contact-name" name="name" maxlength="80" placeholder="你的名字或昵称" required><label for="contact-message">我期待与任何人进行一场深度的交流</label><textarea id="contact-message" name="message" rows="7" placeholder="此刻，你在想些什么？" required maxlength="10000"></textarea><p class="form-note">这里可以保存本机草稿。想把话送达十里，请前往原站的留言区。</p><div class="form-actions"><button class="button outline" type="submit">保留留言草稿</button><a class="button primary" href="https://xyay.mysxl.cn/#_9" target="_blank" rel="noopener noreferrer">启动对撞机 ↗</a></div><p class="draft-status" id="draft-status" role="status"></p></form></dialog></div>`;}
 /* One motion engine shared by photography, artwork and the pantheon. */
 const wallOrders = new Map();
 let wallCleanup = [];
@@ -96,12 +97,13 @@ function shuffled(id){
 }
 function movingWall(id,compact=false){
  const items=D.sections[id].gallery;
- if(id==='pantheon')return `<section class="flow-wall diagonal-wall cinema-wall" data-flow-wall data-group="pantheon" aria-label="万艺殿星群作品"><div class="flow-viewport"><div class="flow-field"></div></div><div class="flow-bottom"><button class="flow-toggle" aria-pressed="false">暂停漂浮 Ⅱ</button></div><a class="flow-wall-link section-wall-entry" href="#/wall/pantheon">查看完整游戏墙 ↗</a></section>`;
+ if(id==='pantheon')return `<section class="flow-wall diagonal-wall cinema-wall" data-flow-wall data-group="pantheon" aria-label="万艺殿星群作品"><div class="flow-viewport"><div class="flow-field"></div></div><a class="flow-wall-link section-wall-entry" href="#/wall/pantheon">查看完整游戏墙 ↗</a></section>`;
  const label={art:'绘画',photography:'摄影',pantheon:'万艺殿',poetry:'诗稿'}[id];
  const en={art:'ARTWORK',photography:'PHOTOGRAPHY',pantheon:'PANTHEON',poetry:'POETRY'}[id];
  return `<section class="flow-wall diagonal-wall ${compact?'compact':''} ${id==='pantheon'?'cinema-wall':id==='poetry'?'poem-wall':''}" data-flow-wall data-group="${id}" aria-label="${label}流动作品墙"><div class="flow-top"><span>${String(items.length).padStart(2,'0')} / ${en}</span><a href="#/wall/${id}">${wallLabel(id)} ↗</a></div><div class="flow-viewport"><div class="flow-field"></div></div><div class="flow-bottom"><span>悬停定格 · 点击放大</span><button class="flow-toggle" aria-pressed="false">暂停流动 Ⅱ</button></div></section>`;
 }
 function fullWallPage(id){
+ if(id==='writing')return '<div class="writing-full-wall"><a href="#/writing" class="arrow-link">← 返回书架</a>'+writingPage(true)+'</div>';
  if(window.shiliSiteEditor?.panels.nav().some(n=>n.id===id)&&(window.shiliSiteEditor.active||!['art','photography','pantheon','poetry'].includes(id)))return window.shiliSiteEditor.panels.wallMarkup(id);
  if(!['art','photography','pantheon','poetry'].includes(id))return homePage();
  const items=D.sections[id].gallery;
@@ -111,43 +113,46 @@ function initWalls(){
  $$('[data-flow-wall]').forEach(wall=>{
   const id=wall.dataset.group;
   const Engine=id==='pantheon'?ConstellationWall:DiagonalWall;
-  const field=new Engine(wall,D.sections[id].gallery,id==='poetry'?D.sections[id].gallery.map((_,i)=>i):shuffled(id),
-   (index,trigger)=>openGallery(D.sections[id].gallery,index,trigger));
-  wallCleanup.push(()=>field.destroy());
+  if(id==='pantheon')wall.classList.add('constellation-wall');
+  wallCleanup.push(mountSceneWhenNeeded(wall,()=>new Engine(wall,D.sections[id].gallery,id==='poetry'?D.sections[id].gallery.map((_,i)=>i):shuffled(id),
+   (index,trigger)=>openGallery(D.sections[id].gallery,index,trigger))));
  });
 }
 
 function getRoute() { let hash=location.hash.slice(1);if(hash==='/friend'||hash==='friend'||hash==='_10'){history.replaceState(null,'','#/contact');return 'contact';}if(/^_\d+$/.test(hash)) return namesFromIndex(Number(hash.slice(1))-1);if(!hash&&location.pathname.includes('/blog/'))return 'article/'+location.pathname.split('/blog/')[1].replace(/\/$/,'');return hash.replace(/^\//,'')||'home'; }
 function namesFromIndex(i) {return D.navigation[i]?.id||'home';}
 let longPage=null;
-function render() {
- experience.close(true);experience.pageCleanup();cleanupWalls();longPage=null;
- const route=getRoute();activeRoute=route;const [id,slug]=route.split('/');const detail=id==='article'||id==='wall';
+function render(route=getRoute()) {
+ const departing=longPage;longPage=null;departing?.destroy();
+ experience.close(true);experience.pageCleanup();cleanupWalls();
+ if(getRoute()!==route)history.replaceState(null,'','#/'+route);
+ activeRoute=route;const [id,slug]=route.split('/');const detail=id==='article'||id==='wall';
  const navId=id==='article'?'writing':id==='wall'?slug:id;
  const title=id==='article'?D.articles.find(a=>a.slug===slug)?.title:displayTitles[navId];document.title=(title?title+' · ':'')+'十里 · 内陆帝国';
  $('#navigation').innerHTML=navigation.map((n,i)=>`<a href="#/${n.id}" class="nav-link ${navId===n.id?'active':''}" ${navId===n.id?'aria-current="page"':''}><span class="nav-label">${E(n.label)}</span><span class="nav-number" aria-hidden="true">${String(i+1).padStart(2,'0')}</span></a>`).join('');
  $('#main').className=detail?(id==='article'?'main-content reading-main':'main-content'):'main-content long-page';
  document.body.classList.toggle('long-mode',!detail);document.body.classList.toggle('pantheon-page',detail&&navId==='pantheon');
  $('#main').innerHTML=detail?(id==='article'?articlePage(slug):fullWallPage(slug)):longPageMarkup();
- closeMenu();bindPage();if(!detail){updateArticles();longPage=new MagneticPageController();wallCleanup.push(()=>longPage?.destroy());}
+ closeMenu();bindPage();if(detail&&slug==='writing')updateArticles();if(!detail){updateArticles();longPage=new MagneticPageController();wallCleanup.push(()=>longPage?.destroy());}
 }
 function bindPage() {
+ if(document.querySelector('.long-page')){const entries=new WallEntryReveal();wallCleanup.push(()=>entries.destroy());}
  const nightPortrait=document.querySelector('.intro-portrait-night');
  if(nightPortrait){const ready=()=>{if(nightPortrait.naturalWidth)nightPortrait.classList.add('is-ready');};if(nightPortrait.complete)ready();else nightPortrait.addEventListener('load',ready,{once:true});}
 
  $$('.editor-wall-card').forEach(button=>button.addEventListener('click',()=>{const editor=window.shiliSiteEditor;if(editor.active&&!editor.previewing)return;const record=editor.catalog().find(r=>r.id===button.dataset.workId);if(!record||!record.visible)return;if(record.kind==='article')location.hash='#/article/'+record.item.slug;else {const item=record.item;openGallery([{...item,src:item.src||editor.poemImage(item.title,item.body),caption:record.title}],0,button);}}));
  const chestnutRoot=$('[data-chestnut-gravity]');if(chestnutRoot){const chestnut=new ChestnutGravity(chestnutRoot);wallCleanup.push(()=>chestnut.destroy());}
- const poetryRoot=document.querySelector('[data-poetry-garden]');if(poetryRoot){const garden=new PoetryGarden(poetryRoot);wallCleanup.push(()=>garden.destroy());}
- const photoRoot=$('[data-photo-hanging]');if(photoRoot&&photos.length){const hanging=new HangingPhotography(photoRoot,photos,(index,trigger)=>openGallery(photos,index,trigger));wallCleanup.push(()=>hanging.destroy());}
- const museumRoot=$('[data-museum-wall]');if(museumRoot&&D.sections.art.gallery.length){const museum=new MuseumWall(museumRoot,D.sections.art.gallery);wallCleanup.push(()=>museum.destroy());}
+ const poetryRoot=document.querySelector('[data-poetry-garden]');if(poetryRoot)wallCleanup.push(mountSceneWhenNeeded(poetryRoot,()=>new PoetryGarden(poetryRoot)));
+ const photoRoot=$('[data-photo-hanging]');if(photoRoot&&photos.length)wallCleanup.push(mountSceneWhenNeeded(photoRoot,()=>new HangingPhotography(photoRoot,photos,(index,trigger)=>openGallery(photos,index,trigger))));
+ const museumRoot=$('[data-museum-wall]');if(museumRoot&&D.sections.art.gallery.length)wallCleanup.push(mountSceneWhenNeeded(museumRoot,()=>new MuseumWall(museumRoot,D.sections.art.gallery)));
  if(photoRoot&&!photos.length)photoRoot.querySelector('.photo-depths').innerHTML='<p class="empty-state">暂时没有摄影作品，可在编辑器中添加或恢复。</p>';
  if(museumRoot&&!D.sections.art.gallery.length){museumRoot.innerHTML='<p class="empty-state">暂时没有画作，可在编辑器中添加或恢复。</p>';museumRoot.parentElement.dataset.entrance='ready';}
  initWalls();
  experience.mountArticle();
  const shelfRoot=$('#article-results');
- if(shelfRoot){const shelf=new ArticleShelfInteraction(shelfRoot);wallCleanup.push(()=>shelf.destroy());}
+ if(shelfRoot&&!shelfRoot.closest('.writing-full-wall'))wallCleanup.push(mountSceneWhenNeeded(shelfRoot,()=>new ArticleShelfInteraction(shelfRoot)));
  const medalRoot=$('.medal-exhibit');
- if(medalRoot){const medal=new MilestoneMedal(medalRoot);const stage=new JourneyStage(medalRoot.closest('#section-journey'));wallCleanup.push(()=>{stage.destroy();medal.destroy();});}
+ if(medalRoot)wallCleanup.push(mountSceneWhenNeeded(medalRoot,()=>{const medal=new MilestoneMedal(medalRoot);const stage=new JourneyStage(medalRoot.closest('#section-journey'));return {preload:()=>medal.preload(),destroy(){stage.destroy();medal.destroy();}};}));
  $('[data-home-image]')?.addEventListener('click',e=>openGallery([{src:D.sections.home.images[0],caption:''}],0,e.currentTarget));
 $$('[data-gallery]:not(.drift-card):not(.star-card):not(.museum-frame):not(#poetry-resume)').forEach(b=>b.addEventListener('click',()=>openGallery(D.sections[b.dataset.gallery].gallery,Number(b.dataset.index),b)));$$('[data-density]').forEach(b=>b.addEventListener('click',()=>{const n=b.dataset.density;$('#gallery-grid').style.setProperty('--columns',n);$$('[data-density]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',String(x===b));});}));$$('[data-category]').forEach(b=>b.addEventListener('click',()=>selectArticleCategory(b.dataset.category)));bindArticleSearch();$('#reading-size')?.addEventListener('click',()=>{$('.article-body').classList.toggle('large-type');$('#reading-size').textContent=$('.article-body').classList.contains('large-type')?'标准字号 Aa':'大字号 Aa';});$('#copy-article')?.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(location.href);toast('文章链接已复制');}catch{toast('请复制浏览器地址栏中的文章链接');}});bindArticleImages($('#main'));$('#contact-form')?.addEventListener('submit',e=>{e.preventDefault();try{localStorage.setItem('shili-message-draft',JSON.stringify({name:$('#contact-name').value,message:$('#contact-message').value}));$('#draft-status').textContent='草稿已保存在此浏览器，尚未发送。';}catch{$('#draft-status').textContent='浏览器不允许保存草稿，请手动复制后到原站留言。';}});if($('#contact-form')){try{const d=JSON.parse(localStorage.getItem('shili-message-draft')||'null');if(d){$('#contact-name').value=d.name;$('#contact-message').value=d.message;$('#draft-status').textContent='已恢复本机草稿，尚未发送。';}}catch{}}}
 
@@ -171,27 +176,28 @@ function toast(message){$('#toast').textContent=message;$('#toast').classList.ad
 function openSearch(){$('#search-dialog').showModal();document.body.classList.add('modal-open');$('#global-search').focus();search();}
 function search(){const q=$('#global-search').value.trim().toLowerCase();const articles=sortedArticles.filter(a=>!q||(a.title+a.text).toLowerCase().includes(q));const nav=navigation.filter(n=>q&&n.label.includes(q));$('#search-results').innerHTML=nav.map(n=>`<a href="#/${n.id}"><span>栏目</span><strong>${E(n.label)}</strong><i>↗</i></a>`).join('')+articles.map(a=>`<a href="#/article/${E(a.slug)}"><span>${E(a.category)}</span><strong>${E(a.title)}</strong><i>↗</i></a>`).join('')||'<p class="empty-state">没有找到相关内容，换个词试试。</p>';$$('#search-results a').forEach(a=>a.addEventListener('click',()=>$('#search-dialog').close()));}
 $('#global-search').addEventListener('input',search);$('#search-dialog').addEventListener('close',()=>document.body.classList.remove('modal-open'));$('#search-dialog').addEventListener('click',e=>{if(e.target===$('#search-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}});
-document.addEventListener('keydown',e=>{if(e.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)&&!document.activeElement.isContentEditable&&!document.querySelector('dialog[open]')){e.preventDefault();openSearch();}if(e.key==='Escape'){const dialog=$('#lightbox').open?$('#lightbox'):document.querySelector('dialog[open]');if(dialog){e.preventDefault();if(dialog.id==='lightbox')experience.close();else dialog.close();}closeMenu();}},true);
+document.addEventListener('keydown',e=>{if(e.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)&&!document.activeElement.isContentEditable&&!document.querySelector('dialog[open]')){e.preventDefault();openSearch();}if(e.key==='Escape'){const dialog=$('#lightbox').open?$('#lightbox'):document.querySelector('dialog[open]');if(dialog){e.preventDefault();if(dialog.id==='lightbox')experience.close();else if(dialog.smoothClose)dialog.smoothClose();else if(!dialog.classList.contains('site-start'))dialog.close();}closeMenu();}},true);
 function closeMenu(){$('body').classList.remove('menu-open');}
 $('#mobile-shade').addEventListener('click',closeMenu);
-function setTheme(dark){document.documentElement.dataset.theme=dark?'dark':'light';$('#theme-toggle span').textContent=dark?'日间模式':'夜读模式';$('#theme-toggle').setAttribute('aria-label',dark?'切换浅色模式':'切换深色模式');try{localStorage.setItem('shili-theme',dark?'dark':'light');}catch{}}
+function setTheme(dark){document.documentElement.dataset.theme=dark?'dark':'light';$('#theme-toggle').setAttribute('aria-label',dark?'切换浅色模式':'切换深色模式');try{localStorage.setItem('shili-theme',dark?'dark':'light');}catch{}}
 let libraryThemeTransition=null,requestedTheme=null;
 function changeTheme(dark){
  requestedTheme=dark;
  if(libraryThemeTransition){libraryThemeTransition.skipTransition();return;}
  const library=document.querySelector('#section-writing'),rect=library?.getBoundingClientRect();
- const visible=rect&&Math.min(rect.bottom,innerHeight)-Math.max(rect.top,0)>innerHeight*.4;
+ const poemRect=document.querySelector('#section-poetry')?.getBoundingClientRect(),poetryVisible=poemRect&&Math.min(poemRect.bottom,innerHeight)-Math.max(poemRect.top,0)>innerHeight*.4;
+ const visible=poetryVisible||(rect&&Math.min(rect.bottom,innerHeight)-Math.max(rect.top,0)>innerHeight*.4),themeClass=poetryVisible?'poetry-theme-changing':'library-theme-changing';
  if(!visible||!document.startViewTransition||matchMedia('(prefers-reduced-motion: reduce)').matches){setTheme(dark);return;}
- document.documentElement.classList.add('library-theme-changing');
+ document.documentElement.classList.add(themeClass);
  try{
   const transition=document.startViewTransition(()=>setTheme(dark));libraryThemeTransition=transition;
   transition.ready.catch(()=>{});
   transition.finished.catch(()=>{}).finally(()=>{
    if(libraryThemeTransition!==transition)return;
-   libraryThemeTransition=null;document.documentElement.classList.remove('library-theme-changing');
+   libraryThemeTransition=null;document.documentElement.classList.remove('library-theme-changing','poetry-theme-changing');
    if(requestedTheme!==(document.documentElement.dataset.theme==='dark'))changeTheme(requestedTheme);
   });
- }catch{document.documentElement.classList.remove('library-theme-changing');setTheme(dark);}
+ }catch{document.documentElement.classList.remove('library-theme-changing','poetry-theme-changing');setTheme(dark);}
 }
 try{setTheme(localStorage.getItem('shili-theme')==='dark');}catch{}$('#theme-toggle').addEventListener('click',()=>changeTheme(!(requestedTheme??(document.documentElement.dataset.theme==='dark'))));
 function finishPage(){
@@ -204,7 +210,9 @@ $('#lightbox-wall').addEventListener('click',()=>experience.close(true));
 if('scrollRestoration' in history)history.scrollRestoration='manual';
 document.addEventListener('click',e=>{
  const link=e.target.closest('a[href^="#/"]');if(!link||e.defaultPrevented||e.button!==0||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;
- const id=link.getAttribute('href').slice(2);if(!longPage||!navigation.some(n=>n.id===id))return;
+ const id=link.getAttribute('href').slice(2);
+ if(longPage&&/^(wall|article)\//.test(id)){e.preventDefault();history.pushState(null,'','#/'+id);routeChanged();return;}
+ if(!longPage||!navigation.some(n=>n.id===id))return;
  e.preventDefault();if($('#search-dialog').open)$('#search-dialog').close();experience.close(true);
  savedScroll.set(activeRoute,scrollY);history.pushState(null,'','#/'+id);longPage.scrollToSection(id,true);
 });

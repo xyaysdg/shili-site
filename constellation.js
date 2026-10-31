@@ -29,7 +29,7 @@ class ConstellationWall {
     return {shell:copy,button:target,shift};
    });
   });
-  this.listen(this.toggle,'click',()=>{this.manualPause=!this.manualPause;this.update();});
+  if(this.toggle)this.listen(this.toggle,'click',()=>{this.manualPause=!this.manualPause;this.update();});
   this.listen(this.motion,'change',()=>{this.manualPause=this.motion.matches;this.paint();this.update();});
   this.listen(document,'visibilitychange',()=>this.update());
   this.resize=new ResizeObserver(()=>this.layout());this.resize.observe(this.viewport);
@@ -65,7 +65,7 @@ class ConstellationWall {
   if(this.destroyed)return;
   if(document.body.classList.contains('site-editor-active')){this.entranceTime=20;this.paint();}
   this.stopped=document.body.classList.contains('site-editor-active')||(this.manualPause&&this.entranceTime>=9.4)||this.motion.matches||!this.visible||document.hidden||document.body.classList.contains('modal-open');
-  this.wall.dataset.motion=this.stopped?'paused':'running';this.toggle.disabled=this.motion.matches;this.toggle.textContent=this.motion.matches?'已减少动态':this.manualPause?'继续漂浮 ▷':'暂停漂浮 Ⅱ';this.toggle.setAttribute('aria-pressed',String(this.manualPause||this.motion.matches));
+  this.wall.dataset.motion=this.stopped?'paused':'running';if(this.toggle){this.toggle.disabled=this.motion.matches;this.toggle.textContent=this.motion.matches?'已减少动态':this.manualPause?'继续漂浮 ▷':'暂停漂浮 Ⅱ';this.toggle.setAttribute('aria-pressed',String(this.manualPause||this.motion.matches));}
   if(!this.stopped&&!this.frame){this.previous=0;this.frame=requestAnimationFrame(t=>this.tick(t));}
   if(this.stopped){cancelAnimationFrame(this.frame);this.frame=0;}
  }
@@ -97,7 +97,7 @@ class ConstellationWall {
   this.section?.style.setProperty('--pantheon-glow',ease(2,3.2));
   this.section?.style.setProperty('--pantheon-title',ease(.15,1.35));
   this.wall.dataset.entrance=t>=9.4?'ready':t<1.4?'title':t<5.9?'pictures':t<7.9?'lines':'stars';
-  this.sky.style.opacity=finish;this.wall.style.setProperty("--pantheon-stars",finish);
+  this.sky.style.opacity=ease(1.35,2.55);this.wall.style.setProperty("--pantheon-stars",finish);
   for(const el of this.entranceControls){el.style.opacity=finish;el.inert=finish<.1;}
   for(const n of this.nodes){const opacity=ease(1.4+n.index*.43,2.8+n.index*.43);for(const el of [n.shell,...n.copies.map(c=>c.shell)]){el.style.opacity=opacity;el.inert=opacity<.3;}}
    this.entrancePainted=t>=9.4;

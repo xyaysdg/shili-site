@@ -14,3 +14,5 @@ dialog.solar-veil{background:transparent;box-shadow:none;transform:none;backdrop
 .solar-white,.solar-black,.solar-eye-guard{position:absolute;inset:0;pointer-events:none;will-change:opacity}
 .solar-white{background:#fff}.solar-black,.solar-eye-guard{background:#000}
 dialog.solar-veil{transition:none!important;animation:none!important;backdrop-filter:none;-webkit-backdrop-filter:none}
+
+.solar-test{display:none!important}
