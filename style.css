@@ -94,3 +94,23 @@ html:is(.library-theme-changing,.poetry-theme-changing) .corner-tools{view-trans
 ::view-transition-group(theme-record),::view-transition-group(theme-navigation),::view-transition-group(theme-brand),::view-transition-group(theme-tools){z-index:10;animation:none}
 ::view-transition-old(theme-record),::view-transition-old(theme-navigation),::view-transition-old(theme-brand),::view-transition-old(theme-tools){display:none}
 ::view-transition-new(theme-record),::view-transition-new(theme-navigation),::view-transition-new(theme-brand),::view-transition-new(theme-tools){animation:none;opacity:1;mix-blend-mode:normal}
+
+/* V155: one viewport snapshot preserves fixed chrome's original stacking order.
+   The older section-specific classes are no longer applied by changeTheme. */
+html.site-theme-changing{view-transition-name:root}
+/* Preserve the theme button's sliding labels and sun/moon motion. */
+html.site-theme-changing *:not(#theme-toggle *),html.site-theme-changing *:not(#theme-toggle *)::before,html.site-theme-changing *:not(#theme-toggle *)::after{transition:none!important}
+html.site-theme-changing::view-transition{pointer-events:none}
+html.site-theme-changing::view-transition-group(root){animation:none}
+html.site-theme-changing::view-transition-image-pair(root){isolation:isolate}
+html.site-theme-changing::view-transition-old(root){animation:none;opacity:1;mix-blend-mode:normal}
+html.site-theme-changing::view-transition-new(root){animation:site-theme-reveal .5s ease-in-out both;mix-blend-mode:normal}
+@keyframes site-theme-reveal{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){html.site-theme-changing::view-transition-new(root){animation:none}}
+
+/* V158: the spinning record is live in a separate opaque snapshot, never crossfaded. */
+html.site-theme-changing .record-player{view-transition-name:site-record}
+html.site-theme-changing::view-transition-group(site-record){z-index:10;animation:none}
+html.site-theme-changing::view-transition-image-pair(site-record){isolation:isolate}
+html.site-theme-changing::view-transition-old(site-record){animation:none;opacity:0;mix-blend-mode:normal}
+html.site-theme-changing::view-transition-new(site-record){animation:none;opacity:1;mix-blend-mode:normal}

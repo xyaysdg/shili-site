@@ -184,20 +184,18 @@ let libraryThemeTransition=null,requestedTheme=null;
 function changeTheme(dark){
  requestedTheme=dark;
  if(libraryThemeTransition){libraryThemeTransition.skipTransition();return;}
- const library=document.querySelector('#section-writing'),rect=library?.getBoundingClientRect();
- const poemRect=document.querySelector('#section-poetry')?.getBoundingClientRect(),poetryVisible=poemRect&&Math.min(poemRect.bottom,innerHeight)-Math.max(poemRect.top,0)>innerHeight*.4;
- const visible=poetryVisible||(rect&&Math.min(rect.bottom,innerHeight)-Math.max(rect.top,0)>innerHeight*.4),themeClass=poetryVisible?'poetry-theme-changing':'library-theme-changing';
- if(!visible||!document.startViewTransition||matchMedia('(prefers-reduced-motion: reduce)').matches){setTheme(dark);return;}
+ const themeClass='site-theme-changing';
+ if(!document.startViewTransition||matchMedia('(prefers-reduced-motion: reduce)').matches){setTheme(dark);return;}
  document.documentElement.classList.add(themeClass);
  try{
   const transition=document.startViewTransition(()=>setTheme(dark));libraryThemeTransition=transition;
   transition.ready.catch(()=>{});
   transition.finished.catch(()=>{}).finally(()=>{
    if(libraryThemeTransition!==transition)return;
-   libraryThemeTransition=null;document.documentElement.classList.remove('library-theme-changing','poetry-theme-changing');
+   libraryThemeTransition=null;document.documentElement.classList.remove('site-theme-changing');
    if(requestedTheme!==(document.documentElement.dataset.theme==='dark'))changeTheme(requestedTheme);
   });
- }catch{document.documentElement.classList.remove('library-theme-changing','poetry-theme-changing');setTheme(dark);}
+ }catch{document.documentElement.classList.remove('site-theme-changing');setTheme(dark);}
 }
 try{setTheme(localStorage.getItem('shili-theme')==='dark');}catch{}$('#theme-toggle').addEventListener('click',()=>changeTheme(!(requestedTheme??(document.documentElement.dataset.theme==='dark'))));
 function finishPage(){

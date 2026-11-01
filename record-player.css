@@ -42,3 +42,8 @@
 .theme-day{transform:translateY(110%);opacity:0}.theme-night{transform:translateY(0);opacity:1}
 [data-theme=dark] .theme-day{transform:translateY(0);opacity:1}[data-theme=dark] .theme-night{transform:translateY(-110%);opacity:0}
 @media(prefers-reduced-motion:reduce){.theme-words>span,.theme-sun,.theme-moon{transition:none}}
+
+/* V157: only the day/night character slides; the suffix stays anchored. */
+.theme-label{display:inline-flex;align-items:center;gap:0;white-space:nowrap}
+.theme-label .theme-words{width:1em;flex:0 0 1em}
+.theme-suffix{display:inline-block;transform:none;opacity:1}
