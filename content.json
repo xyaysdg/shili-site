@@ -1094,6 +1094,15 @@
           "description": "",
           "width": 10000,
           "height": 5000
+        },
+        {
+          "src": "assets/pantheon-user-v159.png",
+          "original": "assets/pantheon-user-v159.png",
+          "thumb": "assets/pantheon-user-v159.thumb.jpg",
+          "caption": "",
+          "description": "",
+          "width": 2560,
+          "height": 1599
         }
       ],
       "originalId": "section-f_1dab3bb5-abdc-436b-8b37-649c93bb655d",

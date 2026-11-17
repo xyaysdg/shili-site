@@ -81,3 +81,8 @@ body:not(.site-editor-active) .start-aura-panel{display:none!important}
 .start-enter.needs-click::before{content:"";position:absolute;left:50%;top:50%;width:calc(100% + 40px);height:calc(100% + 26px);margin:0;border:1px solid #ffffffb0;border-radius:50%;box-shadow:0 0 12px #ffffff55;pointer-events:none;opacity:0;transform:translate(-50%,-50%);animation:start-invite 2.8s ease-out 1.4s infinite}
 .site-start.is-entering .start-enter.needs-click::before{animation-play-state:paused;opacity:0!important;visibility:hidden}
 @media(prefers-reduced-motion:reduce){.start-enter.needs-click::before{display:none}}
+/* V160: phone welcome composition, matching the supplied placement reference. */
+@media(max-width:700px){
+ .site-start .start-enter{font-size:clamp(20px,6.7vw,42px);line-height:1.4;white-space:normal;text-wrap:balance}
+ .site-start .start-mobile-note{position:fixed;left:8%;top:71%;width:84%;max-width:none;margin:0;font-size:clamp(10px,2.65vw,16px);line-height:1.9;text-align:center}
+}
